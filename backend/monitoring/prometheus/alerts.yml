@@ -1,0 +1,65 @@
+groups:
+  - name: agentwatch_alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(errors_total[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate ({{ $value | humanizePercentage }})"
+          description: "Error rate is {{ $value | humanizePercentage }} for the last 5 minutes (threshold: 5%)."
+
+      - alert: HighAuthFailureRate
+        expr: rate(auth_failures_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High authentication failure rate"
+          description: "Auth failures are at {{ $value | humanize }} per second averaged over 5 minutes (threshold: 10)."
+
+      - alert: HighAPILatency
+        expr: histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, method, path)) > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API latency (p99 > 5s)"
+          description: "p99 latency for {{ $labels.method }} {{ $labels.path }} is {{ $value }}s (threshold: 5s)."
+
+      - alert: WorkflowFailures
+        expr: rate(workflow_duration_seconds_count{status="failure"}[10m]) > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Workflow failures detected"
+          description: "Workflows are failing at {{ $value }} executions per second over 10 minutes."
+
+      - alert: RateLimitViolationSpike
+        expr: rate(rate_limit_violations_total[5m]) > 50
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Rate limit violation spike"
+          description: "Rate limit violations are at {{ $value }} per second (threshold: 50)."
+
+      - alert: QueueDepthHigh
+        expr: queue_depth > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Queue depth exceeds 100"
+          description: "Queue {{ $labels.queue_name }} depth is {{ $value }} (threshold: 100)."
+
+      - alert: InstanceDown
+        expr: up{job="agentwatch-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "AgentWatch API instance down"
+          description: "Instance {{ $labels.instance }} has been down for more than 1 minute."

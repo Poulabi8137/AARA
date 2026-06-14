@@ -1,0 +1,301 @@
+{
+  "__inputs": [],
+  "__requires": [],
+  "id": null,
+  "title": "AgentWatch Alerts",
+  "tags": ["agentwatch", "alerts"],
+  "style": "dark",
+  "timezone": "browser",
+  "editable": true,
+  "hideControls": false,
+  "graphTooltip": 0,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Alert Rules",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }
+    },
+    {
+      "id": 2,
+      "title": "High Error Rate (>5%)",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 1 },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 2.5 },
+              { "color": "red", "value": 5 }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(errors_total[5m]) / rate(http_requests_total[5m])",
+          "legendFormat": "error_ratio",
+          "interval": "15s"
+        }
+      ],
+      "alert": {
+        "alertRuleTags": { "severity": "critical" },
+        "conditions": [
+          {
+            "evaluator": { "params": [0.05], "type": "gt" },
+            "operator": { "type": "and" },
+            "query": { "params": ["A", "5m", "now"] },
+            "reducer": { "params": [], "type": "avg" },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "60s",
+        "handler": 1,
+        "name": "High Error Rate",
+        "noDataState": "no_data",
+        "notifications": []
+      },
+      "description": "Alerts when error rate exceeds 5% over 5 minutes"
+    },
+    {
+      "id": 3,
+      "title": "Auth Failure Rate",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 1 },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 5 },
+              { "color": "red", "value": 10 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(auth_failures_total[5m])",
+          "legendFormat": "auth_failures",
+          "interval": "15s"
+        }
+      ],
+      "alert": {
+        "alertRuleTags": { "severity": "warning" },
+        "conditions": [
+          {
+            "evaluator": { "params": [10], "type": "gt" },
+            "operator": { "type": "and" },
+            "query": { "params": ["A", "5m", "now"] },
+            "reducer": { "params": [], "type": "avg" },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "60s",
+        "handler": 1,
+        "name": "High Auth Failure Rate",
+        "noDataState": "no_data",
+        "notifications": []
+      },
+      "description": "Alerts when auth failures exceed 10 per 5 minutes"
+    },
+    {
+      "id": 4,
+      "title": "API Latency p99 > 5s",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 9 },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 2.5 },
+              { "color": "red", "value": 5 }
+            ]
+          },
+          "unit": "s"
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p99",
+          "interval": "15s"
+        }
+      ],
+      "alert": {
+        "alertRuleTags": { "severity": "warning" },
+        "conditions": [
+          {
+            "evaluator": { "params": [5], "type": "gt" },
+            "operator": { "type": "and" },
+            "query": { "params": ["A", "5m", "now"] },
+            "reducer": { "params": [], "type": "avg" },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "60s",
+        "handler": 1,
+        "name": "High API Latency",
+        "noDataState": "no_data",
+        "notifications": []
+      },
+      "description": "Alerts when p99 latency exceeds 5 seconds"
+    },
+    {
+      "id": 5,
+      "title": "Workflow Failures",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 9 },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 0 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(workflow_duration_seconds_count{status=\"failure\"}[10m])",
+          "legendFormat": "workflow_failures",
+          "interval": "15s"
+        }
+      ],
+      "alert": {
+        "alertRuleTags": { "severity": "critical" },
+        "conditions": [
+          {
+            "evaluator": { "params": [0], "type": "gt" },
+            "operator": { "type": "and" },
+            "query": { "params": ["A", "10m", "now"] },
+            "reducer": { "params": [], "type": "avg" },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "60s",
+        "handler": 1,
+        "name": "Workflow Failures",
+        "noDataState": "no_data",
+        "notifications": []
+      },
+      "description": "Alerts when any workflow failures are detected"
+    },
+    {
+      "id": 6,
+      "title": "Rate Limit Violations",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 17 },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 25 },
+              { "color": "red", "value": 50 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(rate_limit_violations_total[5m])",
+          "legendFormat": "violations",
+          "interval": "15s"
+        }
+      ],
+      "alert": {
+        "alertRuleTags": { "severity": "warning" },
+        "conditions": [
+          {
+            "evaluator": { "params": [50], "type": "gt" },
+            "operator": { "type": "and" },
+            "query": { "params": ["A", "5m", "now"] },
+            "reducer": { "params": [], "type": "avg" },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "60s",
+        "handler": 1,
+        "name": "Rate Limit Violation Spike",
+        "noDataState": "no_data",
+        "notifications": []
+      },
+      "description": "Alerts when rate limit violations spike above 50 per second"
+    },
+    {
+      "id": 7,
+      "title": "Queue Depth",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 17 },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 50 },
+              { "color": "red", "value": 100 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "queue_depth",
+          "legendFormat": "{{ queue_name }}",
+          "interval": "15s"
+        }
+      ],
+      "alert": {
+        "alertRuleTags": { "severity": "warning" },
+        "conditions": [
+          {
+            "evaluator": { "params": [100], "type": "gt" },
+            "operator": { "type": "and" },
+            "query": { "params": ["A", "5m", "now"] },
+            "reducer": { "params": [], "type": "avg" },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "60s",
+        "handler": 1,
+        "name": "Queue Depth High",
+        "noDataState": "no_data",
+        "notifications": []
+      },
+      "description": "Alerts when queue depth exceeds 100"
+    }
+  ],
+  "schemaVersion": 36,
+  "version": 1,
+  "refresh": "30s"
+}

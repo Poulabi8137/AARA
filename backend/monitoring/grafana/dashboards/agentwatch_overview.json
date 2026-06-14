@@ -1,0 +1,547 @@
+{
+  "__inputs": [],
+  "__requires": [],
+  "id": null,
+  "title": "AgentWatch Platform Overview",
+  "tags": ["agentwatch", "platform"],
+  "style": "dark",
+  "timezone": "browser",
+  "editable": true,
+  "hideControls": false,
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "id": 1,
+      "title": "API Overview",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }
+    },
+    {
+      "id": 2,
+      "title": "API Request Rate",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 1 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total[1m]))",
+          "legendFormat": "RPS",
+          "interval": "15s"
+        },
+        {
+          "expr": "sum(rate(http_requests_total{status=\"2xx\"}[1m]))",
+          "legendFormat": "2xx",
+          "interval": "15s"
+        },
+        {
+          "expr": "sum(rate(http_requests_total{status=\"4xx\"}[1m]))",
+          "legendFormat": "4xx",
+          "interval": "15s"
+        },
+        {
+          "expr": "sum(rate(http_requests_total{status=\"5xx\"}[1m]))",
+          "legendFormat": "5xx",
+          "interval": "15s"
+        }
+      ],
+      "description": "HTTP request rate by status class"
+    },
+    {
+      "id": 3,
+      "title": "API Latency (p50/p95/p99)",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 1 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p50",
+          "interval": "15s"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p95",
+          "interval": "15s"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p99",
+          "interval": "15s"
+        }
+      ],
+      "description": "API latency percentiles over 5m windows"
+    },
+    {
+      "id": 4,
+      "title": "Error Rate",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 1 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 0.025 },
+              { "color": "red", "value": 0.05 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(errors_total[5m]) / rate(http_requests_total[5m])",
+          "legendFormat": "error_ratio",
+          "interval": "15s"
+        }
+      ],
+      "description": "Error ratio as percentage of total requests"
+    },
+    {
+      "id": 5,
+      "title": "Errors by Type",
+      "type": "piechart",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 9 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "auto"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (error_type) (rate(errors_total[5m]))",
+          "legendFormat": "{{ error_type }}",
+          "interval": "15s"
+        }
+      ],
+      "options": {
+        "legend": { "displayMode": "table", "placement": "right" },
+        "pieType": "pie",
+        "reduceOptions": { "values": false, "calcs": ["sum"], "fields": "" },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "description": "Error count breakdown by error type"
+    },
+    {
+      "id": 6,
+      "title": "Auth Failure Rate",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 9 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 5 },
+              { "color": "red", "value": 10 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(auth_failures_total[5m])",
+          "legendFormat": "auth_failures",
+          "interval": "15s"
+        }
+      ],
+      "description": "Authentication failures per second"
+    },
+    {
+      "id": 7,
+      "title": "Rate Limit Violations",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 9 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 25 },
+              { "color": "red", "value": 50 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(rate_limit_violations_total[5m])",
+          "legendFormat": "violations",
+          "interval": "15s"
+        }
+      ],
+      "description": "Rate limit violations per second"
+    },
+    {
+      "id": 8,
+      "title": "Workflow Execution",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 17 }
+    },
+    {
+      "id": 9,
+      "title": "Workflow Duration",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 18 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(workflow_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p50",
+          "interval": "15s"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(workflow_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p95",
+          "interval": "15s"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(workflow_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p99",
+          "interval": "15s"
+        }
+      ],
+      "description": "Workflow execution duration percentiles"
+    },
+    {
+      "id": 10,
+      "title": "Workflow Success vs Failure",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 18 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(workflow_duration_seconds_count{status=\"success\"}[5m])",
+          "legendFormat": "success",
+          "interval": "15s"
+        },
+        {
+          "expr": "rate(workflow_duration_seconds_count{status=\"failure\"}[5m])",
+          "legendFormat": "failure",
+          "interval": "15s"
+        }
+      ],
+      "description": "Workflow completion rate by outcome"
+    },
+    {
+      "id": 11,
+      "title": "Agent Performance",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 26 }
+    },
+    {
+      "id": 12,
+      "title": "Agent Duration by Agent",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 27 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(agent_duration_seconds_bucket[5m])) by (le, agent_name))",
+          "legendFormat": "{{ agent_name }}",
+          "interval": "15s"
+        }
+      ],
+      "description": "P95 duration per agent"
+    },
+    {
+      "id": 13,
+      "title": "Agent Error Rate",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 27 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(agent_duration_seconds_count{status=\"failure\"}[5m])",
+          "legendFormat": "agent_failures",
+          "interval": "15s"
+        }
+      ],
+      "description": "Agent failure rate per second"
+    },
+    {
+      "id": 14,
+      "title": "LLM & Infrastructure",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 35 }
+    },
+    {
+      "id": 15,
+      "title": "LLM Latency by Provider",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 36 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(llm_request_duration_seconds_bucket[5m])) by (le, provider))",
+          "legendFormat": "{{ provider }}",
+          "interval": "15s"
+        }
+      ],
+      "description": "LLM request duration p95 by provider"
+    },
+    {
+      "id": 16,
+      "title": "Database Query Duration",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 36 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket[5m])) by (le, operation))",
+          "legendFormat": "{{ operation }}",
+          "interval": "15s"
+        }
+      ],
+      "description": "Database query duration p95 by operation"
+    },
+    {
+      "id": 17,
+      "title": "Active Workflows",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 6, "w": 4, "x": 0, "y": 44 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 10 },
+              { "color": "red", "value": 25 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "active_workflows",
+          "legendFormat": "active",
+          "interval": "15s"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "description": "Currently active workflow executions"
+    },
+    {
+      "id": 18,
+      "title": "Queue Depth",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 6, "w": 4, "x": 4, "y": 44 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 50 },
+              { "color": "red", "value": 100 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(queue_depth)",
+          "legendFormat": "total",
+          "interval": "15s"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "description": "Total queue depth across all queues"
+    },
+    {
+      "id": 19,
+      "title": "Queue Depth by Queue",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 6, "w": 16, "x": 8, "y": 44 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "queue_depth",
+          "legendFormat": "{{ queue_name }}",
+          "interval": "15s"
+        }
+      ],
+      "description": "Queue depth per queue name"
+    }
+  ],
+  "schemaVersion": 36,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"],
+    "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
+  },
+  "templating": {
+    "list": [
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "Prometheus",
+        "definition": "label_values(http_requests_total, path)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Path",
+        "multi": true,
+        "name": "path",
+        "options": [],
+        "query": {
+          "query": "label_values(http_requests_total, path)",
+          "refId": "Prometheus-path-Variable-Query"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  }
+}

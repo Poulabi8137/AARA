@@ -1,0 +1,294 @@
+version: "3.9"
+
+name: agentwatch-staging
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-healthcheck: &healthcheck-base
+  interval: 15s
+  timeout: 10s
+  retries: 5
+  start_period: 30s
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    shm_size: 256mb
+    environment:
+      POSTGRES_USER: agentwatch_staging
+      POSTGRES_PASSWORD: ${STAGING_DB_PASSWORD:-agentwatch_staging_pass}
+      POSTGRES_DB: agentwatch_staging
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata_staging:/var/lib/postgresql/data
+    healthcheck:
+      <<: *healthcheck-base
+      test: ["CMD-SHELL", "pg_isready -U agentwatch_staging -d agentwatch_staging"]
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "2g"
+        reservations:
+          cpus: "0.5"
+          memory: "512m"
+    logging: *default-logging
+    networks:
+      - agentwatch_staging
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: redis-server --appendonly yes --save 60 1 --loglevel warning
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data_staging:/data
+    healthcheck:
+      <<: *healthcheck-base
+      test: ["CMD", "redis-cli", "ping"]
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "1g"
+        reservations:
+          cpus: "0.25"
+          memory: "256m"
+    logging: *default-logging
+    networks:
+      - agentwatch_staging
+
+  chromadb:
+    image: chromadb/chroma:0.5.5
+    restart: always
+    ports:
+      - "8002:8000"
+    volumes:
+      - chroma_data_staging:/chroma/chroma
+    environment:
+      IS_PERSISTENT: "TRUE"
+      PERSIST_DIRECTORY: /chroma/chroma
+      ANONYMIZED_TELEMETRY: "FALSE"
+      CHROMA_SERVER_CORS_ALLOW_ORIGINS: '["https://staging.agentwatch.ai"]'
+    healthcheck:
+      <<: *healthcheck-base
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "2g"
+        reservations:
+          cpus: "0.5"
+          memory: "512m"
+    logging: *default-logging
+    networks:
+      - agentwatch_staging
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: agentwatch-api:staging
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      chromadb:
+        condition: service_started
+    environment:
+      APP_NAME: "AgentWatch API (Staging)"
+      ENV: staging
+      DEBUG: "false"
+      LOG_LEVEL: INFO
+      LOG_FORMAT: json
+      DATABASE_URL: postgresql+asyncpg://agentwatch_staging:${STAGING_DB_PASSWORD:-agentwatch_staging_pass}@db:5432/agentwatch_staging
+      DATABASE_ECHO: "false"
+      DATABASE_POOL_SIZE: "20"
+      DATABASE_MAX_OVERFLOW: "40"
+      SECRET_KEY: ${SECRET_KEY}
+      ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+      REFRESH_TOKEN_EXPIRE_DAYS: "7"
+      ALGORITHM: HS256
+      TOKEN_VERSION: "1"
+      PASSWORD_MIN_LENGTH: "12"
+      PASSWORD_MAX_LENGTH: "128"
+      MAX_LOGIN_ATTEMPTS: "5"
+      LOGIN_LOCKOUT_MINUTES: "15"
+      RESET_TOKEN_EXPIRE_HOURS: "1"
+      REQUIRE_EMAIL_VERIFICATION: "true"
+      CORS_ALLOW_CREDENTIALS: "true"
+      ALLOWED_ORIGINS: '["https://staging.agentwatch.ai"]'
+      REDIS_URL: redis://redis:6379/0
+      REDIS_POOL_SIZE: "20"
+      REDIS_MAX_RETRIES: "5"
+      REDIS_SOCKET_TIMEOUT: "5"
+      REDIS_SOCKET_CONNECT_TIMEOUT: "5"
+      REDIS_HEALTH_CHECK_INTERVAL: "30"
+      DEFAULT_CACHE_TTL: "300"
+      LLM_PROVIDER: ${LLM_PROVIDER:-openai}
+      LLM_MODEL: ${LLM_MODEL:-gpt-4o}
+      LLM_TEMPERATURE: "0.0"
+      LLM_MAX_TOKENS: "4096"
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      CHROMA_HOST: chromadb
+      CHROMA_PORT: "8000"
+      VECTORSTORE_PERSIST_DIR: /app/chroma_data
+      VECTORSTORE_COLLECTION_COUNT: "5"
+      CHUNK_SIZE: "1000"
+      CHUNK_OVERLAP: "200"
+      EMBEDDING_MODEL: sentence-transformers/all-MiniLM-L6-v2
+      WORKFLOW_MAX_RETRIES: "3"
+      WORKFLOW_NODE_TIMEOUT: "120"
+      SENTRY_DSN: ${SENTRY_DSN}
+      SENTRY_TRACES_SAMPLE_RATE: "0.5"
+      SENTRY_PROFILES_SAMPLE_RATE: "0.1"
+      SECRETS_BACKEND: ${SECRETS_BACKEND:-env}
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data_staging:/app/chroma_data
+    command: >
+      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4 --limit-concurrency 100 --backlog 2048"
+    healthcheck:
+      <<: *healthcheck-base
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: "4g"
+        reservations:
+          cpus: "1"
+          memory: "1g"
+    logging: *default-logging
+    networks:
+      - agentwatch_staging
+
+  worker:
+    image: agentwatch-api:staging
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      APP_NAME: "AgentWatch Worker (Staging)"
+      ENV: staging
+      LOG_LEVEL: INFO
+      DATABASE_URL: postgresql+asyncpg://agentwatch_staging:${STAGING_DB_PASSWORD:-agentwatch_staging_pass}@db:5432/agentwatch_staging
+      REDIS_URL: redis://redis:6379/0
+      REDIS_POOL_SIZE: "10"
+      LLM_PROVIDER: ${LLM_PROVIDER:-openai}
+      LLM_MODEL: ${LLM_MODEL:-gpt-4o}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      CHROMA_HOST: chromadb
+      CHROMA_PORT: "8000"
+      SECRET_KEY: ${SECRET_KEY}
+      SENTRY_DSN: ${SENTRY_DSN}
+    command: dramatiq app.tasks:broker --processes 2 --threads 8 --watch app.tasks
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "4"
+          memory: "4g"
+        reservations:
+          cpus: "1"
+          memory: "1g"
+    logging: *default-logging
+    networks:
+      - agentwatch_staging
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    restart: always
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus_data_staging:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=30d"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+    ports:
+      - "9090:9090"
+    healthcheck:
+      <<: *healthcheck-base
+      test: ["CMD", "wget", "--spider", "http://localhost:9090/-/healthy"]
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "1g"
+        reservations:
+          cpus: "0.25"
+          memory: "256m"
+    logging: *default-logging
+    networks:
+      - agentwatch_staging
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    restart: always
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-grafana_staging_pass}
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
+      GF_SERVER_ROOT_URL: https://staging.agentwatch.ai/grafana
+      GF_AUTH_DISABLE_LOGIN_FORM: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+    volumes:
+      - grafana_data_staging:/var/lib/grafana
+    ports:
+      - "3001:3000"
+    depends_on:
+      prometheus:
+        condition: service_started
+    healthcheck:
+      <<: *healthcheck-base
+      test: ["CMD", "wget", "--spider", "http://localhost:3000/api/health"]
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "1g"
+        reservations:
+          cpus: "0.25"
+          memory: "256m"
+    logging: *default-logging
+    networks:
+      - agentwatch_staging
+
+volumes:
+  pgdata_staging:
+    driver: local
+  redis_data_staging:
+    driver: local
+  chroma_data_staging:
+    driver: local
+  prometheus_data_staging:
+    driver: local
+  grafana_data_staging:
+    driver: local
+
+networks:
+  agentwatch_staging:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "172.28.0.0/16"

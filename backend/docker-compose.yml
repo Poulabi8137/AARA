@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: agentwatch
+      POSTGRES_PASSWORD: agentwatch
+      POSTGRES_DB: agentwatch
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentwatch"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  chromadb:
+    image: chromadb/chroma:latest
+    restart: unless-stopped
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      IS_PERSISTENT: "TRUE"
+      PERSIST_DIRECTORY: /chroma/chroma
+      ANONYMIZED_TELEMETRY: "FALSE"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      chromadb:
+        condition: service_started
+    environment:
+      DATABASE_URL: postgresql+asyncpg://agentwatch:agentwatch@db:5432/agentwatch
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is required. Set to a secure random string (min 32 chars).}
+      ALLOWED_ORIGINS: '["http://localhost:3000"]'
+      LOG_LEVEL: INFO
+      CHROMA_HOST: chromadb
+      CHROMA_PORT: "8000"
+      VECTORSTORE_PERSIST_DIR: /app/chroma_data
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/app/chroma_data
+    command: >
+      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4"
+
+volumes:
+  pgdata:
+  chroma_data:
