@@ -59,18 +59,22 @@ function verifySignature(token: string, secret: string): boolean {
   }
 }
 
+let _warnedMissingSecret = false
+
 function isValidToken(token: string | undefined): boolean {
   if (!token) return false
 
   const secret = process.env.JWT_SECRET
   if (!secret) {
-    // No JWT secret configured — fall back to payload-only validation.
-    // In production, JWT_SECRET must be set for full signature verification.
-    const payload = decodeJWTPayload(token)
-    if (!payload) return false
-    if (!payload.sub) return false
-    if (isTokenExpired(payload)) return false
-    return true
+    if (!_warnedMissingSecret) {
+      _warnedMissingSecret = true
+      console.error(
+        '[proxy.ts] FATAL: JWT_SECRET environment variable is not set. ' +
+        'All protected routes will redirect to login. ' +
+        'Set JWT_SECRET to match backend SECRET_KEY for authentication to work.'
+      )
+    }
+    return false
   }
 
   if (!verifySignature(token, secret)) return false
