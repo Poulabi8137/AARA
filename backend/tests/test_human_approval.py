@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 from app.graphs.human_approval_node import human_approval_node
 

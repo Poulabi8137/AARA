@@ -1,0 +1,38 @@
+# Each line is a file pattern followed by one or more owners.
+# Order matters: the last matching pattern takes precedence.
+
+# Global default owners
+* @agentwatch/core
+
+# Backend API and core logic
+/backend/app/api/ @agentwatch/backend
+/backend/app/core/ @agentwatch/backend
+/backend/app/services/ @agentwatch/backend
+/backend/app/models/ @agentwatch/backend
+
+# Agent system
+/backend/app/agents/ @agentwatch/ai
+/backend/app/graphs/ @agentwatch/ai
+/backend/app/llm/ @agentwatch/ai
+
+# Infrastructure and deployment
+/backend/Dockerfile @agentwatch/infra
+/backend/docker-compose*.yml @agentwatch/infra
+/backend/monitoring/ @agentwatch/infra
+/.github/workflows/ @agentwatch/infra
+
+# Frontend
+/app/ @agentwatch/frontend
+/components/ @agentwatch/frontend
+/lib/ @agentwatch/frontend
+
+# Documentation
+/docs/ @agentwatch/docs
+README.md @agentwatch/docs
+
+# Security-sensitive files
+/backend/app/middleware/security_headers.py @agentwatch/security
+/backend/app/middleware/rate_limit.py @agentwatch/security
+/backend/app/services/auth_service.py @agentwatch/security
+/backend/app/core/security.py @agentwatch/security
+/backend/app/core/secrets.py @agentwatch/security

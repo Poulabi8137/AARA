@@ -1,0 +1,47 @@
+version: 2
+updates:
+  # Python backend dependencies
+  - package-ecosystem: "pip"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+    reviewers:
+      - "agentwatch/backend"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+
+  # npm/frontend dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
+    reviewers:
+      - "agentwatch/frontend"
+    commit-message:
+      prefix: "chore(deps)"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "chore(ci)"

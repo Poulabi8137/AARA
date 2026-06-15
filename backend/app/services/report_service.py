@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-import uuid
 
-from fastapi import Depends, HTTPException, status
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.session import get_db
 from app.models.research_report import ResearchReport
 from app.schemas.report import ReportCreate
 

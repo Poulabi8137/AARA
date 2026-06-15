@@ -2,12 +2,32 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Save, AlertCircle, CheckCircle } from 'lucide-react'
+import { Save, AlertCircle, CheckCircle, Loader2 } from 'lucide-react'
 import { GlassCard } from '@/components/ui/glass-card'
 import { PageTransition, childVariants } from '@/components/page-transition'
+import { apiClient } from '@/lib/api-client'
 
 export default function SettingsPage() {
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [organization, setOrganization] = useState('')
   const [saved, setSaved] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
+
+  const handleSave = async () => {
+    setIsSaving(true)
+    setSaveError(null)
+    try {
+      await apiClient.updateProfile({ name, email })
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch {
+      setSaveError('Failed to save settings. Backend may be unavailable.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   return (
     <PageTransition className="space-y-6">
@@ -23,24 +43,36 @@ export default function SettingsPage() {
         </motion.div>
       )}
 
+      {saveError && (
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          {saveError}
+        </div>
+      )}
+
       <div className="space-y-6">
         <div className="space-y-3">
           <h2 className="text-sm font-semibold">Account Settings</h2>
           <GlassCard depth="flat" className="p-5 space-y-4">
-            {[
-              { label: 'Full Name', placeholder: 'John Doe' },
-              { label: 'Email', placeholder: 'john@example.com', type: 'email' },
-              { label: 'Organization', placeholder: 'Your Organization' },
-            ].map((field) => (
-              <div key={field.label} className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground/70">{field.label}</label>
-                <input type={field.type || 'text'} placeholder={field.placeholder}
-                  className="w-full px-3 py-2 rounded-xl bg-muted/50 border border-border/50 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all" />
-              </div>
-            ))}
-            <button onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 3000) }}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
-              <Save className="w-4 h-4" /> Save Changes
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-foreground/70">Full Name</label>
+              <input type="text" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl bg-muted/50 border border-border/50 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-foreground/70">Email</label>
+              <input type="email" placeholder="john@example.com" value={email} onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl bg-muted/50 border border-border/50 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-foreground/70">Organization</label>
+              <input type="text" placeholder="Your Organization" value={organization} onChange={(e) => setOrganization(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl bg-muted/50 border border-border/50 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all" />
+            </div>
+            <button onClick={handleSave} disabled={isSaving}
+              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 disabled:opacity-50"
+            >
+              {isSaving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : <><Save className="w-4 h-4" /> Save Changes</>}
             </button>
           </GlassCard>
         </div>

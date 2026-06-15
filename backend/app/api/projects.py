@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
@@ -72,7 +72,7 @@ async def update_project(
     return ProjectResponse.model_validate(project)
 
 
-@router.delete("/{project_id}", status_code=204)
+@router.delete("/{project_id}", status_code=204, response_model=None)
 async def delete_project(
     project_id: uuid.UUID,
     current_user: User = Depends(get_current_user),

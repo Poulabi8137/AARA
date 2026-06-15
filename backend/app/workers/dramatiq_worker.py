@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import os
+from datetime import datetime, timezone
+
 import dramatiq
 from dramatiq.brokers.redis import RedisBroker
 from dramatiq.results import Results
@@ -8,6 +10,8 @@ from dramatiq.results.backends import RedisBackend
 from dramatiq.middleware import TimeLimit, Retries, AgeLimit, ShutdownNotifications
 
 from app.core.config import get_settings
+from app.graphs.workflows import run_research_workflow
+from app.models.agent_execution import ExecutionStatus
 from app.core.logging import get_logger
 
 logger = get_logger("workers.dramatiq")
@@ -82,7 +86,6 @@ async def _execute_workflow(
     objective: str,
 ) -> dict:
     """Internal async workflow execution with DB progress tracking."""
-    from datetime import datetime, timezone
     from app.agents.state import make_initial_state
     from app.models.agent_execution import ExecutionStatus
     from app.core.observability import record_workflow_duration, ACTIVE_WORKFLOWS

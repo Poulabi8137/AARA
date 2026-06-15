@@ -15,7 +15,7 @@ class DedupResult:
     def is_duplicate(self, chunk: dict[str, Any]) -> bool:
         chunk_id = chunk.get("chunk_id", "") or str(hash(chunk.get("content", "")))
         content = chunk.get("content", "")
-        source = chunk.get("source", "") or chunk.get("metadata", {}).get("source", "")
+        chunk.get("source", "") or chunk.get("metadata", {}).get("source", "")
 
         if chunk_id and chunk_id in self._seen_ids:
             self.removed_count += 1

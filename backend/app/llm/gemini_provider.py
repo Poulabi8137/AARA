@@ -30,7 +30,6 @@ class GeminiProvider:
         return self._client
 
     async def generate(self, prompt: str, system_prompt: str | None = None) -> LLMResponse:
-        import google.generativeai as genai
 
         client = self._get_client()
         full_prompt = f"{system_prompt}\n\n{prompt}" if system_prompt else prompt

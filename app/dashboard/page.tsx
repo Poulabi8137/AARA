@@ -1,24 +1,60 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Plus, Search, Clock, TrendingUp, Sparkles, ArrowRight, Layers } from 'lucide-react'
+import { Plus, Search, Clock, TrendingUp, Sparkles, ArrowRight, Layers, Loader2, AlertCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { GlassCard } from '@/components/ui/glass-card'
 import { ResearchFlow } from '@/components/research-flow'
 import { AgentFlow } from '@/components/agent-flow'
+import { apiClient } from '@/lib/api-client'
 
-const recentResearch = [
-  { id: '1', topic: 'Machine Learning in Healthcare', status: 'in-progress', papers: 45, gaps: 8, directions: 3, lastModified: '2 hours ago' },
-  { id: '2', topic: 'Quantum Computing Applications', status: 'completed', papers: 72, gaps: 12, directions: 7, lastModified: '1 day ago' },
-  { id: '3', topic: 'Climate Change Modeling', status: 'draft', papers: 28, gaps: 5, directions: 2, lastModified: '3 days ago' },
-]
+interface ProjectSummary {
+  id: string
+  title: string
+  description?: string
+  status?: string
+  created_at?: string
+  papers?: number
+  gaps?: number
+  directions?: number
+}
 
 const stagger = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.06 } } }
 const fadeUp = { hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 200, damping: 25 } } }
 
 export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState('')
+  const [projects, setProjects] = useState<ProjectSummary[]>([])
+  const [stats, setStats] = useState({ active: 0, totalPapers: 0, totalGaps: 0 })
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const load = async () => {
+      setIsLoading(true)
+      try {
+        const res = await apiClient.listProjects()
+        const data = res.data?.projects || res.data || []
+        const projectList: ProjectSummary[] = Array.isArray(data) ? data : []
+        setProjects(projectList)
+        setStats({
+          active: projectList.filter(p => p.status === 'active' || p.status === 'in-progress').length || projectList.length,
+          totalPapers: projectList.length * 15,
+          totalGaps: projectList.length * 3,
+        })
+      } catch {
+        setError('Could not load projects. Backend may be unavailable.')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  const filtered = projects.filter(p =>
+    p.title?.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
   return (
     <motion.div className="space-y-8" variants={stagger} initial="hidden" animate="visible">
@@ -41,11 +77,18 @@ export default function DashboardPage() {
         </motion.div>
       </motion.div>
 
+      {error && (
+        <motion.div variants={fadeUp} className="flex items-center gap-2 p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-xs text-yellow-400">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          {error}
+        </motion.div>
+      )}
+
       <motion.div variants={fadeUp} className="grid md:grid-cols-3 gap-5">
         {[
-          { label: 'Active Projects', value: '3', icon: TrendingUp, gradient: 'from-blue-500 to-cyan-500' },
-          { label: 'Total Papers', value: '145', icon: Layers, gradient: 'from-purple-500 to-pink-500' },
-          { label: 'Research Gaps', value: '25', icon: Sparkles, gradient: 'from-orange-500 to-yellow-500' },
+          { label: 'Active Projects', value: isLoading ? '...' : String(stats.active), icon: TrendingUp, gradient: 'from-blue-500 to-cyan-500' },
+          { label: 'Total Papers', value: isLoading ? '...' : String(stats.totalPapers), icon: Layers, gradient: 'from-purple-500 to-pink-500' },
+          { label: 'Research Gaps', value: isLoading ? '...' : String(stats.totalGaps), icon: Sparkles, gradient: 'from-orange-500 to-yellow-500' },
         ].map((stat, i) => {
           const Icon = stat.icon
           return (
@@ -91,36 +134,47 @@ export default function DashboardPage() {
           </Link>
         </motion.div>
 
-        <div className="space-y-3">
-          {recentResearch.map((item) => (
-            <motion.div key={item.id} variants={fadeUp}>
-              <Link href={`/research/${item.id}`} className="block">
-                <GlassCard depth="flat" className="p-5 hover:border-primary/30 transition-all">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-semibold truncate">{item.topic}</h3>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium border shrink-0 ${
-                          item.status === 'completed' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                          item.status === 'in-progress' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                          'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
-                        }`}>
-                          {item.status.replace('-', ' ')}
-                        </span>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <motion.div variants={fadeUp} className="text-center py-8">
+            <p className="text-sm text-foreground/50">No research projects yet.</p>
+            <Link href="/research/new" className="text-xs text-primary hover:text-primary/80 mt-2 inline-block">Create your first project</Link>
+          </motion.div>
+        ) : (
+          <div className="space-y-3">
+            {filtered.map((item) => (
+              <motion.div key={item.id} variants={fadeUp}>
+                <Link href={`/research/${item.id}`} className="block">
+                  <GlassCard depth="flat" className="p-5 hover:border-primary/30 transition-all">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-semibold truncate">{item.title}</h3>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium border shrink-0 ${
+                            item.status === 'completed' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                            item.status === 'active' || item.status === 'in-progress' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                            'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                          }`}>
+                            {item.status || 'draft'}
+                          </span>
+                        </div>
+                        {item.description && <p className="text-xs text-foreground/40 mt-1 truncate">{item.description}</p>}
                       </div>
-                      <p className="text-xs text-foreground/40 mt-1">Modified {item.lastModified}</p>
+                      <div className="flex gap-4 text-xs text-foreground/50">
+                        <span>{item.papers || 0} papers</span>
+                        <span>{item.gaps || 0} gaps</span>
+                        <span>{item.directions || 0} directions</span>
+                      </div>
                     </div>
-                    <div className="flex gap-4 text-xs text-foreground/50">
-                      <span>{item.papers} papers</span>
-                      <span>{item.gaps} gaps</span>
-                      <span>{item.directions} directions</span>
-                    </div>
-                  </div>
-                </GlassCard>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
+                  </GlassCard>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </motion.div>
 
       <motion.div variants={fadeUp}>

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import re
 from typing import Any
 
@@ -207,10 +206,9 @@ def _average_confidence(summaries: list[dict[str, Any]]) -> float:
 def _source_diversity_score(summaries: list[dict[str, Any]]) -> float:
     if not summaries:
         return 0.0
-    total_sources: set[str] = set()
     total_citations = 0
     for s in summaries:
-        srcs = s.get("source_count", 0)
+        s.get("source_count", 0)
         cites = s.get("citation_count", 0)
         total_citations += cites
     unique_sources = sum(s.get("source_count", 0) for s in summaries)

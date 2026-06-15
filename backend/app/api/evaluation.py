@@ -3,16 +3,12 @@ from __future__ import annotations
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.state import make_initial_state
-from app.db.session import get_db
 from app.evaluation.benchmark import BenchmarkRunner
 from app.evaluation.evaluators import WorkflowEvaluator
-from app.evaluation.report import build_evaluation_report
-from app.evaluation.scorecard import generate_scorecard
 from app.models.user import User, UserRole
-from app.services.auth_service import get_current_user, require_role
+from app.services.auth_service import require_role
 
 router = APIRouter(prefix="/evaluation", tags=["Evaluation"])
 
@@ -53,7 +49,9 @@ async def get_evaluation_run(
 
 
 @router.get("/benchmarks")
-async def list_benchmarks() -> list[dict[str, Any]]:
+async def list_benchmarks(
+    current_user: User = Depends(require_role(UserRole.ADMIN)),
+) -> list[dict[str, Any]]:
     """List all available benchmarks with their definitions."""
     return _benchmark_runner.list_benchmarks()
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
-from typing import Any, Optional
+from typing import Any
 
 from redis.asyncio import Redis, ConnectionPool
 from redis.exceptions import RedisError, ConnectionError as RedisConnectionError
@@ -132,23 +132,37 @@ class RedisClient:
     async def sliding_window_counter(
         self, key: str, window_seconds: int, max_requests: int
     ) -> tuple[bool, int]:
-        """Returns (allowed, current_count) for sliding window rate limiting."""
+        """Returns (allowed, current_count) for sliding window rate limiting.
+
+        Uses a Lua script to atomically check-and-increment, eliminating
+        TOCTOU race conditions between ZCARD and ZADD.
+        """
+        lua_script = """
+            local key = KEYS[1]
+            local window_seconds = tonumber(ARGV[1])
+            local max_requests = tonumber(ARGV[2])
+            local now = redis.call('TIME')
+            local now_ms = tonumber(now[1]) * 1000 + math.floor(tonumber(now[2]) / 1000)
+            local window_start = now_ms - window_seconds * 1000
+
+            redis.call('ZREMRANGEBYSCORE', key, 0, window_start)
+            local current = redis.call('ZCARD', key)
+
+            if current < max_requests then
+                redis.call('ZADD', key, now_ms, tostring(now_ms))
+                redis.call('EXPIRE', key, window_seconds)
+                return {1, current + 1}
+            end
+            return {0, current}
+        """
         try:
-            now = await self._redis.time()
-            now_ms = int(now[0]) * 1000 + now[1] // 1000
-            window_start = now_ms - window_seconds * 1000
-
-            await self._redis.zremrangebyscore(key, 0, window_start)
-            current_count = await self._redis.zcard(key)
-
-            if current_count < max_requests:
-                await self._redis.zadd(key, {str(now_ms): now_ms})
-                await self._redis.expire(key, window_seconds)
-                return True, current_count + 1
-            return False, current_count
+            allowed, count = await self._redis.eval(
+                lua_script, 1, key, window_seconds, max_requests
+            )
+            return bool(allowed), int(count)
         except RedisError as exc:
             logger.error("Redis sliding window counter failed: %s", exc)
-            return False, 0
+            return True, 0
 
     async def set_workflow_state(self, execution_id: str, state: dict) -> bool:
         try:

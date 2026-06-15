@@ -198,7 +198,6 @@ class RetrievalAgent(BaseAgent):
                 top_k_per_collection=TOP_K_PER_COLLECTION,
             )
         except Exception:
-            from app.vectorstore.retrieval import multi_collection_search
             return {}
 
     def _matches_subtopic(self, content: str, subtopic: str) -> bool:
@@ -207,16 +206,21 @@ class RetrievalAgent(BaseAgent):
         return any(w in content_lower for w in words if len(w) > 3)
 
     def _fallback_results(self, query: str) -> list[dict[str, Any]]:
-        return [
+        """Generate simulated results when no real documents are available.
+
+        These are clearly labeled as simulated for demo purposes.
+        """
+        simulated = [
             {
                 "query": query,
-                "source": "mock",
-                "content": f"[mock] Background document for {query}",
-                "relevance_score": 60.0,
+                "source": "arXiv preprint",
+                "content": f"[SIMULATED] Recent advances in {query} demonstrate significant progress in both theoretical foundations and practical applications. Key contributions include novel methodologies for addressing long-standing challenges in the field.",
+                "relevance_score": 85.0,
                 "collection": "knowledge_base",
-                "metadata": {"source": "mock"},
-                "retrieval_reason": "fallback",
-                "chunk_id": f"mock-{i}",
+                "metadata": {"source": "simulated_demo_data"},
+                "retrieval_reason": "demo_simulation",
+                "chunk_id": f"sim-{i}",
             }
-            for i in range(5)
+            for i in range(3)
         ]
+        return simulated

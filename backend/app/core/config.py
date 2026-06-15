@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-import os
-from pathlib import Path
 from functools import lru_cache
 from pydantic_settings import BaseSettings
-from typing import ClassVar
 
 
 class Settings(BaseSettings):
@@ -31,6 +28,8 @@ class Settings(BaseSettings):
     reset_token_expire_hours: int = 1
     require_email_verification: bool = False
     cors_allow_credentials: bool = True
+
+    max_upload_size: int = 10 * 1024 * 1024  # 10 MB
 
     allowed_origins: list[str] = ["http://localhost:3000", "http://localhost:8000"]
     log_level: str = "INFO"

@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import re
 import time
-from collections import Counter
 from typing import Any
 
 from app.agents.base import BaseAgent
@@ -18,6 +17,10 @@ from app.agents.summarizer_citations import (
     compute_compression_ratio,
 )
 from app.agents.summarizer_scoring import compute_summary_quality
+from app.agents.summarizer_prompts import (
+    SUMMARIZER_SYSTEM_PROMPT,
+    SUMMARIZER_USER_PROMPT_TEMPLATE,
+)
 from app.schemas.summarizer import (
     SectionSummary,
     CitationRecord,
@@ -69,7 +72,7 @@ class SummarizerAgent(BaseAgent):
                 total_chunks += len(evidence)
 
                 # 1. Build citation index
-                citation_index = build_citation_index(evidence)
+                build_citation_index(evidence)
 
                 # 2. Collect all evidence text
                 texts = [e.get("content", "") for e in evidence]
@@ -119,12 +122,30 @@ class SummarizerAgent(BaseAgent):
                 # 9. Build citations
                 citations = self._build_citations(key_findings, evidence)
 
-                # 10. Executive summary
+                # 10. Executive summary (extractive baseline)
                 exec_summary = self._generate_executive_summary(
                     subtopic, key_findings, consensus, stats,
                 )
 
-                # 11. Build SectionSummary
+                # 11. LLM enhancement: abstractive summarization
+                llm_enhanced = await self._enhance_with_llm(
+                    subtopic=subtopic,
+                    evidence_texts=texts,
+                    key_findings=key_findings,
+                    stats=stats,
+                    consensus=consensus,
+                    contradictions=contradictions,
+                )
+                if llm_enhanced is not None:
+                    exec_summary = llm_enhanced.get("executive_summary", exec_summary)
+                    llm_insights = llm_enhanced.get("key_insights", [])
+                    if llm_insights:
+                        key_findings = llm_insights[:6]
+                    metrics.used_fallback = False
+                else:
+                    metrics.used_fallback = True
+
+                # 12. Build SectionSummary
                 summary = SectionSummary(
                     subtopic=subtopic,
                     executive_summary=exec_summary,
@@ -140,16 +161,19 @@ class SummarizerAgent(BaseAgent):
                 )
 
                 summary = compute_summary_quality(summary, bundle)
+                summary._llm_enhanced = llm_enhanced is not None
                 total_summary_chars += len(json.dumps(summary.model_dump()))
                 section_summaries.append(summary)
 
-        # Compute metrics
+        llm_enhancement_count = sum(
+            1 for s in section_summaries if getattr(s, "_llm_enhanced", False)
+        )
+
         compression = compute_compression_ratio(total_original_chars, total_summary_chars)
         if total_chunks > 0:
-            total_cites = sum(len(s.citations) for s in section_summaries)
+            sum(len(s.citations) for s in section_summaries)
             util = compute_evidence_utilization(0, [], total_chunks)
         else:
-            total_cites = 0
             util = 0.0
 
         avg_score = (
@@ -163,6 +187,7 @@ class SummarizerAgent(BaseAgent):
         metrics.compression_ratio = compression
         metrics.evidence_utilization = util
         metrics.average_summary_score = avg_score
+        metrics.llm_enhancement_count = llm_enhancement_count
         metrics.latency_seconds = round(time.monotonic() - start, 3)
 
         state["summaries"] = [s.model_dump() for s in section_summaries]
@@ -277,6 +302,60 @@ class SummarizerAgent(BaseAgent):
         if consensus:
             parts.append(f"there is consensus that {consensus[0].lower()}")
         return ". ".join(parts) + "."
+
+    async def _enhance_with_llm(
+        self,
+        subtopic: str,
+        evidence_texts: list[str],
+        key_findings: list[str],
+        stats: list[str],
+        consensus: list[str],
+        contradictions: list[Any],
+    ) -> dict[str, Any] | None:
+        """Call the LLM for abstractive summarization enhancement.
+
+        Returns a dict with 'executive_summary' and 'key_insights' keys,
+        or None if the LLM call fails or returns unparseable output.
+        """
+        if not evidence_texts:
+            return None
+
+        combined_evidence = "\n\n".join(
+            f"[{i+1}] {t[:500]}" for i, t in enumerate(evidence_texts[:5])
+        )
+        contradictions_text = json.dumps(
+            [c.model_dump() if hasattr(c, "model_dump") else c for c in contradictions]
+        ) if contradictions else "None"
+
+        prompt = SUMMARIZER_USER_PROMPT_TEMPLATE.format(
+            subtopic=subtopic,
+            subtopic_evidence=combined_evidence,
+            key_findings="\n".join(f"- {f}" for f in key_findings or []),
+            statistics="\n".join(f"- {s}" for s in stats or []),
+            consensus_points="\n".join(f"- {c}" for c in consensus or []),
+            contradictions=contradictions_text,
+        )
+
+        try:
+            response = await self.llm.generate(
+                prompt=prompt,
+                system_prompt=SUMMARIZER_SYSTEM_PROMPT,
+            )
+            raw = response.content.strip()
+            # Strip markdown fences if present
+            if raw.startswith("```"):
+                raw = raw.split("\n", 1)[-1]
+                raw = raw.rsplit("\n```", 1)[0]
+            result = json.loads(raw)
+            if not isinstance(result, dict):
+                raise ValueError("LLM response is not a JSON object")
+            return result
+        except Exception as exc:
+            logger.warning(
+                "llm summarization enhancement failed, using extractive fallback",
+                extra={"subtopic": subtopic, "error": str(exc)},
+            )
+            return None
 
     def _fallback_summary(self, query: str, subtopic: str = "general") -> SectionSummary:
         return SectionSummary(

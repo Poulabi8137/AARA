@@ -15,7 +15,7 @@ def compute_report_quality(
     n_refs = len(references)
     total_cites = sum(s.get("citation_count", 0) for s in sections)
     total_stats = sum(1 for s in sections if s.get("statistics", []))
-    total_contras = sum(1 for s in sections if s.get("contradictions", []))
+    sum(1 for s in sections if s.get("contradictions", []))
     avg_conf = _average_confidence(sections)
 
     # Report completeness: sections present, refs present, gaps present

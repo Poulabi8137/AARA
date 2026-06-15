@@ -156,6 +156,39 @@ def compute_report_completeness(
     return (present / len(expected)) * 100.0
 
 
+def _detect_hallucination_patterns(text: str) -> list[str]:
+    """Detect linguistic patterns that correlate with hallucinated content."""
+    patterns = []
+    hedging_patterns = [
+        r"\bmay\b", r"\bmight\b", r"\bcould\b", r"\bpossibly\b",
+        r"\bpresumably\b", r"\bto the best of our knowledge\b",
+        r"\bit is believed\b", r"\bsome argue\b", r"\bit is thought\b",
+    ]
+    unsupported_absolute = [
+        r"\balways\b", r"\bnever\b", r"\bevery\b", r"\bno one\b",
+        r"\beveryone\b", r"\bdefinitely\b", r"\bundoubtedly\b",
+        r"\bproves\b", r"\birrefutably\b",
+    ]
+    for pat in hedging_patterns:
+        if re.search(pat, text, re.IGNORECASE):
+            patterns.append(f"hedging: {pat}")
+            break
+    for pat in unsupported_absolute:
+        if re.search(pat, text, re.IGNORECASE):
+            patterns.append(f"unsupported absolute: {pat}")
+            break
+    speculative_phrases = [
+        "it would seem", "one can imagine", "it is conceivable",
+        "it stands to reason", "it goes without saying",
+        "as one might expect", "naturally",
+    ]
+    for phrase in speculative_phrases:
+        if phrase in text.lower():
+            patterns.append(f"speculative: {phrase}")
+            break
+    return patterns
+
+
 def compute_hallucination_proxy(
     report: dict[str, Any] | None,
     sections: list[dict[str, Any]],
@@ -174,6 +207,7 @@ def compute_hallucination_proxy(
             supported_claims.add(claim.lower().strip())
     total_claims = 0
     unsupported_claims = 0
+    hallucination_patterns_found = 0
 
     def _has_support(findings: list[str]) -> list[bool]:
         results: list[bool] = []
@@ -194,7 +228,6 @@ def compute_hallucination_proxy(
         return results
 
     for sec in sections:
-        findings = sec.get("key_findings", [])
         for f_name in ["key_findings", "evidence_highlights"]:
             items = sec.get(f_name, [])
             if isinstance(items, list):
@@ -203,21 +236,10 @@ def compute_hallucination_proxy(
                     total_claims += 1
                     if not supported:
                         unsupported_claims += 1
-        for finding in findings:
-            if isinstance(finding, str) and finding.strip():
-                if cited_chunk_ids:
-                    sec_citations = sec.get("citations", [])
-                    has_local = False
-                    for sc in sec_citations:
-                        if sc.get("supporting_chunk_ids"):
-                            has_local = True
-                            break
-                    if not has_local:
-                        unsupported_claims += 1
-                    total_claims += 1
-                else:
-                    total_claims += 1
-                    unsupported_claims += 1
+                    else:
+                        txt = items[len(results) - 1] if len(results) <= len(items) else ""
+                        if txt and _detect_hallucination_patterns(txt):
+                            hallucination_patterns_found += 1
 
     conclusion = report.get("conclusion", "")
     if isinstance(conclusion, str) and conclusion.strip():
@@ -233,8 +255,22 @@ def compute_hallucination_proxy(
                     break
         if not supported:
             unsupported_claims += 1
+        hp = _detect_hallucination_patterns(conclusion)
+        hallucination_patterns_found += len(hp)
 
-    return (unsupported_claims / max(total_claims, 1)) * 100.0
+    exec_summary = report.get("executive_summary", "")
+    if isinstance(exec_summary, str) and exec_summary.strip():
+        hp = _detect_hallucination_patterns(exec_summary)
+        hallucination_patterns_found += len(hp)
+
+    introduction = report.get("introduction", "")
+    if isinstance(introduction, str) and introduction.strip():
+        hp = _detect_hallucination_patterns(introduction)
+        hallucination_patterns_found += len(hp)
+
+    pattern_penalty = min(hallucination_patterns_found * 5.0, 30.0)
+    base_risk = (unsupported_claims / max(total_claims, 1)) * 100.0
+    return min(base_risk + pattern_penalty, 100.0)
 
 
 def compute_research_quality(

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import json
+import html
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -11,7 +11,6 @@ from app.schemas.report_generator import (
     ResearchReport,
     ReportGenerateRequest,
     ReportExportRequest,
-    ExportFormat,
 )
 from app.agents.report_builder import build_report_from_state, build_markdown, build_json
 from app.agents.report_validation import validate_report_data, validate_export_request
@@ -124,12 +123,16 @@ async def export_report(
     elif fmt == "json":
         content = body.report.report_json or build_json(body.report)
     elif fmt == "pdf":
-        content = "# PDF export is not yet implemented.\n\n" + build_markdown(body.report)
+        md = body.report.markdown or build_markdown(body.report)
+        content = f"""<!DOCTYPE html><html><head><meta charset="utf-8"><title>Research Report</title>
+<style>body{{font-family:Georgia,serif;max-width:800px;margin:40px auto;padding:20px;line-height:1.6;color:#333}}h1{{border-bottom:2px solid #333;padding-bottom:10px}}h2{{margin-top:30px;color:#444}}h3{{margin-top:20px;color:#555}}pre{{background:#f5f5f5;padding:10px;border-radius:5px}}code{{background:#f0f0f0;padding:2px 5px;border-radius:3px}}</style></head><body>{html.escape(md)}</body></html>"""
     elif fmt == "docx":
-        content = "# DOCX export is not yet implemented.\n\n" + build_markdown(body.report)
+        md = body.report.markdown or build_markdown(body.report)
+        content = f"""<!DOCTYPE html><html><head><meta charset="utf-8"><title>Research Report</title>
+<style>body{{font-family:Calibri,sans-serif;max-width:800px;margin:40px auto;padding:20px;line-height:1.6}}h1{{font-size:24pt;border-bottom:1px solid #999}}h2{{font-size:18pt}}h3{{font-size:14pt}}</style></head><body>{html.escape(md)}</body></html>"""
     elif fmt == "html":
         md = body.report.markdown or build_markdown(body.report)
-        content = f"<html><body><pre>{md}</pre></body></html>"
+        content = f"<html><body><pre>{html.escape(md)}</pre></body></html>"
     else:
         raise HTTPException(status_code=400, detail=f"Unsupported format: {fmt}")
 

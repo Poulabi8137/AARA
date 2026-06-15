@@ -3,14 +3,13 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from app.agents.state import make_initial_state
 from app.agents.retrieval_agent import RetrievalAgent
 from app.llm.mock_provider import MockProvider
 from app.models.user import User
-from app.schemas.retrieval import RetrievalDebugInfo, RetrievalMetrics, RetrievalBundle
 from app.core.logging import get_logger
 from app.services.auth_service import require_role
 from app.models.user import UserRole
@@ -53,7 +52,7 @@ async def debug_retrieval(
         except json.JSONDecodeError:
             logger.warning("invalid planner_output_json in debug request")
 
-    result = await agent.run(state)
+    await agent.run(state)
 
     bundles_raw = state.get("retrieved_documents", [])
     metrics_raw = state.get("agent_metrics", {}).get("retrieval", {})

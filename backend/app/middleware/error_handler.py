@@ -19,7 +19,7 @@ def setup_exception_handlers(app: FastAPI) -> None:
         for error in exc.errors():
             errors.append(
                 {
-                    "field": ".".join(str(l) for l in error.get("loc", [])),
+                    "field": ".".join(str(loc) for loc in error.get("loc", [])),
                     "message": error.get("msg", "Validation error"),
                     "type": error.get("type", ""),
                 }

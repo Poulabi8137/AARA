@@ -9,7 +9,6 @@ from app.agents.state import make_initial_state
 from app.agents.summarizer_agent import SummarizerAgent
 from app.llm.mock_provider import MockProvider
 from app.models.user import User
-from app.schemas.summarizer import SummarizerMetrics
 from app.core.logging import get_logger
 from app.services.auth_service import require_role
 from app.models.user import UserRole
@@ -42,7 +41,7 @@ async def debug_summarizer(
     state = make_initial_state(query=body.query)
     state["retrieved_documents"] = body.retrieved_documents or []
 
-    result = await agent.run(state)
+    await agent.run(state)
 
     summaries_raw = state.get("summaries", [])
     metrics_raw = state.get("agent_metrics", {}).get("summarizer", {})

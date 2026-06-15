@@ -1,0 +1,69 @@
+name: Deploy Staging
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - 'backend/**'
+      - 'backend/docker-compose*.yml'
+      - '.github/workflows/deploy-staging.yml'
+
+concurrency:
+  group: staging-deploy
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,format=short
+            type=ref,event=branch
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          file: backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to Staging
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.STAGING_SSH_KEY }}" > ~/.ssh/staging_key
+          chmod 600 ~/.ssh/staging_key
+      - name: Deploy via docker-compose
+        run: |
+          ssh -i ~/.ssh/staging_key -o StrictHostKeyChecking=no \
+            ${{ secrets.STAGING_HOST }} \
+            "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${GITHUB_SHA::7} && \
+             docker-compose -f docker-compose.staging.yml up -d api"

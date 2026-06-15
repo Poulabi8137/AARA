@@ -5,8 +5,6 @@ from typing import Any
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from app.agents.state import make_initial_state
-from app.agents.gap_detection_agent import GapDetectionAgent
 from app.agents.gap_analysis import detect_all_gaps, _parse_planner
 from app.agents.gap_coverage import (
     compute_coverage_metrics,
@@ -14,9 +12,8 @@ from app.agents.gap_coverage import (
     build_priority_mapping,
     build_risk_mapping,
 )
-from app.llm.mock_provider import MockProvider
 from app.models.user import User
-from app.schemas.gap_detection import CoverageMetrics, ResearchGap
+from app.schemas.gap_detection import CoverageMetrics
 from app.core.logging import get_logger
 from app.services.auth_service import require_role
 from app.models.user import UserRole

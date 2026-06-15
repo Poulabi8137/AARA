@@ -5,12 +5,9 @@ from datetime import datetime, timezone
 from typing import Any
 
 from app.schemas.report_generator import (
-    ExportFormat,
     ReportSection,
     ReportCitation,
     ReportContradiction,
-    ReportReference,
-    ReportMetrics,
     ResearchReport,
 )
 from app.agents.report_references import (
@@ -168,7 +165,7 @@ def build_report_from_state(
     planner = _parse_planner(planner_raw)
     sections = _build_report_sections(summaries)
     references = aggregate_references(summaries)
-    citations_flat = build_citation_list(summaries)
+    build_citation_list(summaries)
     contradictions = build_contradiction_list(summaries)
 
     # Key findings (aggregated from all sections)

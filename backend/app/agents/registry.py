@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
 
 from app.agents.base import BaseAgent
 from app.core.logging import get_logger
@@ -25,7 +24,7 @@ class AgentRegistry:
         if not name:
             raise ValueError(f"agent_name not set on {agent_cls.__name__}")
         cls._agents[name] = agent_cls
-        logger.info("agent registered", extra={"name": name, "class": agent_cls.__name__})
+        logger.info("agent registered", extra={"agent_name": name, "class": agent_cls.__name__})
         return agent_cls
 
     @classmethod
@@ -61,4 +60,4 @@ class AgentRegistry:
             try:
                 __import__(mod)
             except ImportError:
-                logger.warning("agent module not found, skipping", extra={"module": mod})
+                logger.warning("agent module not found, skipping", extra={"agent_module": mod})

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import IO
 
 from app.core.logging import get_logger
 

@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 const TOKEN_KEY = 'authToken';
 const REFRESH_KEY = 'refreshToken';
@@ -134,81 +134,64 @@ class APIClient {
     return this.client.post('/auth/refresh', { refresh_token: refreshToken });
   }
 
-  async createResearch(topic: string, description?: string) {
-    return this.client.post('/research', { topic, description });
+  async updateProfile(data: { name?: string; email?: string }) {
+    return this.client.put('/auth/me', data);
   }
 
-  async getResearch(id: string) {
-    return this.client.get(`/research/${id}`);
+  async listProjects() {
+    return this.client.get('/projects');
   }
 
-  async listResearch() {
-    return this.client.get('/research');
+  async createProject(title: string, description?: string) {
+    return this.client.post('/projects', { title, description });
   }
 
-  async updateResearch(id: string, data: any) {
-    return this.client.put(`/research/${id}`, data);
+  async getProject(id: string) {
+    return this.client.get(`/projects/${id}`);
   }
 
-  async searchPapers(query: string, researchId: string) {
-    return this.client.get('/papers/search', {
-      params: { query, researchId },
-    });
+  async updateProject(id: string, data: any) {
+    return this.client.put(`/projects/${id}`, data);
   }
 
-  async getPapers(researchId: string) {
-    return this.client.get(`/research/${researchId}/papers`);
+  async deleteProject(id: string) {
+    return this.client.delete(`/projects/${id}`);
   }
 
-  async getPaper(paperId: string) {
-    return this.client.get(`/papers/${paperId}`);
+  async getProjectResearchOutputs(id: string) {
+    return this.client.get(`/projects/${id}/research-outputs`);
   }
 
-  async startAgent(researchId: string, agentType: string) {
-    return this.client.post(`/research/${researchId}/agents`, { agentType });
+  async runWorkflow(projectId: string, query: string, objective?: string) {
+    return this.client.post('/agents/run', { project_id: projectId, query, objective });
   }
 
-  async getAgentStatus(agentId: string) {
-    return this.client.get(`/agents/${agentId}`);
+  async getExecutionStatus(executionId: string) {
+    return this.client.get(`/agents/executions/${executionId}/status`);
   }
 
-  async listAgents(researchId: string) {
-    return this.client.get(`/research/${researchId}/agents`);
+  async listExecutions() {
+    return this.client.get('/agents/executions');
   }
 
-  async getLiteratureReview(researchId: string) {
-    return this.client.get(`/research/${researchId}/literature-review`);
+  async getExecution(executionId: string) {
+    return this.client.get(`/agents/executions/${executionId}`);
   }
 
-  async getGapAnalysis(researchId: string) {
-    return this.client.get(`/research/${researchId}/gap-analysis`);
+  async listSessions() {
+    return this.client.get('/sessions');
   }
 
-  async getNovelDirections(researchId: string) {
-    return this.client.get(`/research/${researchId}/novel-directions`);
+  async createSession(projectId: string, sessionName: string) {
+    return this.client.post('/sessions', { project_id: projectId, session_name: sessionName });
   }
 
-  async generateReport(researchId: string, template?: string) {
-    return this.client.post(`/research/${researchId}/report`, { template });
+  async listReports() {
+    return this.client.get('/reports');
   }
 
-  async getReport(researchId: string) {
-    return this.client.get(`/research/${researchId}/report`);
-  }
-
-  async exportReport(researchId: string, format: 'pdf' | 'docx' | 'markdown') {
-    return this.client.get(`/research/${researchId}/report/export`, {
-      params: { format },
-      responseType: 'blob',
-    });
-  }
-
-  async generateCitations(researchId: string, format: 'apa' | 'mla' | 'chicago' | 'bibtex') {
-    return this.client.post(`/research/${researchId}/citations`, { format });
-  }
-
-  async getCitations(researchId: string) {
-    return this.client.get(`/research/${researchId}/citations`);
+  async generateReport(data: { content: string; sections: string[]; format?: string }) {
+    return this.client.post('/reports/generate', data);
   }
 }
 

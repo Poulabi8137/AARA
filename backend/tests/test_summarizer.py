@@ -19,7 +19,6 @@ from app.schemas.summarizer import (
     SectionSummary,
     CitationRecord,
     Contradiction,
-    SummarizerMetrics,
 )
 
 
@@ -225,7 +224,7 @@ class TestSummarizerAgent:
         agent = SummarizerAgent(llm_provider=provider)
         state = _state_with_bundles()
         await agent.run(state)
-        found = any(s.get("contradictions") for s in state["summaries"])
+        any(s.get("contradictions") for s in state["summaries"])
 
     @pytest.mark.asyncio
     async def test_metrics_populated(self) -> None:

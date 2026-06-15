@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import os
-from typing import Any
 
 from app.core.config import Settings
 from app.core.logging import get_logger

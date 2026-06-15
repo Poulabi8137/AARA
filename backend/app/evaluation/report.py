@@ -31,18 +31,18 @@ def _build_markdown(result: dict[str, Any]) -> str:
     eval_time = result.get("evaluated_at", "")
 
     lines = [
-        f"# Evaluation Report",
-        f"",
+        "# Evaluation Report",
+        "",
         f"**Query:** {query}",
         f"**Evaluated At:** {eval_time}",
         f"**Composite Score:** {composite:.1f}/100",
         f"**Tier:** {summary.get('tier', 'unknown').upper()}",
         f"**Passed:** {'✓' if summary.get('passed') else '✗'}",
-        f"",
-        f"## Score Breakdown",
-        f"",
-        f"| Metric | Score |",
-        f"|--------|-----:|",
+        "",
+        "## Score Breakdown",
+        "",
+        "| Metric | Score |",
+        "|--------|-----:|",
     ]
     for name, score in sorted(scores.items()):
         if name == "research_quality":
@@ -51,9 +51,9 @@ def _build_markdown(result: dict[str, Any]) -> str:
         lines.append(f"| {name.replace('_', ' ').title()} | {score:.1f} {bar} |")
 
     lines.extend([
-        f"",
+        "",
         f"**Overall Quality:** {composite:.1f}/100",
-        f"",
+        "",
     ])
 
     return "\n".join(lines)

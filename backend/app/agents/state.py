@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any, Optional, TypedDict
+from typing import Any, TypedDict
 
 
 class ResearchState(TypedDict, total=False):

@@ -1,13 +1,17 @@
 from __future__ import annotations
 
+import json
 import time
 from typing import Any
 
 from app.agents.base import BaseAgent
 from app.agents.registry import AgentRegistry
 from app.agents.state import ResearchState
-from app.agents.report_builder import build_report_from_state
-from app.agents.report_validation import validate_report_data
+from app.agents.report_builder import build_report_from_state, build_markdown
+from app.agents.report_generator_prompts import (
+    REPORT_GENERATOR_SYSTEM_PROMPT,
+    REPORT_GENERATOR_USER_PROMPT_TEMPLATE,
+)
 from app.schemas.report_generator import ResearchReport
 from app.core.logging import get_logger
 
@@ -33,6 +37,20 @@ class ReportGeneratorAgent(BaseAgent):
             report = self._fallback_report(query, planner_output, gaps)
         else:
             report = build_report_from_state(query, planner_output, summaries, gaps, objective)
+            if summaries:
+                llm_enhanced = await self._enhance_report_with_llm(
+                    query=query,
+                    summaries=summaries,
+                    key_findings=report.key_findings,
+                    gaps=gaps,
+                    citations=report.references,
+                )
+                if llm_enhanced is not None:
+                    report.executive_summary = llm_enhanced.get("executive_summary", report.executive_summary)
+                    report.introduction = llm_enhanced.get("introduction", report.introduction)
+                    report.conclusion = llm_enhanced.get("conclusion", report.conclusion)
+                    report.markdown = build_markdown(report)
+                    report.report_json = json.dumps(report.model_dump(), indent=2, default=str)
 
         report.metrics.generation_latency = round(time.monotonic() - start, 3)
 
@@ -72,6 +90,59 @@ class ReportGeneratorAgent(BaseAgent):
         report_text = state.get("generated_report", "")
         if not report_text or len(report_text) < 50:
             raise ValueError("Generated report is too short or empty")
+
+    async def _enhance_report_with_llm(
+        self,
+        query: str,
+        summaries: list[dict[str, Any]],
+        key_findings: list[str],
+        gaps: list[dict[str, Any]],
+        citations: list[Any],
+    ) -> dict[str, str] | None:
+        if not summaries:
+            return None
+        summaries_text = "\n\n".join(
+            f"Subtopic: {s.get('subtopic', 'General')}\n"
+            f"Summary: {s.get('executive_summary', '')[:500]}\n"
+            f"Findings: {'; '.join(s.get('key_findings', [])[:3])}"
+            for s in summaries[:8]
+        )
+        gaps_text = "\n".join(
+            f"- [{g.get('severity', 'unknown')}] {g.get('description', '')[:200]}"
+            for g in gaps[:5]
+        ) if gaps else "None identified"
+        citations_text = "\n".join(
+            f"- {r.source if hasattr(r, 'source') else r.get('source', '')}"
+            for r in citations[:10]
+        ) if citations else "None"
+
+        prompt = REPORT_GENERATOR_USER_PROMPT_TEMPLATE.format(
+            query=query,
+            summaries_text=summaries_text,
+            key_findings="\n".join(f"- {f}" for f in key_findings[:10]),
+            gaps_text=gaps_text,
+            citations_text=citations_text,
+        )
+        try:
+            response = await self.llm.generate(
+                prompt=prompt,
+                system_prompt=REPORT_GENERATOR_SYSTEM_PROMPT,
+            )
+            raw = response.content.strip()
+            if raw.startswith("```"):
+                raw = raw.split("\n", 1)[-1]
+                raw = raw.rsplit("\n```", 1)[0]
+            result = json.loads(raw)
+            if not isinstance(result, dict):
+                raise ValueError("LLM response is not a JSON object")
+            logger.info("report LLM enhancement succeeded", extra={"query": query})
+            return result
+        except Exception as exc:
+            logger.warning(
+                "report LLM enhancement failed, using template-based fallback",
+                extra={"query": query, "error": str(exc)},
+            )
+            return None
 
     def _fallback_report(
         self,

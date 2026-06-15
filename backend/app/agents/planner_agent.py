@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import time
-from datetime import datetime, timezone
 from typing import Any
 
 from app.agents.base import BaseAgent
@@ -54,7 +53,6 @@ class PlannerAgent(BaseAgent):
         last_error: str | None = None
         repair_attempts = 0
         validation_failures = 0
-        used_fallback = False
 
         # --- Attempt LLM generation with retries ---
         for attempt in range(self.MAX_RETRIES):
@@ -130,7 +128,6 @@ class PlannerAgent(BaseAgent):
 
         # --- Fallback: use template ---
         logger.warning("planner using fallback template", extra={"error": last_error})
-        used_fallback = True
         fallback = dict(PLANNER_FALLBACK_TEMPLATE)
         fallback["research_goal"] = fallback["research_goal"].format(query=query)
         fallback["research_questions"] = [q.format(query=query) for q in fallback["research_questions"]]

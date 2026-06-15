@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime, timezone
 import enum
 
-from sqlalchemy import String, Text, Integer, DateTime, ForeignKey, Enum as SAEnum
+from sqlalchemy import String, Integer, DateTime, ForeignKey, Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 

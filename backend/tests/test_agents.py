@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 import pytest
-from datetime import datetime, timezone
-from typing import Any
 
 from app.agents.state import ResearchState, make_initial_state
-from app.agents.base import BaseAgent, AgentResult
+from app.agents.base import BaseAgent
 from app.agents.registry import AgentRegistry
 from app.llm.mock_provider import MockProvider
 from app.graphs.research_graph import ResearchWorkflow
@@ -141,7 +139,7 @@ class TestBaseAgent:
 class TestAgentRegistry:
     def test_register_and_get(self) -> None:
         AgentRegistry._agents.clear()
-        provider = MockProvider()
+        MockProvider()
         agent_cls = type("DynamicAgent", (BaseAgent,), {
             "agent_name": "dynamic",
             "description": "dynamically registered",
@@ -335,7 +333,6 @@ class TestFailureRecovery:
     @pytest.mark.asyncio
     async def test_conditional_edge_retry_on_error(self) -> None:
         from app.graphs.research_graph import ResearchWorkflow
-        from app.graphs.nodes import planner_node
         state = make_initial_state(query="test")
         state["errors"] = ["planner: something went wrong"]
         result = state

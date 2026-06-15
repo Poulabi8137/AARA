@@ -3,6 +3,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from typing import Any
+
 import chromadb
 from chromadb.config import Settings as ChromaSettings
 
@@ -12,7 +14,7 @@ from app.core.logging import get_logger
 settings = get_settings()
 logger = get_logger("vectorstore.chroma")
 
-_CHROMA_INSTANCE: chromadb.AsyncHttpClient | None = None
+_CHROMA_INSTANCE: Any = None
 
 
 def _persist_dir() -> Path:
@@ -21,8 +23,8 @@ def _persist_dir() -> Path:
     return path
 
 
-async def get_chroma_client() -> chromadb.AsyncHttpClient:
-    """Return a singleton ChromaDB async HTTP client.
+async def get_chroma_client() -> Any:
+    """Return a singleton ChromaDB client.
 
     For production use the Chroma server container (port 8001).
     Falls back to ephemeral in-memory when the server is unreachable.
@@ -50,13 +52,9 @@ async def get_chroma_client() -> chromadb.AsyncHttpClient:
             "ChromaDB server unreachable, falling back to ephemeral client",
             extra={"host": host, "port": port},
         )
-        _CHROMA_INSTANCE = await chromadb.AsyncHttpClient(
-            host=host,
-            port=port,
+        _CHROMA_INSTANCE = chromadb.EphemeralClient(
             settings=ChromaSettings(
                 anonymized_telemetry=False,
-                persist_directory=str(_persist_dir()),
-                is_persistent=False,
             ),
         )
     return _CHROMA_INSTANCE

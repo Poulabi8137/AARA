@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,7 +15,6 @@ from app.core.security import (
     create_access_token,
     create_refresh_token,
     decode_token,
-    TokenError,
     TokenExpiredError,
     TokenInvalidError,
     create_password_reset_token,
@@ -32,6 +30,7 @@ security_scheme = HTTPBearer(auto_error=False)
 
 
 async def get_current_user(
+    request: Request,
     credentials: HTTPAuthorizationCredentials | None = Depends(security_scheme),
     db: AsyncSession = Depends(get_db),
 ) -> User:
@@ -80,6 +79,8 @@ async def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found",
         )
+
+    request.state.user_id = str(user.id)
     return user
 
 

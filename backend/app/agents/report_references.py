@@ -1,9 +1,54 @@
 from __future__ import annotations
 
-from collections import Counter
 from typing import Any
 
 from app.schemas.report_generator import ReportReference, ReportCitation
+
+
+def verify_citations_against_evidence(
+    citations: list[ReportCitation],
+    summaries: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Cross-check citations against available evidence sources.
+
+    Flags citations where the source does not match any known evidence source
+    from the retrieved documents. Citations whose chunk_ids are found in
+    evidence are verified; those without matching chunk_ids are flagged.
+    """
+    known_sources: dict[str, set[str]] = {}
+    known_chunk_ids: set[str] = set()
+
+    for s in summaries:
+        evidence_list = s.get("evidence", [])
+        if not isinstance(evidence_list, list):
+            continue
+        for e in evidence_list:
+            if not isinstance(e, dict):
+                continue
+            src = e.get("source", "") or ""
+            cid = e.get("chunk_id", "") or ""
+            if src:
+                known_sources.setdefault(src.lower(), set()).add(cid)
+            if cid:
+                known_chunk_ids.add(cid)
+
+    warnings: list[dict[str, Any]] = []
+    for c in citations:
+        source = c.source or ""
+        chunk_ids = c.supporting_chunk_ids or []
+
+        source_match = source.lower() in known_sources
+        chunk_match = any(cid in known_chunk_ids for cid in chunk_ids)
+
+        if not source_match and not chunk_match:
+            warnings.append({
+                "type": "unverifiable_citation",
+                "source": source,
+                "claim": c.claim[:120],
+                "reason": "Source not found in retrieved evidence and no matching chunk_ids",
+            })
+
+    return warnings
 
 
 def aggregate_references(summaries: list[dict[str, Any]]) -> list[ReportReference]:
@@ -23,7 +68,7 @@ def aggregate_references(summaries: list[dict[str, Any]]) -> list[ReportReferenc
                 continue
             source = c.get("source", "unknown") or "unknown"
             claim = c.get("claim", "")
-            chunk_ids = c.get("supporting_chunk_ids", [])
+            c.get("supporting_chunk_ids", [])
 
             key = _reference_key(source, claim)
             if key not in ref_map:

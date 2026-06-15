@@ -29,7 +29,7 @@ function SkeletonCard() {
 }
 
 function SkeletonLine({ width = '100%' }: { width?: string }) {
-  return <Skeleton className={`h-3 w-[${width}]`} />
+  return <Skeleton className="h-3" style={{ width }} />
 }
 
 export { Skeleton, SkeletonCard, SkeletonLine }

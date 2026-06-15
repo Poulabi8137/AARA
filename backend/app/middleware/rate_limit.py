@@ -52,7 +52,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         for window, max_req in limits:
             allowed, remaining, retry_after = await self._check_limit(
-                client_id, request.url.path, window, max_req
+                request, client_id, request.url.path, window, max_req
             )
             if not allowed:
                 raise RateLimitExceeded(retry_after=retry_after)
@@ -61,14 +61,14 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         return response
 
     async def _check_limit(
-        self, client_id: str, path: str, window: int, max_req: int
+        self, request: Request, client_id: str, path: str, window: int, max_req: int
     ) -> tuple[bool, int, int]:
         """
         Sliding window counter using Redis sorted sets.
         Returns (allowed, remaining, retry_after).
         If Redis is unavailable, allow the request (fail open).
         """
-        redis = getattr(self._app.state, "redis_client", None)
+        redis = getattr(request.app.state, "redis_client", None)
         if redis is None:
             return True, max_req, 0
 

@@ -7,8 +7,6 @@ from typing import Any
 from app.agents.state import make_initial_state
 from app.agents.report_builder import (
     build_report_from_state,
-    build_markdown,
-    build_json,
 )
 from app.agents.report_references import (
     aggregate_references,
@@ -25,7 +23,6 @@ from app.schemas.report_generator import (
     ReportCitation,
     ReportReference,
     ReportMetrics,
-    ReportContradiction,
     ExportFormat,
 )
 
@@ -276,7 +273,7 @@ class TestReportBuilder:
             gaps=[_sample_gap("LOW_EVIDENCE", "high")],
         )
         assert len(report.limitations) >= 1
-        assert any("Limited evidence" in l for l in report.limitations)
+        assert any("Limited evidence" in lim for lim in report.limitations)
 
     def test_recommendations_from_gaps(self) -> None:
         report = build_report_from_state(

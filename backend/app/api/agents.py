@@ -57,9 +57,24 @@ async def run_workflow(
 ) -> Any:
     execution_id = uuid.uuid4()
 
+    if not request.project_id:
+        raise HTTPException(
+            status_code=422,
+            detail="project_id is required to run a workflow",
+        )
+
+    project_check = await session.execute(
+        select(ResearchProject).where(
+            ResearchProject.id == uuid.UUID(request.project_id),
+            ResearchProject.created_by == current_user.id,
+        )
+    )
+    if project_check.scalar_one_or_none() is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+
     execution = AgentExecution(
         id=execution_id,
-        project_id=uuid.UUID(request.project_id) if request.project_id else uuid.uuid4(),
+        project_id=uuid.UUID(request.project_id),
         agent_name="research_workflow",
         execution_status=ExecutionStatus.PENDING,
         input_query=request.query,
@@ -193,7 +208,9 @@ async def cancel_execution(
 
 
 @router.get("/registry", response_model=AgentListResponse)
-async def list_registered_agents() -> Any:
+async def list_registered_agents(
+    current_user: User = Depends(get_current_user),
+) -> Any:
     """List all agents registered in the agent registry."""
     agents = AgentRegistry.list_agents()
     return AgentListResponse(

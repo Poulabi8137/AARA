@@ -19,6 +19,7 @@ from app.api.router import (
     report_generator_router,
     evaluation_router,
     human_approval_router,
+    research_outputs_router,
 )
 from app.core.logging import setup_logging, get_logger
 from app.middleware.setup import setup_middleware
@@ -130,6 +131,7 @@ def create_app() -> FastAPI:
     app.include_router(report_generator_router)
     app.include_router(evaluation_router)
     app.include_router(human_approval_router)
+    app.include_router(research_outputs_router)
 
     return app
 

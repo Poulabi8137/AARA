@@ -46,4 +46,5 @@ class SummarizerMetrics(BaseModel):
     evidence_utilization: float = 0.0
     average_summary_score: float = 0.0
     used_fallback: bool = False
+    llm_enhancement_count: int = 0
     errors: list[str] = Field(default_factory=list)

@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field
-from typing import Any
 
 import pytest
 
-from app.schemas.planner import PlannerOutput, PlannerMetrics
+from app.schemas.planner import PlannerOutput
 from app.agents.planner_validator import (
     parse_llm_response,
     compute_planning_score,
@@ -16,7 +14,7 @@ from app.agents.planner_validator import (
 from app.agents.prompts import PLANNER_FALLBACK_TEMPLATE
 from app.agents.planner_agent import PlannerAgent
 from app.agents.state import make_initial_state
-from app.llm.provider import LLMResponse, ProviderConfig
+from app.llm.provider import LLMResponse
 from app.llm.mock_provider import MockProvider
 
 
@@ -446,7 +444,7 @@ class TestPlannerAgent:
         agent = PlannerAgent(llm_provider=provider)
         state = make_initial_state(query="AI alignment")
         await agent.run(state)
-        output = json.loads(state["planner_output"])
+        json.loads(state["planner_output"])
 
     @pytest.mark.asyncio
     async def test_retry_behavior(self) -> None:

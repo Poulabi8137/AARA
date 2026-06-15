@@ -4,7 +4,7 @@ import json
 import re
 from typing import Any
 
-from app.schemas.gap_detection import GapType, ResearchGap, RemediationSuggestion, SeverityLevel
+from app.schemas.gap_detection import GapType, ResearchGap
 from app.agents.gap_severity import compute_severity
 from app.agents.gap_remediation import generate_remediation
 

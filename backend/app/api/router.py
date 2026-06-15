@@ -11,6 +11,7 @@ from app.api.gap_debug import router as gap_debug_router
 from app.api.report_generator import router as report_generator_router
 from app.api.evaluation import router as evaluation_router
 from app.api.human_approval import router as human_approval_router
+from app.api.research_outputs import router as research_outputs_router
 
 __all__ = [
     "auth_router",
@@ -26,4 +27,5 @@ __all__ = [
     "report_generator_router",
     "evaluation_router",
     "human_approval_router",
+    "research_outputs_router",
 ]

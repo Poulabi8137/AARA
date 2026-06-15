@@ -104,7 +104,7 @@ class MetricsMiddleware(BaseHTTPMiddleware):
             HTTP_REQUEST_COUNT.labels(method=method, path=path, status=status_group).inc()
             HTTP_REQUEST_DURATION.labels(method=method, path=path).observe(elapsed)
             return response
-        except Exception as exc:
+        except Exception:
             elapsed = time.monotonic() - start
             HTTP_REQUEST_COUNT.labels(method=method, path=path, status="5xx").inc()
             HTTP_REQUEST_DURATION.labels(method=method, path=path).observe(elapsed)

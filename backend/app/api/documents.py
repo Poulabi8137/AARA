@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import re
 import uuid
 
-from fastapi import APIRouter, Depends, Query, UploadFile, File, HTTPException, status
+from fastapi import APIRouter, Depends, Query, UploadFile, File, HTTPException, status, Response
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
@@ -20,10 +22,19 @@ from app.schemas.document import (
 from app.services.auth_service import get_current_user
 from app.ingestion.ingestion_service import IngestionService
 from app.ingestion.document_loader import UnsupportedFormatError, SUPPORTED_EXTENSIONS
-from app.vectorstore.collections import CollectionName, list_collections
+from app.core.config import get_settings
+from app.vectorstore.collections import CollectionName
 from app.vectorstore.retrieval import similarity_search, multi_collection_search
 
 router = APIRouter(tags=["Documents & Retrieval"])
+
+
+def _sanitize_filename(filename: str) -> str:
+    """Strip path separators, null bytes, and other dangerous characters."""
+    filename = re.sub(r"[\x00-\x1f/\\:]", "_", filename)
+    filename = re.sub(r"\.\.", "_", filename)
+    filename = filename.strip(". ")
+    return filename or "unnamed"
 
 
 @router.post("/documents/upload", response_model=DocumentResponse, status_code=201)
@@ -38,8 +49,12 @@ async def upload_document(
     """Upload a document for ingestion into the vector store.
 
     Supported formats: PDF, DOCX, TXT, Markdown.
+    Max upload size is controlled by settings.max_upload_size (default 10 MB).
     """
-    ext = f".{file.filename.rsplit('.', 1)[-1].lower()}" if "." in (file.filename or "") else ""
+    raw_filename = (file.filename or "unknown").strip()
+    safe_filename = _sanitize_filename(raw_filename)
+
+    ext = f".{safe_filename.rsplit('.', 1)[-1].lower()}" if "." in safe_filename else ""
 
     if ext not in SUPPORTED_EXTENSIONS:
         raise HTTPException(
@@ -47,6 +62,7 @@ async def upload_document(
             detail=f"Unsupported file format '{ext}'. Supported: {', '.join(sorted(SUPPORTED_EXTENSIONS))}",
         )
 
+    settings = get_settings()
     try:
         content = await file.read()
     except Exception as e:
@@ -55,11 +71,30 @@ async def upload_document(
             detail=f"Failed to read uploaded file: {str(e)}",
         )
 
+    if len(content) > settings.max_upload_size:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"File too large. Maximum size is {settings.max_upload_size // (1024 * 1024)} MB",
+        )
+
+    if project_id:
+        project_check = await db.execute(
+            select(ResearchProject).where(
+                ResearchProject.id == uuid.UUID(project_id),
+                ResearchProject.created_by == current_user.id,
+            )
+        )
+        if project_check.scalar_one_or_none() is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Project not found",
+            )
+
     service = IngestionService(db)
     try:
         document = await service.ingest_document(
             file_content=content,
-            filename=file.filename or "unknown",
+            filename=safe_filename,
             project_id=project_id,
             collection=collection,
             author=author,
@@ -78,6 +113,18 @@ async def list_documents(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> DocumentListResponse:
+    if project_id:
+        project_check = await db.execute(
+            select(ResearchProject).where(
+                ResearchProject.id == uuid.UUID(project_id),
+                ResearchProject.created_by == current_user.id,
+            )
+        )
+        if project_check.scalar_one_or_none() is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Project not found",
+            )
     service = IngestionService(db)
     docs, total = await service.list_documents(
         project_id=project_id, skip=skip, limit=limit
@@ -88,7 +135,7 @@ async def list_documents(
     )
 
 
-@router.delete("/documents/{document_id}", status_code=204)
+@router.delete("/documents/{document_id}", status_code=204, response_class=Response)
 async def delete_document(
     document_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
@@ -110,6 +157,7 @@ async def delete_document(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
     service = IngestionService(db)
     await service.delete_document(document_id)
+    return Response(status_code=204)
 
 
 @router.post("/retrieval/search", response_model=SearchResponse)
@@ -159,7 +207,6 @@ async def retrieve_context(
     Returns results grouped by collection so agents can prioritise sources.
     """
     collections = body.collections or [c.value for c in CollectionName]
-    filter = {"project_id": body.project_id} if body.project_id else None
 
     results = await multi_collection_search(
         query=body.query,

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
 from typing import Any
 
 from sqlalchemy import select
@@ -9,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
 from app.ingestion.document_loader import extract_text_from_bytes
-from app.ingestion.chunking import chunk_text, Chunk
+from app.ingestion.chunking import chunk_text
 from app.ingestion.metadata_extractor import extract_default_metadata
 from app.models.document import Document, DocumentStatus
 from app.vectorstore.collections import CollectionName
@@ -98,9 +97,10 @@ class IngestionService:
         if doc is None:
             return
 
+        project_filter = str(doc.project_id) if doc.project_id else f"doc_{doc.id}"
         await delete_documents_by_filter(
             collection=doc.collection,
-            filter={"project_id": str(doc.id)},
+            filter={"project_id": project_filter},
         )
         await self.db.delete(doc)
         await self.db.flush()
@@ -112,19 +112,22 @@ class IngestionService:
         skip: int = 0,
         limit: int = 50,
     ) -> tuple[list[Document], int]:
-        query = select(Document).order_by(Document.uploaded_at.desc())
-        count_query = select(Document).order_by(Document.uploaded_at.desc())
+        from sqlalchemy import func as sa_func
+
+        base_query = select(Document).order_by(Document.uploaded_at.desc())
+        count_query = select(sa_func.count(Document.id))
 
         if project_id:
-            query = query.where(Document.project_id == uuid.UUID(project_id))
-            count_query = count_query.where(Document.project_id == uuid.UUID(project_id))
+            pid = uuid.UUID(project_id)
+            base_query = base_query.where(Document.project_id == pid)
+            count_query = count_query.where(Document.project_id == pid)
 
-        query = query.offset(skip).limit(limit)
+        query = base_query.offset(skip).limit(limit)
 
         result = await self.db.execute(query)
         docs = list(result.scalars().all())
 
         count_result = await self.db.execute(count_query)
-        total = len(count_result.scalars().all())
+        total = count_result.scalar_one()
 
         return docs, total

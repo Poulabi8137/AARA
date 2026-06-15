@@ -87,7 +87,7 @@ function isValidToken(token: string | undefined): boolean {
   return true
 }
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = request.cookies.get('auth_token')?.value
   const isAuthenticated = isValidToken(token)

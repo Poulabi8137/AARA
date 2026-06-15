@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 from app.core.config import get_settings
 from app.core.logging import get_logger

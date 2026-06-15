@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any
 
 from app.evaluation.metrics import (
-    METRIC_REGISTRY,
     compute_citation_density,
     compute_evidence_strength,
     compute_gap_coverage,
@@ -73,18 +72,6 @@ def generate_scorecard(state: dict[str, Any]) -> dict[str, Any]:
         s.get("subtopic", "") for s in summaries if s.get("subtopic")
     ]
 
-    metrics_input = {
-        "planner_questions": planner_questions,
-        "answered_questions": answered_questions,
-        "summaries": summaries,
-        "citations": citations,
-        "sections": sections,
-        "sources": sources,
-        "evidence_chunks": evidence_chunks,
-        "key_findings": key_findings,
-        "gaps": gaps,
-        "report": report,
-    }
 
     scores: dict[str, float] = {}
     details: dict[str, Any] = {}

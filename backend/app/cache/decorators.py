@@ -5,7 +5,7 @@ import functools
 import hashlib
 import inspect
 import json
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 from app.cache.service import CacheService
 from app.core.config import get_settings

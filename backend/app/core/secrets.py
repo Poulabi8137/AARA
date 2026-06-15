@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 import json
-from typing import Any
 
 from app.core.logging import get_logger
 
@@ -52,7 +51,6 @@ class SecretManager:
         """Load secrets from AWS Secrets Manager."""
         try:
             import boto3
-            from botocore.exceptions import ClientError
 
             secret_name = os.environ.get("AWS_SECRET_NAME", "agentwatch/production")
             region = os.environ.get("AWS_REGION", "us-east-1")
@@ -92,7 +90,7 @@ class SecretManager:
                     secret = client.get_secret(name)
                     self._secrets[name.replace("-", "_")] = secret.value
                 except Exception:
-                    logger.warning("secret not found in Key Vault", extra={"name": name})
+                    logger.warning("secret not found in Key Vault", extra={"secret_name": name})
 
             logger.info("loaded secrets from Azure Key Vault")
         except Exception as exc:
@@ -120,7 +118,7 @@ class SecretManager:
                     response = client.access_secret_version(request={"name": resource_name})
                     self._secrets[name.replace("-", "_")] = response.payload.data.decode("UTF-8")
                 except Exception:
-                    logger.warning("secret not found in GCP", extra={"name": name})
+                    logger.warning("secret not found in GCP", extra={"secret_name": name})
 
             logger.info("loaded secrets from GCP Secret Manager")
         except Exception as exc:
