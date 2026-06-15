@@ -24,7 +24,7 @@ jobs:
     name: k6 ${{ github.event.inputs.test_type }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run k6 test
         uses: grafana/k6-action@v0.3.1
         with:
