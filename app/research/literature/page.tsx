@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { EvidencePanel } from '@/components/evidence-panel'
@@ -10,7 +10,7 @@ import { GlassCard } from '@/components/ui/glass-card'
 import { PageTransition, childVariants } from '@/components/page-transition'
 import { apiClient } from '@/lib/api-client'
 
-export default function LiteratureReviewPage() {
+function LiteratureReviewPageInner() {
   const searchParams = useSearchParams()
   const projectId = searchParams.get('id')
 
@@ -138,5 +138,13 @@ export default function LiteratureReviewPage() {
         </>
       )}
     </PageTransition>
+  )
+}
+
+export default function LiteratureReviewPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center p-8"><Loader2 className="w-6 h-6 animate-spin" /></div>}>
+      <LiteratureReviewPageInner />
+    </Suspense>
   )
 }

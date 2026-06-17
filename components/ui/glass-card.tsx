@@ -2,12 +2,15 @@
 
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import type { HTMLAttributes } from 'react'
+import type { ReactNode } from 'react'
 
-interface GlassCardProps extends HTMLAttributes<HTMLDivElement> {
+interface GlassCardProps {
+  children: ReactNode
+  className?: string
   hover?: boolean
   glow?: 'primary' | 'accent' | 'none'
   depth?: 'flat' | 'raised' | 'floating'
+  onClick?: (e: React.MouseEvent) => void
 }
 
 const depthStyles = {
@@ -28,7 +31,7 @@ export function GlassCard({
   hover = true,
   glow = 'primary',
   depth = 'raised',
-  ...props
+  onClick,
 }: GlassCardProps) {
   return (
     <motion.div
@@ -37,6 +40,7 @@ export function GlassCard({
       viewport={{ once: true }}
       transition={{ type: 'spring', stiffness: 200, damping: 25 }}
       whileHover={hover ? { y: -2, scale: 1.005 } : undefined}
+      onClick={onClick}
       className={cn(
         'rounded-xl border border-border/50 bg-background/60 dark:bg-white/[0.04] backdrop-blur-xl',
         'transition-all duration-300',
@@ -45,7 +49,6 @@ export function GlassCard({
         hover && 'cursor-default',
         className
       )}
-      {...props}
     >
       {children}
     </motion.div>

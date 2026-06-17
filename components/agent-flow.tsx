@@ -33,7 +33,8 @@ const statusColors = {
   pending: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10',
 }
 
-function AgentNode({ data }: NodeProps) {
+function AgentNode({ data: rawData }: NodeProps) {
+  const data = rawData as { label?: string; status?: string; progress?: number; description?: string }
   const StatusIcon = statusIcons[data.status as keyof typeof statusIcons]
   return (
     <motion.div

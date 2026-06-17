@@ -11,6 +11,8 @@ interface AuthState {
   signup: (name: string, email: string, password: string) => Promise<void>
   logout: () => void
   getMe: () => Promise<void>
+  clearError: () => void
+  hydrate: () => void
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -26,7 +28,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const data = res.data
       const name = data.user?.name || email.split('@')[0]
       set({
-        user: { id: data.user?.id || '', name, email },
+        user: { id: data.user?.id || '', name, email, createdAt: new Date().toISOString() },
         token: data.access_token,
         isLoading: false,
       })
@@ -44,7 +46,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const res = await apiClient.signup(email, password, name)
       const data = res.data
       set({
-        user: data.user || { id: '', name, email },
+        user: data.user || { id: '', name, email, createdAt: new Date().toISOString() },
         token: data.access_token,
         isLoading: false,
       })
@@ -70,6 +72,15 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ user: data })
     } catch {
       set({ user: null, token: null })
+    }
+  },
+
+  clearError: () => set({ error: null }),
+
+  hydrate: () => {
+    const token = localStorage.getItem('authToken')
+    if (token) {
+      set({ token })
     }
   },
 }))

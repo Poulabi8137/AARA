@@ -37,7 +37,8 @@ const moduleGradients: Record<string, string> = {
   report: 'from-rose-500/20 to-red-500/20 border-rose-500/20',
 }
 
-function ModuleNode({ data }: NodeProps) {
+function ModuleNode({ data: rawData }: NodeProps) {
+  const data = rawData as { label?: string; moduleId?: string }
   const Icon = moduleIcons[data.moduleId as keyof typeof moduleIcons]
   return (
     <motion.div

@@ -9,7 +9,7 @@ const pageVariants = {
     y: 0,
     transition: {
       duration: 0.4,
-      ease: [0.25, 0.1, 0.25, 1],
+      ease: [0.25, 0.1, 0.25, 1] as const,
       staggerChildren: 0.06,
     },
   },
@@ -20,7 +20,7 @@ const childVariants = {
   animate: {
     opacity: 1,
     y: 0,
-    transition: { type: 'spring', stiffness: 200, damping: 25 },
+    transition: { type: 'spring' as const, stiffness: 200, damping: 25 },
   },
 }
 

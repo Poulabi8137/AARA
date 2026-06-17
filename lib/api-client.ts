@@ -193,6 +193,81 @@ class APIClient {
   async generateReport(data: { content: string; sections: string[]; format?: string }) {
     return this.client.post('/reports/generate', data);
   }
+
+  // ── Paper Authoring API ──────────────────────────────────────────────────
+
+  async createProposal(data: {
+    project_id: string;
+    gap_id?: string;
+    domain?: string;
+    objective: string;
+    keywords?: string;
+    methodology_preference?: string;
+    base_paper_doi?: string;
+    base_paper_url?: string;
+  }) {
+    return this.client.post('/papers/proposal', data);
+  }
+
+  async getProposal(proposalId: string) {
+    return this.client.get(`/papers/proposal/${proposalId}`);
+  }
+
+  async listProposals(projectId: string) {
+    return this.client.get(`/papers/proposals/${projectId}`);
+  }
+
+  async generatePaper(projectId: string, proposalId: string) {
+    return this.client.post('/papers/generate', { project_id: projectId, proposal_id: proposalId });
+  }
+
+  async getPaper(paperId: string) {
+    return this.client.get(`/papers/${paperId}`);
+  }
+
+  async updatePaper(paperId: string, data: { title?: string; abstract?: string; keywords?: string[] }) {
+    return this.client.put(`/papers/${paperId}`, data);
+  }
+
+  async listProjectPapers(projectId: string) {
+    return this.client.get(`/papers/project/${projectId}`);
+  }
+
+  async rewriteSection(paperId: string, sectionId: string, operation: string) {
+    return this.client.post(`/papers/${paperId}/sections/${sectionId}/rewrite`, { operation });
+  }
+
+  async updateSectionContent(paperId: string, sectionId: string, content: string) {
+    return this.client.put(`/papers/${paperId}/section/${sectionId}?content=${encodeURIComponent(content)}`);
+  }
+
+  async qualityReview(paperId: string) {
+    return this.client.post(`/papers/${paperId}/quality-review`);
+  }
+
+  async validateCitations(paperId: string) {
+    return this.client.post(`/papers/${paperId}/validate-citations`);
+  }
+
+  async validateEvidence(paperId: string) {
+    return this.client.post(`/papers/${paperId}/validate-evidence`);
+  }
+
+  async downloadPaper(paperId: string, format: 'pdf' | 'docx') {
+    return this.client.get(`/papers/${paperId}/download/${format}`, { responseType: 'blob' });
+  }
+
+  async get<T = any>(url: string, config?: any) {
+    return this.client.get<T>(url, config);
+  }
+
+  async post<T = any>(url: string, data?: any) {
+    return this.client.post<T>(url, data);
+  }
+
+  async put<T = any>(url: string, data?: any) {
+    return this.client.put<T>(url, data);
+  }
 }
 
 export { clearPersistedAuth, TOKEN_KEY, REFRESH_KEY, USER_KEY, COOKIE_NAME, setCookie };

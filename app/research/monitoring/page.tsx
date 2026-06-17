@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { Suspense, useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Activity, Zap, AlertCircle, CheckCircle, Network, Loader2 } from 'lucide-react'
@@ -33,7 +33,7 @@ const statusIcons: Record<string, React.ReactNode> = {
   pending: <Activity className="w-3.5 h-3.5" />,
 }
 
-export default function MonitoringPage() {
+function MonitoringPageInner() {
   const searchParams = useSearchParams()
   const executionId = searchParams.get('execution')
 
@@ -178,5 +178,13 @@ export default function MonitoringPage() {
         </button>
       </div>
     </PageTransition>
+  )
+}
+
+export default function MonitoringPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center p-8"><Loader2 className="w-6 h-6 animate-spin" /></div>}>
+      <MonitoringPageInner />
+    </Suspense>
   )
 }

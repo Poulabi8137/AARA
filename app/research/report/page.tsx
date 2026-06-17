@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { FileText, Download, Eye, Edit2, Check, AlertCircle, Loader2 } from 'lucide-react'
@@ -14,7 +14,7 @@ const templates = [
   { name: 'Custom Report', id: 'custom', description: 'Build your own report with selected sections and content', sections: ['Abstract', 'Introduction', 'Literature Review', 'Gap Analysis', 'Novel Directions', 'Recommendations', 'Timeline', 'Conclusion'] },
 ]
 
-export default function ReportGenerationPage() {
+function ReportGenerationPageInner() {
   const searchParams = useSearchParams()
   const projectId = searchParams.get('id')
 
@@ -164,5 +164,13 @@ export default function ReportGenerationPage() {
         </div>
       </div>
     </PageTransition>
+  )
+}
+
+export default function ReportGenerationPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center p-8"><Loader2 className="w-6 h-6 animate-spin" /></div>}>
+      <ReportGenerationPageInner />
+    </Suspense>
   )
 }
