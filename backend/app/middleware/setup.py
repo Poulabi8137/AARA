@@ -9,8 +9,12 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.core.config import get_settings
 from app.core.logging import get_logger
+from app.middleware.error_handler import setup_exception_handlers
+from app.middleware.proxy import ProxyHeadersMiddleware, TrustedHostMiddleware, setup_proxy_middleware
 from app.middleware.rate_limit import RateLimitMiddleware
 from app.middleware.security_headers import SecurityHeadersMiddleware
+from app.middleware.compression import setup_compression_middleware
+
 
 settings = get_settings()
 logger = get_logger("middleware")
@@ -57,6 +61,15 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 
 
 def setup_middleware(app: FastAPI) -> None:
+    # Setup exception handlers first
+    setup_exception_handlers(app)
+
+    # Setup proxy headers and trusted host middleware for HTTPS
+    setup_proxy_middleware(app)
+
+    # Setup compression middleware for response GZip compression
+    setup_compression_middleware(app)
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.allowed_origins,
@@ -66,7 +79,7 @@ def setup_middleware(app: FastAPI) -> None:
         expose_headers=["X-Request-ID", "X-Correlation-ID"],
     )
 
-    app.add_middleware(SecurityHeadersMiddleware)
+    app.add_middleware(SecurityHeadersMiddleware, production=settings.env == "production")
 
     app.add_middleware(RequestLoggingMiddleware)
 
