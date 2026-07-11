@@ -1,0 +1,9 @@
+{
+  "action": "navigate",
+  "args": {
+    "url": "http://localhost:3000",
+    "newTab": true,
+    "group_title": "AARA Test"
+  },
+  "session": "aara-test"
+}

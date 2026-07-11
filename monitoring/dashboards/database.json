@@ -1,0 +1,53 @@
+{
+  "title": "Database",
+  "uid": "database",
+  "panels": [
+    {
+      "title": "Active Connections",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "db_connections_active"
+        }
+      ]
+    },
+    {
+      "title": "Query Duration (P50/P95)",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, rate(db_query_duration_seconds_bucket[5m]))",
+          "legendFormat": "P50 {{operation}}"
+        },
+        {
+          "expr": "histogram_quantile(0.95, rate(db_query_duration_seconds_bucket[5m]))",
+          "legendFormat": "P95 {{operation}}"
+        }
+      ]
+    },
+    {
+      "title": "Cache Hit/Miss Rate",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "rate(cache_hits_total[5m])",
+          "legendFormat": "Hits {{cache_name}}"
+        },
+        {
+          "expr": "rate(cache_misses_total[5m])",
+          "legendFormat": "Misses {{cache_name}}"
+        }
+      ]
+    },
+    {
+      "title": "Cache Size by Name",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "cache_size_bytes",
+          "legendFormat": "{{cache_name}}"
+        }
+      ]
+    }
+  ]
+}

@@ -1,47 +1,41 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from sqlalchemy import String, Text, DateTime, ForeignKey, Enum as SAEnum
+from sqlalchemy import JSON, DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID
-import enum
 
-from app.db.session import Base
-
-
-class ProjectStatus(str, enum.Enum):
-    DRAFT = "draft"
-    ACTIVE = "active"
-    COMPLETED = "completed"
-    ARCHIVED = "archived"
+from app.core.database import Base
 
 
 class ResearchProject(Base):
     __tablename__ = "research_projects"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    id: Mapped[str] = mapped_column(
+        String(36),
+        primary_key=True,
+        default=lambda: str(uuid.uuid4()),
     )
-    title: Mapped[str] = mapped_column(String(512), nullable=False)
+    workspace_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("workspaces.id"), nullable=False
+    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
-    status: Mapped[ProjectStatus] = mapped_column(
-        SAEnum(ProjectStatus, name="project_status", create_constraint=True),
-        default=ProjectStatus.DRAFT,
-        nullable=False,
-    )
-    created_by: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
-    )
+    status: Mapped[str] = mapped_column(String(20), default="active")
+    research_goal: Mapped[str | None] = mapped_column(Text, nullable=True)
+    key_questions: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
     )
 
-    creator = relationship("User", back_populates="projects")
-    sessions = relationship("ResearchSession", back_populates="project", cascade="all, delete-orphan")
-    reports = relationship("ResearchReport", back_populates="project", cascade="all, delete-orphan")
-    agent_executions = relationship("AgentExecution", back_populates="project", cascade="all, delete-orphan")
-
-    def __repr__(self) -> str:
-        return f"<ResearchProject id={self.id} title={self.title} status={self.status}>"
+    workspace = relationship("Workspace", back_populates="projects")
+    sessions = relationship(
+        "ResearchSession", back_populates="project", cascade="all, delete-orphan"
+    )
+    papers = relationship("ResearchPaper", back_populates="project")

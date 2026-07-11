@@ -1,96 +1,59 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+import abc
 from typing import Any
 
-from app.agents.state import ResearchState
-from app.llm.provider import LLMProvider
-from app.core.logging import get_logger
-
-logger = get_logger("agents.base")
+from app.agents.lifecycle import AgentLifecycleManager
+from app.agents.models import AgentContext, AgentOutput, AgentPhase, AgentState, AgentStatus
 
 
-@dataclass
-class AgentResult:
-    """Standardised result envelope from any agent execution."""
-    success: bool
-    output: Any = None
-    error: str | None = None
-    metadata: dict[str, Any] = field(default_factory=dict)
-
-
-class BaseAgent(ABC):
-    """Abstract base for all research agents.
-
-    Lifecycle: validate_input -> run -> validate_output -> log_execution.
-    Subclasses override arun() and optionally the lifecycle hooks.
-    """
-
+class BaseAgent(abc.ABC):
+    agent_id: str = ""
     agent_name: str = ""
-    description: str = ""
-    requires_human_approval: bool = False
+    version: str = "1.0"
+    max_retries: int = 3
+    timeout_seconds: int = 60
 
-    def __init__(self, llm_provider: LLMProvider) -> None:
-        self.llm = llm_provider
+    def __init__(self) -> None:
+        self._state = AgentState(
+            agent_id=self.agent_id,
+            workflow_id="",
+            status=AgentStatus.INITIALIZED,
+            current_phase=AgentPhase.IDLE,
+            max_retries=self.max_retries,
+        )
+        self._lifecycle = AgentLifecycleManager(self._state)
 
-    # ── Abstract ──────────────────────────────────────────
-
-    @abstractmethod
-    async def arun(self, state: ResearchState) -> ResearchState:
-        """Core execution logic. Subclasses implement this."""
+    @abc.abstractmethod
+    async def execute(self, context: AgentContext) -> AgentOutput:
         ...
 
-    # ── Lifecycle hooks ───────────────────────────────────
+    async def validate_output(self, output: AgentOutput) -> bool:
+        _ = output
+        return True
 
-    async def validate_input(self, state: ResearchState) -> None:
-        """Raise ValueError if preconditions are not met."""
-        if not state.get("query", "").strip():
-            raise ValueError("query must not be empty")
+    async def lifecycle(self) -> AgentState:
+        return self._state
 
-    async def validate_output(self, state: ResearchState) -> None:
-        """Override to assert postconditions after arun()."""
+    async def update_state(self, **kwargs: Any) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self._state, key):
+                setattr(self._state, key, value)
 
-    async def log_execution(self, state: ResearchState, start: datetime) -> None:
-        """Log execution telemetry."""
-        elapsed = (datetime.now(timezone.utc) - start).total_seconds()
-        logger.info(
-            "agent execution complete",
-            extra={
-                "agent": self.agent_name,
-                "duration_seconds": elapsed,
-                "status": state.get("status"),
-            },
+    async def handle_error(self, error: Exception, context: AgentContext) -> AgentOutput:
+        self._state.retry_count += 1
+        if self._state.retry_count < self.max_retries:
+            self._state.status = AgentStatus.ERROR
+            self._state.current_phase = AgentPhase.IDLE
+            raise error
+        return AgentOutput(
+            agent_id=self.agent_id,
+            workflow_id=context.workflow_id,
+            output={"error": str(error)},
+            summary=f"Agent failed after {self._state.retry_count} retries: {error}",
+            duration_ms=0,
         )
 
-    async def handle_error(self, state: ResearchState, exc: Exception) -> ResearchState:
-        """Graceful error recovery. Override for custom fallback logic."""
-        errors = state.get("errors", [])
-        errors.append(f"[{self.agent_name}] {exc}")
-        state["errors"] = errors
-        state["status"] = "failed"
-        return state
-
-    # ── Public execution entry point ──────────────────────
-
-    async def run(self, state: ResearchState) -> AgentResult:
-        """Full lifecycle entry point called by graph nodes."""
-        start = datetime.now(timezone.utc)
-        state["timestamp"] = start.isoformat()
-        state["status"] = "running"
-
-        try:
-            await self.validate_input(state)
-            state = await self.arun(state)
-            await self.validate_output(state)
-        except Exception as exc:
-            state = await self.handle_error(state, exc)
-            await self.log_execution(state, start)
-            return AgentResult(success=False, error=str(exc), metadata={"agent": self.agent_name})
-
-        # Preserve agent-specific status (e.g. "planner_complete") if already set
-        if state.get("status") in ("running", None):
-            state["status"] = "completed"
-        await self.log_execution(state, start)
-        return AgentResult(success=True, metadata={"agent": self.agent_name})
+    @staticmethod
+    def _estimate_tokens(text: str) -> int:
+        return len(text) // 4

@@ -1,35 +1,32 @@
 from __future__ import annotations
 
-import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, Field
-
-from app.models.research_project import ProjectStatus
+from pydantic import BaseModel
 
 
 class ProjectCreate(BaseModel):
-    title: str = Field(..., min_length=1, max_length=512)
-    description: str | None = Field(None, max_length=10000)
+    workspace_id: str
+    name: str
+    description: str | None = None
+    research_question: str | None = None
 
 
 class ProjectUpdate(BaseModel):
-    title: str | None = Field(None, min_length=1, max_length=512)
-    description: str | None = Field(None, max_length=10000)
-    status: ProjectStatus | None = None
+    name: str | None = None
+    description: str | None = None
+    research_question: str | None = None
+    status: str | None = None
 
 
 class ProjectResponse(BaseModel):
-    id: uuid.UUID
-    title: str
-    description: str | None
-    status: ProjectStatus
-    created_by: uuid.UUID
-    created_at: datetime
+    id: str
+    workspace_id: str
+    name: str
+    description: str | None = None
+    research_question: str | None = None
+    status: str = "active"
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
     model_config = {"from_attributes": True}
-
-
-class ProjectListResponse(BaseModel):
-    projects: list[ProjectResponse]
-    total: int

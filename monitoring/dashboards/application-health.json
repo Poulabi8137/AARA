@@ -1,0 +1,45 @@
+{
+  "title": "Application Health",
+  "uid": "application-health",
+  "panels": [
+    {
+      "title": "Overall Health Status",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "up{job=\"aara-backend\"}",
+          "legendFormat": "Backend"
+        }
+      ]
+    },
+    {
+      "title": "Error Rate by Type",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "sum by (type) (rate(errors_total[5m]))",
+          "legendFormat": "{{type}}"
+        }
+      ]
+    },
+    {
+      "title": "Active Background Tasks",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "background_tasks_active"
+        }
+      ]
+    },
+    {
+      "title": "Background Tasks Completed",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "rate(background_tasks_completed_total[5m])",
+          "legendFormat": "{{status}}"
+        }
+      ]
+    }
+  ]
+}

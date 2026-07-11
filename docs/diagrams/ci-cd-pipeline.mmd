@@ -1,0 +1,15 @@
+graph LR
+    DEV[Developer Push] --> CI[GitHub Actions CI]
+    CI --> LINT[Lint & Type Check]
+    CI --> UNIT[Unit Tests]
+    CI --> INTEGRATION[Integration Tests]
+
+    LINT --> BUILD[Build]
+    UNIT --> BUILD
+    INTEGRATION --> BUILD
+
+    BUILD --> PUBLISH[Docker Build & Push]
+    PUBLISH --> STAGING[Deploy to Staging]
+    STAGING --> E2E[E2E Tests]
+
+    E2E -->|Manual Approval| PRODUCTION[Deploy to Production]

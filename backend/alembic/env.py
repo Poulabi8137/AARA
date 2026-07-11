@@ -1,19 +1,30 @@
-from __future__ import annotations
-
 import asyncio
+import os
+import sys
 from logging.config import fileConfig
+from pathlib import Path
 
-from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from app.db.session import Base
-from app.models import *  # noqa: F401, F403 — load all models so Base.metadata is populated
+from alembic import context
+
+# Ensure backend directory is on path for model imports
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from app.core.database import Base  # noqa: E402
+import app.models  # noqa: E402,F401  # populates Base.metadata for autogenerate
 
 config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
+
+# DATABASE_URL_SYNC takes precedence over alembic.ini so the same migrations
+# can be validated against the production engine (Postgres) in CI/deploys
+# without editing the ini file, while local dev keeps the sqlite default.
+if database_url_sync := os.environ.get("DATABASE_URL_SYNC"):
+    config.set_main_option("sqlalchemy.url", database_url_sync)
 
 target_metadata = Base.metadata
 

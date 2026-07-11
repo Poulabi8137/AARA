@@ -1,0 +1,21 @@
+stateDiagram-v2
+    [*] --> Initialized: Agent instantiated
+    Initialized --> ReceivingContext: execute() called
+    ReceivingContext --> Planning: Context received
+    Planning --> Reasoning: Decompose goal
+    Reasoning --> RequestingTool: Identify information needed
+    RequestingTool --> ExecutingTool: Tool call sent
+
+    ExecutingTool --> ObservingResult: Tool response received
+    ObservingResult --> Reflecting: Evaluate result
+    Reflecting --> Planning: Need more information (loop)
+    Reflecting --> SelfValidating: Sufficient information
+
+    SelfValidating --> OutputtingResult: Valid
+    SelfValidating --> Planning: Validation failed, retry
+
+    OutputtingResult --> [*]: Return structured output
+
+    ExecutingTool --> Error: Tool failure
+    Error --> RequestingTool: Retry
+    Error --> OutputtingResult: Non-retryable error

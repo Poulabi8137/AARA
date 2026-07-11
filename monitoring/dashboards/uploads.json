@@ -1,0 +1,40 @@
+{
+  "title": "Uploads",
+  "uid": "uploads",
+  "panels": [
+    {
+      "title": "Upload Rate by File Type",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "rate(uploads_total[5m])",
+          "legendFormat": "{{file_type}} {{status}}"
+        }
+      ]
+    },
+    {
+      "title": "Total Uploaded Bytes",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "rate(upload_bytes_total[5m])",
+          "legendFormat": "{{file_type}}"
+        }
+      ]
+    },
+    {
+      "title": "Upload Success vs Failure",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "sum(uploads_total{status=\"success\"})",
+          "legendFormat": "Success"
+        },
+        {
+          "expr": "sum(uploads_total{status=\"failed\"})",
+          "legendFormat": "Failed"
+        }
+      ]
+    }
+  ]
+}

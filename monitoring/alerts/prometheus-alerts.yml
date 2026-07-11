@@ -1,0 +1,104 @@
+groups:
+  - name: aara-backend-alerts
+    interval: 30s
+    rules:
+
+      # High Error Rate
+      - alert: HighErrorRate
+        expr: rate(errors_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected ({{ $value }}/s)"
+          description: "Error rate has exceeded 10 errors/sec for more than 2 minutes."
+
+      # Database Unavailable
+      - alert: DatabaseUnavailable
+        expr: up{job="aara-backend"} == 0 or absent(up{job="aara-backend"})
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database service is unavailable"
+          description: "The database endpoint is not reachable."
+
+      # High Memory Usage
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes > 500 * 1024 * 1024
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage ({{ $value | humanize1024 }})"
+          description: "Memory usage has exceeded 500MB for more than 5 minutes."
+
+      # High CPU Usage
+      - alert: HighCPUUsage
+        expr: rate(process_cpu_seconds_total[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage ({{ $value | humanizePercentage }})"
+          description: "CPU usage has exceeded 80% for more than 5 minutes."
+
+      # High Request Latency
+      - alert: HighRequestLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2.0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High request latency (P95: {{ $value }}s)"
+          description: "95th percentile request latency has exceeded 2 seconds."
+
+      # Repeated Authentication Failures
+      - alert: RepeatedAuthFailures
+        expr: rate(auth_failures_total[5m]) > 5
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Repeated authentication failures ({{ $value }}/s)"
+          description: "Authentication failure rate has exceeded 5/sec for more than 2 minutes."
+
+      # AI Provider Failures
+      - alert: AIProviderFailure
+        expr: rate(ai_requests_total{status="error"}[5m]) > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "AI provider failure rate elevated ({{ $value }}/s)"
+          description: "AI provider error rate has exceeded 5 errors/sec."
+
+      # Application Down
+      - alert: ApplicationDown
+        expr: up{job="aara-backend"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "AARA backend is down"
+          description: "The AARA backend service has been unreachable for 30 seconds."
+
+      # High Background Task Queue
+      - alert: HighBackgroundTaskQueue
+        expr: background_tasks_active > 20
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High number of active background tasks ({{ $value }})"
+          description: "More than 20 background tasks active for over 5 minutes."
+
+      # Storage Unavailable (approximated via upload errors)
+      - alert: StorageUnavailable
+        expr: rate(uploads_total{status="failed"}[5m]) > 3
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Storage service may be unavailable"
+          description: "Upload failure rate has exceeded 3/sec for more than 2 minutes."

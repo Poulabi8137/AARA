@@ -1,0 +1,102 @@
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Gateway as API Gateway
+    participant WE as Workflow Engine
+    participant Planner
+    participant Researcher
+    participant Analyst
+    participant IdeaGen as Idea Generator
+    participant Writer
+    participant Reviewer
+    participant Tools as Tool Router + Registry
+    participant LLM as Provider Router
+    participant VDB as Qdrant
+    participant DB as PostgreSQL
+
+    User->>Frontend: Submit research topic
+    Frontend->>Gateway: POST /workflows {query, workspace_id}
+    Gateway->>WE: Start workflow
+    WE->>Planner: Execute(query)
+
+    Note over Planner: ReAct Loop: Plan → Reason → Validate
+
+    Planner->>LLM: Infer(search_strategy_prompt)
+    LLM-->>Planner: ExecutionPlan
+    Planner-->>WE: Plan with 6 steps
+
+    WE->>Researcher: Execute(plan.step[0])
+
+    Note over Researcher: ReAct Loop: Plan → Reason → Request Tool
+
+    Researcher->>Tools: semantic_scholar.search(query, limit=50)
+    Tools->>+Tools: Validate input, check cache
+    alt Cache Miss
+        Tools->>SS: HTTPS Request
+        SS-->>Tools: Papers JSON
+        Tools->>Tools: Normalize output, cache
+    end
+    Tools-->>Researcher: Normalized results
+
+    Note over Researcher: Observe → Reflect → Refine query
+
+    Researcher->>Tools: arxiv.search(query, max_results=30)
+    Tools-->>Researcher: Papers JSON
+    Researcher->>Tools: crossref.validate(dois)
+    Tools-->>Researcher: Validation results
+
+    Note over Researcher: Validate → Return
+
+    Researcher-->>WE: PaperCollection (ranked + deduplicated)
+
+    WE->>WE: Publish AgentCompleted(event)
+
+    Note over WE: APPROVAL CHECKPOINT 1
+
+    WE->>Frontend: WebSocket {type: "approval_needed", phase: "research"}
+    User->>Frontend: Approve
+    Frontend->>WE: WebSocket {type: "approve", checkpoint_id}
+
+    WE->>Analyst: Execute(Papers + Topic)
+
+    Note over Analyst: ReAct Loop: Cluster → Extract → Generate
+
+    Analyst->>VDB: similarity_search(paper_embeddings)
+    VDB-->>Analyst: Clusters
+    Analyst->>LLM: Infer(theme_extraction_prompt)
+    LLM-->>Analyst: Themes
+    Analyst->>LLM: Infer(gap_analysis_prompt)
+    LLM-->>Analyst: Gaps
+    Analyst->>LLM: Infer(comparison_table_prompt)
+    LLM-->>Analyst: Comparisons
+    Analyst-->>WE: AnalysisReport
+
+    Note over WE: APPROVAL CHECKPOINT 2
+
+    WE->>User: Awaiting approval for ideas
+    User->>WE: Approve Idea Generation
+
+    WE->>IdeaGen: Execute(AnalysisReport)
+    IdeaGen->>LLM: Infer(idea_generation_prompt)
+    LLM-->>IdeaGen: Ideas
+    IdeaGen->>VDB: overlap_analysis(idea_embeddings)
+    VDB-->>IdeaGen: Overlap scores
+    IdeaGen-->>WE: IdeaProposal (ranked with overlap)
+
+    Note over WE: APPROVAL CHECKPOINT 3
+
+    WE->>Writer: Execute(AnalysisReport + IdeaProposal)
+    Writer->>LLM: Infer(writing_prompt, section_by_section)
+    LLM-->>Writer: Draft with citations
+    Writer-->>WE: PaperDraft
+
+    WE->>Reviewer: Execute(PaperDraft)
+    Reviewer->>Tools: crossref.validate_citations(dois)
+    Tools-->>Reviewer: Citation validation
+    Reviewer->>LLM: Infer(review_prompt)
+    LLM-->>Reviewer: Review
+    Reviewer-->>WE: ReviewReport
+
+    WE->>DB: Persist all results
+    WE->>Frontend: WorkflowCompleted(summary)
+    Frontend->>User: Results dashboard

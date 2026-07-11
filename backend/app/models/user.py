@@ -1,43 +1,41 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from sqlalchemy import String, DateTime, Enum as SAEnum
+from sqlalchemy import Boolean, DateTime, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID
-import enum
 
-from app.db.session import Base
-
-
-class UserRole(str, enum.Enum):
-    ADMIN = "admin"
-    RESEARCHER = "researcher"
-    VIEWER = "viewer"
+from app.core.database import Base
 
 
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    id: Mapped[str] = mapped_column(
+        String(36),
+        primary_key=True,
+        default=lambda: str(uuid.uuid4()),
     )
-    name: Mapped[str] = mapped_column(String(256), nullable=False)
-    email: Mapped[str] = mapped_column(
-        String(320), unique=True, nullable=False, index=True
-    )
-    password_hash: Mapped[str] = mapped_column(String(128), nullable=False)
-    role: Mapped[UserRole] = mapped_column(
-        SAEnum(UserRole, name="user_role", create_constraint=True),
-        default=UserRole.RESEARCHER,
-        nullable=False,
+    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    hashed_password: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    display_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    avatar_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    role: Mapped[str] = mapped_column(String(20), default="student")
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    monthly_budget_usd: Mapped[float] = mapped_column(Numeric(10, 2), default=5.00)
+    embedding_model: Mapped[str] = mapped_column(
+        String(200), default="sentence-transformers/all-MiniLM-L6-v2"
     )
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
     )
 
-    projects = relationship("ResearchProject", back_populates="creator")
-
-    def __repr__(self) -> str:
-        return f"<User id={self.id} email={self.email} role={self.role}>"
+    preferences = relationship("UserPreferences", uselist=False, back_populates="user")
+    workspaces = relationship("Workspace", back_populates="owner")
+    workspace_memberships = relationship("WorkspaceMember", back_populates="user")

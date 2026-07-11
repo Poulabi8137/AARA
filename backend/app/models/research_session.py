@@ -1,43 +1,47 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from sqlalchemy import String, DateTime, ForeignKey, Enum as SAEnum
+from sqlalchemy import JSON, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID
-import enum
 
-from app.db.session import Base
-
-
-class SessionStatus(str, enum.Enum):
-    PENDING = "pending"
-    RUNNING = "running"
-    COMPLETED = "completed"
-    FAILED = "failed"
+from app.core.database import Base
 
 
 class ResearchSession(Base):
     __tablename__ = "research_sessions"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    id: Mapped[str] = mapped_column(
+        String(36),
+        primary_key=True,
+        default=lambda: str(uuid.uuid4()),
     )
-    project_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("research_projects.id"), nullable=False
+    project_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("research_projects.id"), nullable=False
     )
-    session_name: Mapped[str] = mapped_column(String(256), nullable=False)
-    status: Mapped[SessionStatus] = mapped_column(
-        SAEnum(SessionStatus, name="session_status", create_constraint=True),
-        default=SessionStatus.PENDING,
-        nullable=False,
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    workflow_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    query: Mapped[str | None] = mapped_column(Text, nullable=True)
+    agent_phases_completed: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    total_tokens: Mapped[int] = mapped_column(Integer, default=0)
+    total_cost: Mapped[float] = mapped_column(Float, default=0.0)
+    started_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
     )
+    completed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Per-phase agent output, keyed by phase name (e.g. "analysis", "writing",
+    # "idea_generation"). Populated by trigger_retrieval/analysis/writing in
+    # research_service.py — previously the agent's AgentOutput was discarded
+    # after execute(), so gap-analysis/idea-generation results were computed
+    # but never persisted or retrievable via the API.
+    results: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
 
     project = relationship("ResearchProject", back_populates="sessions")
-
-    def __repr__(self) -> str:
-        return f"<ResearchSession id={self.id} name={self.session_name} status={self.status}>"
+    documents = relationship("Document", back_populates="session")

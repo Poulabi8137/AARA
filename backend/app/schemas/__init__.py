@@ -1,69 +1,164 @@
+from app.schemas.ai import (
+    ConversationResponse,
+    CreateConversationRequest,
+    CreateMessageRequest,
+    GenerateRequest,
+    GenerateResponse,
+)
+from app.schemas.ai import (
+    MessageResponse as AIChatMessageResponse,
+)
+from app.schemas.approval import (
+    ApprovalCreate,
+    ApprovalResponse,
+    ApprovalUpdate,
+)
 from app.schemas.auth import (
-    TokenResponse,
-    RefreshRequest,
-    RegisterRequest,
+    EmailVerificationRequest,
     LoginRequest,
+    PasswordResetConfirmRequest,
+    PasswordResetRequest,
+    RefreshTokenRequest,
+    RegisterRequest,
+    TokenResponse,
+    UserCreate,
+    UserLogin,
+    UserResponse,
+    UserUpdate,
 )
-from app.schemas.user import UserResponse, UserCreate, UserUpdate
-from app.schemas.project import (
-    ProjectCreate,
-    ProjectUpdate,
-    ProjectResponse,
-    ProjectListResponse,
+from app.schemas.citation import (
+    CitationCreate,
+    CitationExportRequest,
+    CitationExportResponse,
+    CitationLibrarySummary,
+    CitationResponse,
+    CitationUpdate,
 )
-from app.schemas.session import SessionCreate, SessionResponse, SessionListResponse
-from app.schemas.report import ReportCreate, ReportResponse, ReportListResponse
-from app.schemas.health import HealthResponse
-from app.schemas.agent import (
-    AgentRunRequest,
-    AgentRunResponse,
-    AgentExecutionResponse,
-    ExecutionListResponse,
-    CancelResponse,
-    AgentInfoResponse,
-    AgentListResponse,
+from app.schemas.common import (
+    ErrorResponse,
+    MessageResponse,
+    PaginatedResponse,
+)
+from app.schemas.dashboard import (
+    DashboardResponse,
+    EvaluationScoreResponse,
+    ProviderUsageResponse,
+    TokenUsageResponse,
+    WorkflowStatusResponse,
 )
 from app.schemas.document import (
+    DocumentCreate,
+    DocumentExportRequest,
+    DocumentGenerateRequest,
     DocumentResponse,
-    DocumentListResponse,
+    DocumentUpdate,
+)
+from app.schemas.feature_flags import (
+    FeatureFlagsResponse,
+    FeatureFlagUpdate,
+)
+from app.schemas.library import (
+    DuplicateCheckResponse,
+    PaperCreate,
+    PaperResponse,
+    PaperUpdate,
+    PaperUploadResponse,
+    PaperVersionResponse,
+)
+from app.schemas.project import (
+    ProjectCreate,
+    ProjectResponse,
+    ProjectUpdate,
+)
+from app.schemas.research import (
+    ResearchSessionCreate,
+    ResearchSessionResponse,
+    ResearchSubmission,
+    ResearchSubmissionResponse,
+)
+from app.schemas.search import (
     SearchRequest,
-    SearchResultItem,
     SearchResponse,
-    ContextRequest,
-    ContextResponse,
+    SearchResult,
+)
+from app.schemas.workspace import (
+    WorkspaceCreate,
+    WorkspaceResponse,
+    WorkspaceUpdate,
 )
 
 __all__ = [
-    "TokenResponse",
-    "RefreshRequest",
-    "RegisterRequest",
+    # Auth
+    "EmailVerificationRequest",
     "LoginRequest",
-    "UserResponse",
+    "PasswordResetConfirmRequest",
+    "PasswordResetRequest",
+    "RefreshTokenRequest",
+    "RegisterRequest",
+    "TokenResponse",
     "UserCreate",
+    "UserLogin",
+    "UserResponse",
     "UserUpdate",
+    # Common
+    "ErrorResponse",
+    "MessageResponse",
+    "PaginatedResponse",
+    # Dashboard
+    "DashboardResponse",
+    "EvaluationScoreResponse",
+    "ProviderUsageResponse",
+    "TokenUsageResponse",
+    "WorkflowStatusResponse",
+    # Document
+    "DocumentResponse",
+    "DocumentCreate",
+    "DocumentUpdate",
+    "DocumentGenerateRequest",
+    "DocumentExportRequest",
+    # Library
+    "PaperResponse",
+    "PaperCreate",
+    "PaperUpdate",
+    "PaperUploadResponse",
+    "PaperVersionResponse",
+    "DuplicateCheckResponse",
+    # Research
+    "ResearchSessionResponse",
+    "ResearchSessionCreate",
+    "ResearchSubmission",
+    "ResearchSubmissionResponse",
+    # Search
+    "SearchResponse",
+    "SearchRequest",
+    "SearchResult",
+    # Workspace
+    "WorkspaceResponse",
+    "WorkspaceCreate",
+    "WorkspaceUpdate",
+    # Citation
+    "CitationResponse",
+    "CitationCreate",
+    "CitationUpdate",
+    "CitationExportRequest",
+    "CitationExportResponse",
+    "CitationLibrarySummary",
+    # AI
+    "ConversationResponse",
+    "CreateConversationRequest",
+    "AIChatMessageResponse",
+    "CreateMessageRequest",
+    "GenerateResponse",
+    "GenerateRequest",
+    # Project
+    "ProjectResponse",
     "ProjectCreate",
     "ProjectUpdate",
-    "ProjectResponse",
-    "ProjectListResponse",
-    "SessionCreate",
-    "SessionResponse",
-    "SessionListResponse",
-    "ReportCreate",
-    "ReportResponse",
-    "ReportListResponse",
-    "HealthResponse",
-    "DocumentResponse",
-    "DocumentListResponse",
-    "AgentRunRequest",
-    "AgentRunResponse",
-    "AgentExecutionResponse",
-    "ExecutionListResponse",
-    "CancelResponse",
-    "AgentInfoResponse",
-    "AgentListResponse",
-    "SearchRequest",
-    "SearchResultItem",
-    "SearchResponse",
-    "ContextRequest",
-    "ContextResponse",
+    # Approval
+    "ApprovalResponse",
+    "ApprovalCreate",
+    "ApprovalUpdate",
+    # Feature Flags
+    "FeatureFlagsResponse",
+    "FeatureFlagUpdate",
 ]

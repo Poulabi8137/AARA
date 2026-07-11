@@ -1,18 +1,114 @@
-# v0 sandbox internal files
-__v0_runtime_loader.js
-__v0_devtools.tsx
-__v0_jsx-dev-runtime.ts
-.snowflake/
-.v0-trash/
-.vercel/
+# CI/CD optimization files
+.github/cache/
+validation-reports/
+
+# Dependencies
+node_modules/
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+
+# Build artifacts
+.aara-frontend/
+artifacts/
+deployment-artifacts/
+deployment-reports/
 
 # Environment variables
-.env*.local
+.env
+.env.local
+.env.production
+.env.development
 
-# Common ignores
-node_modules
-.next/
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
 .DS_Store
+Thumbs.db
 
-# Archive / non-essential docs
-docs/archive/
+# Logs
+*.log
+
+# Temporary files
+tmp/
+*.tmp
+
+# Docker
+.dockerignore
+Dockerfile.local
+.Dockerfile_cache
+
+# Git
+.git-rewrite*
+.git-rewrite/*
+
+# Other
+*.bak
+*.orig
+*.rej
+*.swp
+
+# Project specific
+build-verification-checklist.md
+database-production-checklist.md
+deployment-checklist.md
+environment-checklist.md
+known-deployment-issues.md
+startup-checklist.md
+
+# Generated documentation
+*.md.orig
+*.md.bak
+
+# Database
+aara_dev.db
+*.sqlite
+*.sqlite3
+
+# Cache
+.cache
+.npm
+.pnpm-cache
+.yarn
+.yarn-cache
+
+# Coverage reports
+coverage.xml
+coverage.html
+
+# Node.js
+yarn.lock
+package-lock.json
+
+# Temporary
+*.tmp
+*.temp
+
+# Build directories
+.next
+.next-static
+out/
+
+# Logs and reports
+logs/
+grafana_data/
+prometheus/
+nginx-conf.d/
+ssl/
+
+# Test artifacts
+tests/htmlcov/
+tests/reports/
+test_output*.txt
+
+# Editor
+.editorconfig

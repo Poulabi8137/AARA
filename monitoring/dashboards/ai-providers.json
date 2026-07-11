@@ -1,0 +1,36 @@
+{
+  "title": "AI Providers",
+  "uid": "ai-providers",
+  "panels": [
+    {
+      "title": "AI Request Rate by Provider",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "rate(ai_requests_total[5m])",
+          "legendFormat": "{{provider}} {{model}}"
+        }
+      ]
+    },
+    {
+      "title": "Token Consumption",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "rate(ai_tokens_total[5m])",
+          "legendFormat": "{{type}} {{provider}}"
+        }
+      ]
+    },
+    {
+      "title": "AI Request Status",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "sum by (status) (rate(ai_requests_total[5m]))",
+          "legendFormat": "{{status}}"
+        }
+      ]
+    }
+  ]
+}

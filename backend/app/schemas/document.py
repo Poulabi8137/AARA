@@ -1,62 +1,59 @@
 from __future__ import annotations
 
-import uuid
 from datetime import datetime
+from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
-from app.models.document import DocumentStatus
+
+class DocumentGenerateRequest(BaseModel):
+    workspace_id: str
+    session_id: str | None = None
+    project_id: str | None = None
+    format: Literal["markdown", "docx", "pdf", "html"]
+    title: str
+    template: str | None = None
+    sections: list[str] | None = None
 
 
 class DocumentResponse(BaseModel):
-    id: uuid.UUID
-    project_id: uuid.UUID | None
-    filename: str
-    collection: str
-    status: DocumentStatus
-    chunk_count: int | None
-    char_count: int | None
-    author: str | None
-    uploaded_at: datetime
+    id: str
+    workspace_id: str
+    session_id: str | None = None
+    format: str
+    title: str
+    content: str | None = None
+    file_path: str | None = None
+    file_size: int | None = None
+    status: str
+    version: int = 1
+    citation_count: int = 0
+    template_used: str | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
     model_config = {"from_attributes": True}
 
 
-class DocumentListResponse(BaseModel):
-    documents: list[DocumentResponse]
-    total: int
-
-
-class SearchRequest(BaseModel):
-    query: str = Field(..., min_length=1, max_length=5000)
-    collection: str | None = Field(None, description="Restrict to a single collection")
+class DocumentCreate(BaseModel):
+    workspace_id: str
+    title: str
+    format: Literal["markdown", "docx", "pdf", "html"] = "markdown"
+    session_id: str | None = None
     project_id: str | None = None
-    top_k: int = Field(10, ge=1, le=100)
 
 
-class SearchResultItem(BaseModel):
+class DocumentUpdate(BaseModel):
+    title: str | None = None
+    content: str | None = None
+
+
+class DocumentExportRequest(BaseModel):
+    format: Literal["markdown", "docx", "pdf", "html"]
+
+
+class DocumentExportResponse(BaseModel):
+    format: str
     content: str
-    source: str
-    score: float
-    metadata: dict
-    chunk_id: str
-
-
-class SearchResponse(BaseModel):
-    query: str
-    results: list[SearchResultItem]
-    total: int
-    collection: str | None
-
-
-class ContextRequest(BaseModel):
-    query: str = Field(..., min_length=1, max_length=5000)
-    project_id: str | None = None
-    top_k: int = Field(10, ge=1, le=100)
-    collections: list[str] | None = None
-
-
-class ContextResponse(BaseModel):
-    query: str
-    collections: dict[str, list[SearchResultItem]]
-    total: int
+    filename: str
+    mime_type: str | None = None

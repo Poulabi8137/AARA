@@ -1,0 +1,17 @@
+graph TB
+    subgraph "Global Memory"
+        GM[PostgreSQL: user_preferences<br/>global_memory table<br/>TTL: Indefinite]
+    end
+
+    subgraph "Workspace Memory"
+        WM[PostgreSQL: papers, analyses,<br/>ideas, drafts, workflows<br/>Qdrant: paper embeddings<br/>TTL: Workspace lifetime]
+    end
+
+    subgraph "Session Memory"
+        SM[In-Memory Dict<br/>TTL: Workflow duration]
+    end
+
+    SM -->|persist on checkpoint| WM
+    WM -->|aggregate patterns| GM
+    GM -->|defaults| WM
+    WM -->|context| SM

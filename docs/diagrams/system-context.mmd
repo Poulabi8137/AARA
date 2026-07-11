@@ -1,0 +1,36 @@
+C4Context
+  title System Context — AARA Platform
+
+  Person(researcher, "Researcher", "Student, PhD, R&D engineer using AARA")
+  System(aara, "AARA Platform", "Agentic AI Research Assistant")
+
+  System_Ext(semantic_scholar, "Semantic Scholar API")
+  System_Ext(arxiv, "arXiv API")
+  System_Ext(pubmed, "PubMed API")
+  System_Ext(crossref, "Crossref API")
+  System_Ext(openalex, "OpenAlex API")
+
+  System_Ext(openai, "OpenAI API")
+  System_Ext(gemini, "Google Gemini")
+  System_Ext(groq, "Groq API")
+  System_Ext(openrouter, "OpenRouter API")
+  System_Ext(ollama, "Ollama (Local)")
+
+  System_Ext(supabase, "Supabase (PostgreSQL, Auth, Storage)")
+  System_Ext(qdrant, "Qdrant (Vector DB)")
+
+  Rel(researcher, aara, "Uses", "HTTPS/WSS")
+  Rel(aara, semantic_scholar, "Searches papers", "HTTPS")
+  Rel(aara, arxiv, "Fetches papers", "HTTPS")
+  Rel(aara, pubmed, "Searches biomedical lit", "HTTPS")
+  Rel(aara, crossref, "DOI + citation lookup", "HTTPS")
+  Rel(aara, openalex, "Open research graph", "HTTPS")
+
+  Rel(aara, openai, "LLM inference", "HTTPS")
+  Rel(aara, gemini, "LLM inference (fallback)", "HTTPS")
+  Rel(aara, groq, "High-speed inference", "HTTPS")
+  Rel(aara, openrouter, "Fallback routing", "HTTPS")
+  Rel(aara, ollama, "Local inference (dev)", "HTTP")
+
+  Rel(aara, supabase, "Auth, persistence, files", "HTTPS")
+  Rel(aara, qdrant, "Vector embeddings", "gRPC/HTTPS")

@@ -1,0 +1,40 @@
+{
+  "title": "Authentication",
+  "uid": "authentication",
+  "panels": [
+    {
+      "title": "Auth Request Rate",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "rate(auth_requests_total[5m])",
+          "legendFormat": "{{method}} {{status}}"
+        }
+      ]
+    },
+    {
+      "title": "Auth Failure Rate",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "rate(auth_failures_total[5m])",
+          "legendFormat": "{{reason}}"
+        }
+      ]
+    },
+    {
+      "title": "Auth Success vs Failure",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "sum(auth_requests_total{status=\"success\"})",
+          "legendFormat": "Success"
+        },
+        {
+          "expr": "sum(auth_failures_total)",
+          "legendFormat": "Failures"
+        }
+      ]
+    }
+  ]
+}

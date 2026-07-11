@@ -1,63 +1,53 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 
-from app.agents.base import BaseAgent
-from app.core.logging import get_logger
+from app.agents.models import AgentMetadata
 
-logger = get_logger("agents.registry")
+if TYPE_CHECKING:
+    from app.agents.base import BaseAgent
+
+
+class RegistryError(Exception):
+    pass
 
 
 class AgentRegistry:
-    """Global registry for research agents.
+    def __init__(self) -> None:
+        self._agents: dict[str, type[BaseAgent]] = {}
+        self._instances: dict[str, BaseAgent] = {}
 
-    Agents register themselves by name. The registry supports
-    dynamic discovery so new agent types can be added without
-    modifying orchestration code.
-    """
+    def register(self, agent_id: str | None = None):
+        def decorator(cls: type[BaseAgent]) -> type[BaseAgent]:
+            aid = agent_id or getattr(cls, "agent_id", "")
+            if not aid:
+                raise RegistryError("Agent must define agent_id or pass one to register()")
+            if aid in self._agents:
+                raise RegistryError(f"Agent '{aid}' already registered")
+            self._agents[aid] = cls
+            return cls
+        return decorator
 
-    _agents: dict[str, type[BaseAgent]] = {}
+    def get(self, agent_id: str) -> BaseAgent:
+        if agent_id not in self._instances:
+            cls = self._agents.get(agent_id)
+            if not cls:
+                raise RegistryError(f"Agent '{agent_id}' not found. Registered: {list(self._agents.keys())}")
+            self._instances[agent_id] = cls()
+        return self._instances[agent_id]
 
-    @classmethod
-    def register(cls, agent_cls: type[BaseAgent]) -> type[BaseAgent]:
-        """Decorator to register an agent class."""
-        name = agent_cls.agent_name
-        if not name:
-            raise ValueError(f"agent_name not set on {agent_cls.__name__}")
-        cls._agents[name] = agent_cls
-        logger.info("agent registered", extra={"agent_name": name, "class": agent_cls.__name__})
-        return agent_cls
-
-    @classmethod
-    def get(cls, name: str) -> type[BaseAgent] | None:
-        return cls._agents.get(name)
-
-    @classmethod
-    def list_agents(cls) -> list[dict[str, str]]:
+    def list_agents(self) -> list[AgentMetadata]:
         return [
-            {
-                "name": name,
-                "description": getattr(agent_cls, "description", ""),
-                "requires_human_approval": getattr(agent_cls, "requires_human_approval", False),
-            }
-            for name, agent_cls in cls._agents.items()
+            AgentMetadata(
+                id=aid,
+                name=getattr(cls, "agent_name", aid),
+                version=getattr(cls, "version", "1.0"),
+            )
+            for aid, cls in self._agents.items()
         ]
 
-    @classmethod
-    def discover(cls) -> None:
-        """Trigger dynamic discovery by importing known agent modules.
+    def clear_instances(self) -> None:
+        self._instances.clear()
 
-        New agent types can register themselves at import time via
-        the @AgentRegistry.register decorator.
-        """
-        modules = [
-            "app.agents.planner_agent",
-            "app.agents.retrieval_agent",
-            "app.agents.summarizer_agent",
-            "app.agents.gap_detection_agent",
-            "app.agents.report_generator_agent",
-        ]
-        for mod in modules:
-            try:
-                __import__(mod)
-            except ImportError:
-                logger.warning("agent module not found, skipping", extra={"agent_module": mod})
+    def __contains__(self, agent_id: str) -> bool:
+        return agent_id in self._agents

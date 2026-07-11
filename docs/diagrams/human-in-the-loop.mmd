@@ -1,0 +1,23 @@
+graph TD
+    START[Workflow Started] --> RESEARCH[Research Phase]
+    RESEARCH --> CP1{Checkpoint 1:<br/>Review Papers}
+    CP1 -->|Approve| ANALYSIS[Analysis Phase]
+    CP1 -->|Reject| MODIFY[Modify Query]
+    MODIFY --> RESEARCH
+
+    ANALYSIS --> CP2{Checkpoint 2:<br/>Review Analysis}
+    CP2 -->|Approve| IDEAS[Idea Generation]
+    CP2 -->|Reject| REFINE[Refine Analysis]
+    REFINE --> ANALYSIS
+
+    IDEAS --> CP3{Checkpoint 3:<br/>Select Ideas}
+    CP3 -->|Approve| DRAFT[Draft Phase]
+    CP3 -->|Reject| REGEN[Regenerate Ideas]
+    REGEN --> IDEAS
+
+    DRAFT --> CP4{Checkpoint 4:<br/>Review Draft}
+    CP4 -->|Approve| REVIEW[AI Review + Export]
+    CP4 -->|Reject| REVISE[Revise Draft]
+    REVISE --> DRAFT
+
+    REVIEW --> EXPORT[Export Results]

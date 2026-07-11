@@ -1,0 +1,50 @@
+{
+  "title": "Infrastructure",
+  "uid": "infrastructure",
+  "panels": [
+    {
+      "title": "Memory Usage",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "process_resident_memory_bytes",
+          "legendFormat": "RSS"
+        },
+        {
+          "expr": "process_virtual_memory_bytes",
+          "legendFormat": "Virtual"
+        }
+      ]
+    },
+    {
+      "title": "CPU Usage",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "rate(process_cpu_seconds_total[5m])",
+          "legendFormat": "CPU"
+        }
+      ]
+    },
+    {
+      "title": "Open File Descriptors",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "process_open_fds",
+          "legendFormat": "Open FDs"
+        }
+      ]
+    },
+    {
+      "title": "Start Time",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "time() - process_start_time_seconds",
+          "legendFormat": "Uptime (s)"
+        }
+      ]
+    }
+  ]
+}

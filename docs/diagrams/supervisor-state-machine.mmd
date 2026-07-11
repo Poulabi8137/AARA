@@ -1,0 +1,32 @@
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> Planning: Workflow request received
+    Planning --> AwaitingPlan: Planning Agent running
+    AwaitingPlan --> Executing: Plan received
+    AwaitingPlan --> Failed: Planning error
+
+    Executing --> AgentRunning: Start next step
+    AgentRunning --> AwaitingApproval: Checkpoint required
+    AgentRunning --> AgentCompleted: Step finished
+    AgentRunning --> AgentFailed: Step error
+    AgentRunning --> Cancelled: User requested cancel
+
+    AwaitingApproval --> AgentCompleted: User approved
+    AwaitingApproval --> Cancelled: User rejected
+    AwaitingApproval --> TimedOut: No response within window
+
+    AgentCompleted --> Executing: More steps remain
+    AgentCompleted --> Aggregating: All steps done
+
+    AgentFailed --> AgentRunning: Retrying
+    AgentFailed --> Executing: Skip failed step
+    AgentFailed --> Aggregating: Non-critical step failed
+
+    Aggregating --> Completed: Success
+    Aggregating --> PartialFailure: Some steps failed
+    TimedOut --> PartialFailure: Checkpoint expired
+
+    Completed --> [*]
+    PartialFailure --> [*]
+    Failed --> [*]
+    Cancelled --> [*]
