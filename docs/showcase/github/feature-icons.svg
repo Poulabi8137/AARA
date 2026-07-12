@@ -1,0 +1,26 @@
+<svg width="800" height="120" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="145" height="120" rx="12" fill="#1e293b"/>
+  <text x="72" y="45" font-family="monospace" font-size="28" text-anchor="middle">🤖</text>
+  <text x="72" y="80" font-family="monospace" font-size="11" fill="#94a3b8" text-anchor="middle">5 Agents</text>
+  <text x="72" y="96" font-family="monospace" font-size="10" fill="#64748b" text-anchor="middle">LangGraph</text>
+
+  <rect x="163" y="0" width="145" height="120" rx="12" fill="#1e293b"/>
+  <text x="235" y="45" font-family="monospace" font-size="28" text-anchor="middle">🔒</text>
+  <text x="235" y="80" font-family="monospace" font-size="11" fill="#94a3b8" text-anchor="middle">Security</text>
+  <text x="235" y="96" font-family="monospace" font-size="10" fill="#64748b" text-anchor="middle">4-Layer Auth</text>
+
+  <rect x="326" y="0" width="145" height="120" rx="12" fill="#1e293b"/>
+  <text x="398" y="45" font-family="monospace" font-size="28" text-anchor="middle">📊</text>
+  <text x="398" y="80" font-family="monospace" font-size="11" fill="#94a3b8" text-anchor="middle">Reports</text>
+  <text x="398" y="96" font-family="monospace" font-size="10" fill="#64748b" text-anchor="middle">3 Formats</text>
+
+  <rect x="489" y="0" width="145" height="120" rx="12" fill="#1e293b"/>
+  <text x="561" y="45" font-family="monospace" font-size="28" text-anchor="middle">📐</text>
+  <text x="561" y="80" font-family="monospace" font-size="11" fill="#94a3b8" text-anchor="middle">Gap Analysis</text>
+  <text x="561" y="96" font-family="monospace" font-size="10" fill="#64748b" text-anchor="middle">Severity Rating</text>
+
+  <rect x="652" y="0" width="145" height="120" rx="12" fill="#1e293b"/>
+  <text x="724" y="45" font-family="monospace" font-size="28" text-anchor="middle">📈</text>
+  <text x="724" y="80" font-family="monospace" font-size="11" fill="#94a3b8" text-anchor="middle">Monitoring</text>
+  <text x="724" y="96" font-family="monospace" font-size="10" fill="#64748b" text-anchor="middle">Prometheus</text>
+</svg>

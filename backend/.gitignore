@@ -2,10 +2,14 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .env
+.env.production
+.env.production.example
 venv/
 .venv/
+.venv-wsl/
 *.db
 .pytest_cache/
+.ruff_cache/
 .coverage
 htmlcov/
 .next/

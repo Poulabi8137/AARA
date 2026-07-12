@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.2.0] - 2026-06-17
+
+### Final Polish & Launch Sprint
+- Production-quality README with 30+ sections and live screenshots
+- ARCHITECTURE.md with system diagrams and data model (ERD)
+- ROADMAP.md with completed, short-term, medium-term, and long-term goals
+- CASE_STUDY.md with architecture highlights, metrics, and sample workflows
+- CODE_OF_CONDUCT.md for community standards
+- Expanded .gitignore (18 → 38 entries) covering Python, Node, IDE, and OS artifacts
+- Updated CHANGELOG.md with complete release history
+- docs/ cleanup: archived 30+ temporary iteration reports to docs/archive/
+- Screenshot capture: 13 pages verified across entire application
+- Gemini API integration verified (2.5 Flash and 2.0 Flash, <0.5s latency)
+- 13 benchmark queries executed (7 real Gemini, 6 template fallback)
+- 10 IEEE papers generated (template fallback after quota exhaustion)
+- 392/395 tests passing (2m03s execution, 3 skipped for PostgreSQL features)
+- Removed middleware.ts (Next.js 16 deprecation), kept proxy.ts only
+- Removed temp diagnostic scripts from repo root
+- Deployment report, benchmark report, paper generation report, final validation report generated
+
 ## [0.1.0] - 2026-06-15
 
 ### Security

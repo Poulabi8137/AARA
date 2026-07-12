@@ -27,6 +27,13 @@ class DocumentListResponse(BaseModel):
     total: int
 
 
+class DocumentCreate(BaseModel):
+    filename: str
+    content_type: str
+    file_size: int
+    extension: str
+
+
 class SearchRequest(BaseModel):
     query: str = Field(..., min_length=1, max_length=5000)
     collection: str | None = Field(None, description="Restrict to a single collection")

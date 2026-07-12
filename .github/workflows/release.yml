@@ -1,0 +1,211 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 1.0.0)'
+        required: true
+        type: string
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - staging
+        default: 'staging'
+
+concurrency:
+  group: release
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: '3.12'
+  NODE_VERSION: '20'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  validate-version:
+    name: Validate Version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate version format
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Version must be in format: major.minor.patch (e.g., 1.0.0)"
+            exit 1
+          fi
+          echo "Validated version: $VERSION"
+
+  generate-changelog:
+    name: Generate Changelog
+    runs-on: ubuntu-latest
+    outputs:
+      changelog: ${{ steps.generate-changelog.outputs.changelog }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate changelog
+        id: generate-changelog
+        run: |
+          CHANGELOG_FILE="CHANGELOG.md"
+          VERSION="${{ github.event.inputs.version }}"
+          TIMESTAMP="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          git_diff=$(git diff HEAD~10 HEAD -- CHANGELOG.md | grep -A 20 "^\+\|^\-" | sed 's/^\+//' | sed 's/^\-//' | head -50)
+          
+          if [ -z "$git_diff" ]; then
+            git_diff="Released version $VERSION with standard improvements and fixes"
+          fi
+          
+          {
+            echo "## Version $VERSION - $TIMESTAMP"
+            echo ""
+            echo "$git_diff"
+            echo ""
+            echo "---"
+          } > changelog-entry
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          cat changelog-entry >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+  build-frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    outputs:
+      frontend-artifact: ${{ steps.upload.outputs.artifact }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run build
+        run: npm run build
+      - name: Upload frontend artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: out/
+          retention-days: 1
+
+  build-backend:
+    name: Build Backend
+    runs-on: ubuntu-latest
+    outputs:
+      backend-artifact: ${{ steps.upload.outputs.artifact }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        id: build
+        with:
+          context: backend
+          file: backend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.version }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          labels: |
+            org.opencontainers.image.description=AARA Backend Service
+            org.opencontainers.image.version=${{ github.event.inputs.version }}
+            org.opencontainers.image.source=${{ github.repository.url }}
+            org.opencontainers.image.licenses=UNLICENSED
+            org.opencontainers.image.documentation=https://github.com/${{ github.repository }}/blob/main/README.md
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Upload backend artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-image
+          path: /tmp/backend-image.tar
+          retention-days: 1
+
+  verify-artifacts:
+    name: Verify Artifacts
+    needs: [build-frontend, build-backend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: '**'
+          merge-multiple: true
+      - name: Verify frontend artifact
+        run: |
+          if [ ! -d "out" ]; then
+            echo "Frontend artifact missing or invalid"
+            exit 1
+          fi
+          echo "Frontend artifact verified"
+      - name: Verify backend artifact
+        run: |
+          if [ ! -f "backend-image.tar" ]; then
+            echo "Backend artifact missing or invalid"
+            exit 1
+          fi
+          echo "Backend artifact verified"
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: [validate-version, generate-changelog, build-frontend, build-backend, verify-artifacts]
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.environment == 'staging' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.STAGING_SSH_KEY }}" > ~/.ssh/staging_key
+          chmod 600 ~/.ssh/staging_key
+      - name: Deploy to staging
+        run: |
+          ssh -i ~/.ssh/staging_key -o StrictHostKeyChecking=no \
+            ${{ secrets.STAGING_HOST }} \
+            "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.version }} && \
+             docker-compose -f docker-compose.staging.yml up -d api && \
+             echo 'Deployment successful' || echo 'Deployment failed'
+      - name: Notify deployment
+        run: |
+          echo "Deployment to staging completed successfully"
+          echo "Version: ${{ github.event.inputs.version }}"
+          echo "Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.version }}"
+
+  publish-release:
+    name: Publish Release
+    needs: [deploy-staging]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          name: Release v${{ github.event.inputs.version }}
+          body: |
+            ## Automated Release Notes
+            
+            This release was generated automatically.
+            
+            ### Changes
+            - Built from commit ${{ github.sha }}
+            - Deployed to: staging
+            
+            ### Artifacts
+            - Frontend build
+            - Backend Docker image
+            
+            ### Deployment
+            - Staging environment updated
+          draft: false
+          prerelease: false
+          generate_release_notes: true

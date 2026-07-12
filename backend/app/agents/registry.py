@@ -55,6 +55,11 @@ class AgentRegistry:
             "app.agents.summarizer_agent",
             "app.agents.gap_detection_agent",
             "app.agents.report_generator_agent",
+            "app.agents.proposal_agent",
+            "app.agents.paper_author_agent",
+            "app.agents.quality_review_agent",
+            "app.agents.citation_validator_agent",
+            "app.agents.evidence_validator_agent",
         ]
         for mod in modules:
             try:

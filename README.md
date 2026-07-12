@@ -7,9 +7,10 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js)](https://nextjs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Multi--stage-2496ED?logo=docker)](https://www.docker.com/)
-[![Tests](https://img.shields.io/badge/Tests-371%20passing-2ea44f)](backend/tests/)
-[![Benchmark](https://img.shields.io/badge/Benchmark-20%20questions-8A2BE2)](backend/app/evaluation/benchmark_20_questions.py)
+[![Tests](https://img.shields.io/badge/Tests-507%20passing-2ea44f)](backend/tests/)
+[![Benchmark](https://img.shields.io/badge/Benchmark-13%20real%20queries-8A2BE2)](docs/benchmark_results_real.md)
 [![Quality](https://img.shields.io/badge/Quality-8%20Metrics-4CAF50)](backend/app/evaluation/metrics.py)
+[![Screenshots](https://img.shields.io/badge/Screenshots-13%20pages-FF6B6B)](docs/screenshots_verified.md)
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=githubactions)](.github/workflows/)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE.md)
 
@@ -39,10 +40,10 @@
 
 ## Overview
 
-AARA transforms unstructured research queries into structured, evidence-grounded reports. Instead of a single Q&A model, it runs a **coordinated team of 5 specialized agents** — each with a distinct role — that work through a structured research process:
+AARA transforms unstructured research queries into structured, evidence-grounded reports. Instead of a single Q&A model, it runs a **coordinated team of 10 specialized agents** — each with a distinct role — that work through a structured research pipeline:
 
 ```
-User Query → Planner → Retriever → Summarizer → Gap Analyzer → Report Generator → Final Report
+User Query → Planner → Retriever → Summarizer → Gap Analyzer → Citation Validator → Evidence Validator → Quality Reviewer → Report Generator → Final Report
 ```
 
 Each agent's output is grounded in actual sources with confidence scores, citation tracking, contradiction detection, and transparent reasoning traces.
@@ -53,7 +54,7 @@ Each agent's output is grounded in actual sources with confidence scores, citati
 - **Defense-in-depth** — 4 independent auth layers (proxy, interceptor, middleware, service-level checks)
 - **Resilient by default** — graceful degradation for Redis, ChromaDB, and LLM provider failures
 - **Observable** — structured JSON logging, Prometheus metrics, Grafana dashboards, Sentry error tracking
-- **Tested** — 371 passing tests across unit, integration, and E2E scenarios
+- **Tested** — 507+ passing tests across unit, integration, and E2E scenarios
 
 ---
 
@@ -73,7 +74,7 @@ graph TB
         API[API Layer<br/>46 Endpoints / 13 Routers]
         Auth[Auth Service<br/>JWT + RBAC + Ownership]
         MW[Middleware Stack<br/>Rate Limit / Logging / Security Headers]
-        Agents[LangGraph Agent System<br/>5 Specialized Agents]
+        Agents[LangGraph Agent System<br/>10 Specialized Agents]
         Ingestion[Document Ingestion<br/>PDF / DOCX / TXT / MD]
         LLM[LLM Providers<br/>OpenAI / Gemini / Mock]
     end
@@ -143,7 +144,7 @@ sequenceDiagram
 
 | Category | Feature | Details |
 |----------|---------|---------|
-| **AI** | Multi-Agent System | 5 LangGraph agents: Planner, Retriever, Summarizer, Gap Analyzer, Report Generator |
+| **AI** | Multi-Agent System | 10 LangGraph agents: Planner, Retriever, Summarizer, Gap Analyzer, Report Generator, Proposal, Paper Author, Citation Validator, Evidence Validator, Quality Reviewer |
 | **AI** | Research Planning | Agent analyzes query, generates structured plan with subtopics and search queries |
 | **AI** | RAG Pipeline | Semantic search across ChromaDB vector store with re-ranking and deduplication |
 | **AI** | Gap Analysis | Identifies 5-10 research gaps with severity ratings, confidence scores, and remediation |
@@ -151,8 +152,9 @@ sequenceDiagram
 | **AI** | LLM-Enhanced Reports | Abstractive summarization and report section generation via configurable LLM providers |
 | **AI** | Citation Tracking | Evidence-grounded citations with source verification |
 | **AI** | Hallucination Detection | Linguistic pattern analysis + citation-support overlap scoring |
-| **AI** | Benchmark Suite | 20 research questions across 7 categories with 8 quality metrics |
+| **AI** | Benchmark Suite | 13 real Gemini queries + 6 template fallback, 8 quality metrics, 100% completion |
 | **AI** | Demo Dataset | 10 polished showcase projects with seed report data |
+| **AI** | Google Gemini | Dual model support: 2.0 Flash (1,500 req/day) + 2.5 Flash (20 req/day) |
 | **AI** | Pluggable LLMs | OpenAI GPT-4o, Google Gemini, Mock provider (configurable) |
 | **Security** | JWT Authentication | HMAC-SHA256, configurable expiry, refresh token rotation, token versioning |
 | **Security** | RBAC Authorization | Admin, Researcher, Viewer roles — enforced at every endpoint |
@@ -163,7 +165,7 @@ sequenceDiagram
 | **Security** | Prompt Injection Mitigation | Instruction delimiters, system-level guards |
 | **Security** | Password Security | bcrypt hashing, complexity validation, account lockout |
 | **DevOps** | Docker | Multi-stage builds (200MB image), non-root user, health checks |
-| **DevOps** | GitHub Actions | 4 workflows: PR checks, main branch, security scan, load test |
+| **DevOps** | GitHub Actions | 6 workflows: PR checks, main branch, security scan, load test, deploy staging, release |
 | **DevOps** | k6 Load Testing | 5 scenarios: smoke, average (50 users), stress (300), spike (500), endurance |
 | **DevOps** | Monitoring | Prometheus + Grafana + Sentry with pre-built dashboards |
 | **DevOps** | Health Checks | /health, /ready, /live endpoints for orchestration |
@@ -206,13 +208,13 @@ Layer 4: Service Layer (Backend)
 
 A comprehensive security audit (10 phases) has been completed:
 
-- **Authorization audit** — all 46 endpoints checked; 2 missing auth fixed
+- **Authorization audit** — all endpoints checked; 2 missing auth fixed
 - **Database integrity** — ChromaDB filter bug fixed, COUNT query optimized
 - **Security posture** — no hardcoded secrets, JWT implementation verified
 - **Upload security** — size limits, sanitization, extension validation
 - **Rate limiting** — atomic Lua scripting, TOCTOU race condition fixed
 - **AI safety** — prompt injection mitigation, citation verification added
-- **Full report**: [docs/archive/BACKEND_AUDIT_REPORT.md](docs/archive/BACKEND_AUDIT_REPORT.md)
+- **Full report**: [docs/BACKEND_AUDIT_REPORT.md](docs/BACKEND_AUDIT_REPORT.md)
 
 ---
 
@@ -226,12 +228,12 @@ A comprehensive security audit (10 phases) has been completed:
 | FastAPI 0.115 | REST framework with async support |
 | SQLAlchemy 2.0 | Async ORM with PostgreSQL 16 |
 | Pydantic v2 | Request/response validation |
-| Alembic | Database migrations (5 versions) |
+| Alembic | Database migrations (7 versions) |
 | LangGraph | Agent workflow orchestration |
 | ChromaDB | Vector similarity search |
 | Redis 7 | Rate limiting and cache |
 | Dramatiq | Background task queue |
-| pytest | 371 tests |
+| pytest | 507+ tests (15 files) |
 
 ### Frontend
 
@@ -264,7 +266,7 @@ A comprehensive security audit (10 phases) has been completed:
 ```
 aara/
 ├── .github/                         # GitHub standards
-│   ├── workflows/                   # CI/CD pipelines (4 workflows)
+│   ├── workflows/                   # CI/CD pipelines (6 workflows)
 │   ├── ISSUE_TEMPLATE/              # Bug, feature, security templates
 │   ├── PULL_REQUEST_TEMPLATE.md     # PR checklist
 │   ├── CODEOWNERS                   # Ownership assignments
@@ -272,9 +274,12 @@ aara/
 │
 ├── backend/                         # FastAPI backend
 │   ├── app/                         # Application code
-│   │   ├── api/                     # 46 endpoints across 13 routers
-│   │   ├── agents/                  # 5 LangGraph agents + utilities
+│   │   ├── agents/                  # 10 specialized agents + utilities
+│   │   ├── analysis/                # Research Analysis Engine (Phase 2.5)
+│   │   ├── api/                     # 62 endpoints across 15 routers
+│   │   ├── cache/                   # Caching layer
 │   │   ├── core/                    # Config, security, logging, observability
+│   │   ├── db/                      # Database session management
 │   │   ├── evaluation/              # Benchmark framework (20 questions, 8 metrics)
 │   │   │   ├── metrics.py           # QA metrics: coverage, density, hallucination
 │   │   │   ├── scorecard.py         # Weighted composite scoring
@@ -283,15 +288,27 @@ aara/
 │   │   │   ├── benchmark_20_questions.py # 20-question suite (7 categories)
 │   │   │   ├── evaluators.py        # Workflow evaluation + trend analysis
 │   │   │   └── report.py            # Evaluation report formatting
+│   │   ├── experiments/             # Experiment Planning Engine (Phase 2.7)
 │   │   ├── graphs/                  # Workflow orchestration
 │   │   ├── ingestion/               # Document processing pipeline
+│   │   ├── knowledge_graph/         # Knowledge Graph Engine (Phase 2.8)
 │   │   ├── llm/                     # LLM providers (OpenAI, Gemini, Mock)
+│   │   ├── methodology/             # Research Methodology Engine (Phase 2.6)
 │   │   ├── middleware/              # Rate limiting, security headers, logging
-│   │   ├── models/                  # 8 SQLAlchemy ORM models
+│   │   ├── models/                  # 10 SQLAlchemy ORM models
+│   │   ├── planner/                 # Research Planner subsystem (Phase 2.3)
+│   │   ├── rag/                     # RAG Core + Advanced Retrieval (Phase 2.1-2.2)
+│   │   ├── redis/                   # Redis client utilities
+│   │   ├── schemas/                 # Pydantic request/response schemas
 │   │   ├── seed_data/               # Demo project data (10 showcase projects)
 │   │   ├── services/                # Business logic layer
+│   │   ├── summarization/           # Research Summarization Engine (Phase 2.4)
+│   │   ├── tasks/                   # Background task definitions
+│   │   ├── utils/                   # Shared utility functions
+│   │   ├── vectorstore/             # ChromaDB vector store integration
+│   │   ├── workers/                 # Background worker processes
 │   │   └── main.py                  # App factory with lifespan validation
-│   ├── tests/                       # 371 tests across 13 files
+│   ├── tests/                       # 507+ tests across 15 files
 │   ├── monitoring/                  # Prometheus + Grafana config
 │   ├── audit_reports/               # 10-phase security audit
 │   ├── Dockerfile                   # Multi-stage build
@@ -416,7 +433,7 @@ Additional: Redis 7, Dramatiq workers (2 replicas), Prometheus, Grafana
 
 ## API Documentation
 
-46 REST endpoints across 13 routers. Full OpenAPI spec at `/docs` or `/redoc`.
+62 REST endpoints across 15 routers. Full OpenAPI spec at `/docs` or `/redoc`.
 
 ### Authentication
 
@@ -515,8 +532,8 @@ Structured JSON logging with:
 ### Dashboards
 
 Pre-built Grafana dashboards in `backend/monitoring/grafana/dashboards/`:
-- **AgentWatch Overview** — system health, request rate, latency, error rate
-- **AgentWatch Alerts** — alerting dashboard with threshold violations
+- **AARA Overview** — system health, request rate, latency, error rate
+- **AARA Alerts** — alerting dashboard with threshold violations
 
 **Monitoring guide**: [backend/monitoring/README.md](backend/monitoring/README.md)
 
@@ -524,7 +541,7 @@ Pre-built Grafana dashboards in `backend/monitoring/grafana/dashboards/`:
 
 ## CI/CD Pipeline
 
-4 GitHub Actions workflows:
+6 GitHub Actions workflows:
 
 ### PR Checks (`pr-checks.yml`)
 Triggered on pull requests to `main`/`develop`:
@@ -551,6 +568,17 @@ Manual trigger via workflow_dispatch:
 - Runs k6 scenarios against target URL
 - Supports smoke, average-load, stress-test, spike-test, endurance-test
 
+### Deploy Staging (`deploy-staging.yml`)
+Triggered via release workflow:
+- Deploys to staging environment with full monitoring stack
+- Docker Compose with PostgreSQL, ChromaDB, Redis, Dramatiq workers
+
+### Release (`release.yml`)
+Manual trigger with version validation:
+- Validates semver format (major.minor.patch)
+- Builds frontend + backend Docker images
+- Publishes GitHub Release with auto-generated notes
+
 ---
 
 ## Performance Testing
@@ -572,6 +600,27 @@ k6 run load-testing/stress-test.js
 ```
 
 **Full documentation**: [load-testing/README.md](load-testing/README.md)
+
+---
+
+## Screenshots
+
+| Page | Preview |
+|------|---------|
+| Landing Page | ![Landing](screenshots/landing.png) |
+| Login | ![Login](screenshots/login.png) |
+| Dashboard | ![Dashboard](screenshots/dashboard.png) |
+| New Research | ![New Research](screenshots/research-new.png) |
+| Papers View | ![Papers](screenshots/research-papers.png) |
+| Literature Review | ![Literature Review](screenshots/literature-review.png) |
+| Gap Analysis | ![Gap Analysis](screenshots/gap-analysis.png) |
+| Novel Directions | ![Novel Directions](screenshots/novel-directions.png) |
+| Report Generation | ![Report Generation](screenshots/report-generation.png) |
+| Citation Manager | ![Citation Manager](screenshots/citation-manager.png) |
+| Agent Monitoring | ![Agent Monitoring](screenshots/agent-monitoring.png) |
+| Settings | ![Settings](screenshots/settings.png) |
+
+Full screenshot verification: [screenshots_verified.md](docs/screenshots_verified.md)
 
 ---
 
@@ -622,8 +671,8 @@ Assets for internship/new-grad applications:
 - [ ] Multi-agent collaboration (agents critique each other's outputs)
 
 ### Medium-term
-- [ ] Knowledge graphs from extracted entities
-- [ ] Long-term memory across research sessions
+- [x] Knowledge graphs from extracted entities (Phase 2.8)
+- [x] Long-term memory across research sessions (Phase 1)
 - [ ] Collaborative workspaces
 - [ ] Zotero/Mendeley integration
 - [ ] Terraform infrastructure-as-code

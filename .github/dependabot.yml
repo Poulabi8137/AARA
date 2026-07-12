@@ -12,8 +12,6 @@ updates:
     labels:
       - "dependencies"
       - "python"
-    reviewers:
-      - "agentwatch/backend"
     commit-message:
       prefix: "chore(deps)"
       prefix-development: "chore(deps-dev)"
@@ -30,8 +28,6 @@ updates:
     labels:
       - "dependencies"
       - "javascript"
-    reviewers:
-      - "agentwatch/frontend"
     commit-message:
       prefix: "chore(deps)"
 

@@ -1,18 +1,59 @@
-# v0 sandbox internal files
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+.next/
+.pnpm-store/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+nextjs.log
+backend/app/core/logs/
+
+# Temp / generated
+screenshots/
+scripts/
+docs/archive/
+
+# Vercel / v0
+.v0-trash/
+.snowflake/
+.vercel/
 __v0_runtime_loader.js
 __v0_devtools.tsx
 __v0_jsx-dev-runtime.ts
-.snowflake/
-.v0-trash/
-.vercel/
 
-# Environment variables
-.env*.local
+# Nested recovery clone
+AARA/
 
-# Common ignores
-node_modules
-.next/
-.DS_Store
+# Generated reports
+reports/
+audit_reports/
+audit_report.md
 
-# Archive / non-essential docs
-docs/archive/

@@ -1,0 +1,13 @@
+.venv
+.venv-wsl
+__pycache__
+*.pyc
+.env
+.env.local
+.git
+.gitignore
+Dockerfile
+.dockerignore
+README.md
+tests/
+audit_reports/
