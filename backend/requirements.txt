@@ -26,5 +26,5 @@ langchain-google-genai==2.0.7
 tiktoken==0.8.0
 
 # Background task execution
-dramatiq[redis]==1.17.1
+dramatiq[redis]==2.2.0
 redis[hiredis]==5.2.0
