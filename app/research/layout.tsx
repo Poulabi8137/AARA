@@ -3,8 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { ResearchFlow } from '@/components/research-flow'
-import { ChevronRight, BookOpen, Search, Lightbulb, Quote, FileText, Sparkles } from 'lucide-react'
+import { ChevronRight, BookOpen, Search, Lightbulb, Quote, FileText, FileEdit } from 'lucide-react'
 
 const researchModules = [
   { href: '/research/papers', label: 'Papers', icon: BookOpen },
@@ -13,6 +12,7 @@ const researchModules = [
   { href: '/research/directions', label: 'Directions', icon: Lightbulb },
   { href: '/research/citations', label: 'Citations', icon: Quote },
   { href: '/research/report', label: 'Report', icon: FileText },
+  { href: '/research/papers/author', label: 'Paper Authoring', icon: FileEdit },
 ]
 
 export default function ResearchLayout({ children }: { children: React.ReactNode }) {

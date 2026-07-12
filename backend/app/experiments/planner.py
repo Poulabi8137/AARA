@@ -12,7 +12,6 @@ from app.experiments.evaluation import EvaluationPlanner
 from app.experiments.hypothesis import HypothesisGenerator
 from app.experiments.models import (
     ExperimentMetadata,
-    ExperimentObjective,
     ExperimentPlan,
     ExperimentStatistics,
     ExperimentTimeline,
@@ -64,37 +63,58 @@ class ExperimentPlanner:
         start = time.monotonic()
 
         hypotheses = await self._hypothesis_gen.generate(
-            query, analysis_result, methodology_result,
+            query,
+            analysis_result,
+            methodology_result,
         )
 
         objectives, phases, datasets = await self._designer.design(
-            query, analysis_result, methodology_result, hypotheses,
+            query,
+            analysis_result,
+            methodology_result,
+            hypotheses,
         )
 
         variables = await self._variable_planner.plan(
-            query, analysis_result, methodology_result, hypotheses,
+            query,
+            analysis_result,
+            methodology_result,
+            hypotheses,
         )
 
         baselines, benchmarks = await self._baseline_planner.plan(
-            query, methodology_result,
+            query,
+            methodology_result,
         )
 
         resources = await self._resource_planner.estimate(
-            query, methodology_result, phases,
+            query,
+            methodology_result,
+            phases,
         )
 
         metrics, outcomes = await self._evaluation_planner.plan(
-            query, methodology_result, phases,
+            query,
+            methodology_result,
+            phases,
         )
 
         risks = await self._risk_analyzer.analyze(
-            query, methodology_result, phases,
+            query,
+            methodology_result,
+            phases,
         )
 
         timeline = self._build_timeline(phases, risks)
 
         stats = self._build_statistics(
-            hypotheses, phases, variables, baselines, risks, metrics, timeline,
+            hypotheses,
+            phases,
+            variables,
+            baselines,
+            risks,
+            metrics,
+            timeline,
         )
 
         plan = ExperimentPlan(
@@ -150,9 +170,7 @@ class ExperimentPlanner:
         phases: list,
         risks: list,
     ) -> ExperimentTimeline:
-        total_minutes = sum(
-            getattr(p, "estimated_duration_minutes", 0) for p in phases
-        )
+        total_minutes = sum(getattr(p, "estimated_duration_minutes", 0) for p in phases)
         total_days = max(1, total_minutes // (8 * 60))
 
         milestones = [
@@ -166,7 +184,11 @@ class ExperimentPlanner:
             total_estimated_days=total_days,
             phases=[getattr(p, "name", f"phase_{i}") for i, p in enumerate(phases)],
             milestones=milestones[: len(phases)],
-            critical_path=[getattr(p, "name", "") for p in phases if getattr(p, "estimated_duration_minutes", 0) > 300],
+            critical_path=[
+                getattr(p, "name", "")
+                for p in phases
+                if getattr(p, "estimated_duration_minutes", 0) > 300
+            ],
         )
 
     def _build_statistics(
@@ -179,9 +201,7 @@ class ExperimentPlanner:
         metrics: list,
         timeline: ExperimentTimeline,
     ) -> ExperimentStatistics:
-        total_steps = sum(
-            len(getattr(p, "steps", [])) for p in phases
-        )
+        total_steps = sum(len(getattr(p, "steps", [])) for p in phases)
         confidence = self._compute_confidence(hypotheses)
 
         return ExperimentStatistics(

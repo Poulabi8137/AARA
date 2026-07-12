@@ -112,17 +112,23 @@ def compute_planning_score(plan: PlannerOutput) -> PlannerOutput:
     checks += 1
 
     # Coverage: breadth and diversity of topics
-    total_distinct = len(set(
-        plan.research_questions
-        + plan.keywords
-        + plan.search_queries
-        + plan.subtopics
-    ))
+    total_distinct = len(
+        set(
+            plan.research_questions
+            + plan.keywords
+            + plan.search_queries
+            + plan.subtopics
+        )
+    )
     coverage = min(100, total_distinct * 3)
 
     # Specificity: average length and depth of entries
-    avg_q_len = sum(len(q) for q in plan.research_questions) / max(len(plan.research_questions), 1)
-    avg_sq_len = sum(len(sq) for sq in plan.search_queries) / max(len(plan.search_queries), 1)
+    avg_q_len = sum(len(q) for q in plan.research_questions) / max(
+        len(plan.research_questions), 1
+    )
+    avg_sq_len = sum(len(sq) for sq in plan.search_queries) / max(
+        len(plan.search_queries), 1
+    )
     avg_sub_len = sum(len(st) for st in plan.subtopics) / max(len(plan.subtopics), 1)
 
     spec_score = 0
@@ -158,11 +164,17 @@ def validate_plan(plan: PlannerOutput) -> list[str]:
     if not plan.research_goal.endswith(".") and not plan.research_goal.endswith("?"):
         warnings.append("research_goal should end with a period or question mark")
 
-    questions_with_qmark = [q for q in plan.research_questions if q.strip().endswith("?")]
+    questions_with_qmark = [
+        q for q in plan.research_questions if q.strip().endswith("?")
+    ]
     if len(questions_with_qmark) < len(plan.research_questions):
-        warnings.append(f"{len(plan.research_questions) - len(questions_with_qmark)} research question(s) do not end with '?'")
+        warnings.append(
+            f"{len(plan.research_questions) - len(questions_with_qmark)} research question(s) do not end with '?'"
+        )
 
     if plan.estimated_steps < 3 or plan.estimated_steps > 15:
-        warnings.append(f"estimated_steps ({plan.estimated_steps}) seems unusual for a research workflow")
+        warnings.append(
+            f"estimated_steps ({plan.estimated_steps}) seems unusual for a research workflow"
+        )
 
     return warnings

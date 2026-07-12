@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import re
 import uuid
-from typing import Any
 
 from app.core.logging import get_logger
 from app.planner.models import ResearchGoal, TaskComplexity
@@ -17,14 +16,24 @@ _COMPLEXITY_PATTERNS: dict[TaskComplexity, list[re.Pattern]] = {
         re.compile(r"^\w{3,30}\?$", re.IGNORECASE),
     ],
     TaskComplexity.MODERATE: [
-        re.compile(r"\b(compare|contrast|difference|similarity|explain|describe|analyze)\b", re.IGNORECASE),
+        re.compile(
+            r"\b(compare|contrast|difference|similarity|explain|describe|analyze)\b",
+            re.IGNORECASE,
+        ),
         re.compile(r"\b(how does|how is|why does)\b", re.IGNORECASE),
         re.compile(r"\bimpact|effect|influence|relationship\b", re.IGNORECASE),
     ],
     TaskComplexity.COMPLEX: [
-        re.compile(r"\b(design|implement|develop|create|build|experiment|investigate)\b", re.IGNORECASE),
-        re.compile(r"\b(framework|methodology|pipeline|system|architecture)\b", re.IGNORECASE),
-        re.compile(r"\b(multi-step|multistep|end-to-end|comprehensive)\b", re.IGNORECASE),
+        re.compile(
+            r"\b(design|implement|develop|create|build|experiment|investigate)\b",
+            re.IGNORECASE,
+        ),
+        re.compile(
+            r"\b(framework|methodology|pipeline|system|architecture)\b", re.IGNORECASE
+        ),
+        re.compile(
+            r"\b(multi-step|multistep|end-to-end|comprehensive)\b", re.IGNORECASE
+        ),
     ],
 }
 
@@ -36,13 +45,27 @@ _AMBIGUITY_PATTERNS: list[re.Pattern] = [
 ]
 
 _OUTPUT_PATTERNS: dict[str, re.Pattern] = {
-    "summary": re.compile(r"\b(summarize|summary|overview|brief|abstract)\b", re.IGNORECASE),
-    "comparison": re.compile(r"\b(compare|contrast|difference|similarity|vs\.?|versus)\b", re.IGNORECASE),
-    "analysis": re.compile(r"\b(analyze|analysis|examine|evaluate|assess)\b", re.IGNORECASE),
-    "recommendation": re.compile(r"\b(recommend|suggest|propose|advise)\b", re.IGNORECASE),
-    "explanation": re.compile(r"\b(explain|describe|elaborate|clarify)\b", re.IGNORECASE),
-    "methodology": re.compile(r"\b(method|approach|technique|procedure|protocol)\b", re.IGNORECASE),
-    "literature_review": re.compile(r"\b(literature|survey|review|related work|state of the art)\b", re.IGNORECASE),
+    "summary": re.compile(
+        r"\b(summarize|summary|overview|brief|abstract)\b", re.IGNORECASE
+    ),
+    "comparison": re.compile(
+        r"\b(compare|contrast|difference|similarity|vs\.?|versus)\b", re.IGNORECASE
+    ),
+    "analysis": re.compile(
+        r"\b(analyze|analysis|examine|evaluate|assess)\b", re.IGNORECASE
+    ),
+    "recommendation": re.compile(
+        r"\b(recommend|suggest|propose|advise)\b", re.IGNORECASE
+    ),
+    "explanation": re.compile(
+        r"\b(explain|describe|elaborate|clarify)\b", re.IGNORECASE
+    ),
+    "methodology": re.compile(
+        r"\b(method|approach|technique|procedure|protocol)\b", re.IGNORECASE
+    ),
+    "literature_review": re.compile(
+        r"\b(literature|survey|review|related work|state of the art)\b", re.IGNORECASE
+    ),
 }
 
 
@@ -141,9 +164,7 @@ class GoalAnalyzer:
         }[complexity]
         return round(min(1.0, base + ambiguity * 0.2 + len(outputs) * 0.05), 2)
 
-    def _detect_missing_info(
-        self, normalized: str, keywords: list[str]
-    ) -> list[str]:
+    def _detect_missing_info(self, normalized: str, keywords: list[str]) -> list[str]:
         missing: list[str] = []
         if not keywords:
             missing.append("No specific research terms found")

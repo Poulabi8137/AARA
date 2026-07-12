@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Protocol, runtime_checkable
 
 
-
 @runtime_checkable
 class EmbeddingProvider(Protocol):
     """Protocol that all embedding providers must implement.
@@ -15,14 +14,11 @@ class EmbeddingProvider(Protocol):
     model_name: str
     dimensions: int
 
-    async def embed_text(self, text: str) -> list[float]:
-        ...
+    async def embed_text(self, text: str) -> list[float]: ...
 
-    async def embed_batch(self, texts: list[str]) -> list[list[float]]:
-        ...
+    async def embed_batch(self, texts: list[str]) -> list[list[float]]: ...
 
-    async def embed_query(self, query: str) -> list[float]:
-        ...
+    async def embed_query(self, query: str) -> list[float]: ...
 
 
 class MiniLMEmbeddingProvider:
@@ -40,6 +36,7 @@ class MiniLMEmbeddingProvider:
     def _get_model(self):
         if self._model is None:
             from sentence_transformers import SentenceTransformer
+
             self._model = SentenceTransformer(self.model_name)
         return self._model
 
@@ -65,20 +62,17 @@ class OpenAIEmbeddingProvider:
 
     def __init__(self, api_key: str, model: str | None = None) -> None:
         from openai import AsyncOpenAI
+
         self._client = AsyncOpenAI(api_key=api_key)
         if model:
             self.model_name = model
 
     async def embed_text(self, text: str) -> list[float]:
-        resp = await self._client.embeddings.create(
-            model=self.model_name, input=text
-        )
+        resp = await self._client.embeddings.create(model=self.model_name, input=text)
         return resp.data[0].embedding
 
     async def embed_batch(self, texts: list[str]) -> list[list[float]]:
-        resp = await self._client.embeddings.create(
-            model=self.model_name, input=texts
-        )
+        resp = await self._client.embeddings.create(model=self.model_name, input=texts)
         sorted_data = sorted(resp.data, key=lambda x: x.index)
         return [d.embedding for d in sorted_data]
 

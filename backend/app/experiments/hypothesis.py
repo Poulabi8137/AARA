@@ -58,7 +58,9 @@ class HypothesisGenerator:
 
         llm_hypotheses: list[ExperimentHypothesis] = []
         if self._llm and settings.enable_llm:
-            llm_hypotheses = await self._llm_assisted(query, analysis_result, methodology_result)
+            llm_hypotheses = await self._llm_assisted(
+                query, analysis_result, methodology_result
+            )
 
         seen: set[str] = set()
         merged: list[ExperimentHypothesis] = []
@@ -121,21 +123,33 @@ class HypothesisGenerator:
         methodology_result: MethodologyResult,
     ) -> list[ExperimentHypothesis]:
         try:
-            consensus_text = "; ".join(
-                c.statement[:100] for c in analysis_result.consensus[:5]
-            ) if analysis_result.consensus else "none"
-            trends_text = "; ".join(
-                t.trend[:100] for t in analysis_result.trends[:5]
-            ) if analysis_result.trends else "none"
-            rec_text = "; ".join(
-                r.recommendation[:100] for r in analysis_result.recommendations[:5]
-            ) if analysis_result.recommendations else "none"
-            methods_text = ", ".join(
-                m.method for m in methodology_result.methods[:5]
-            ) if methodology_result.methods else "none"
-            datasets_text = ", ".join(
-                d.dataset_name for d in methodology_result.datasets[:5]
-            ) if methodology_result.datasets else "none"
+            consensus_text = (
+                "; ".join(c.statement[:100] for c in analysis_result.consensus[:5])
+                if analysis_result.consensus
+                else "none"
+            )
+            trends_text = (
+                "; ".join(t.trend[:100] for t in analysis_result.trends[:5])
+                if analysis_result.trends
+                else "none"
+            )
+            rec_text = (
+                "; ".join(
+                    r.recommendation[:100] for r in analysis_result.recommendations[:5]
+                )
+                if analysis_result.recommendations
+                else "none"
+            )
+            methods_text = (
+                ", ".join(m.method for m in methodology_result.methods[:5])
+                if methodology_result.methods
+                else "none"
+            )
+            datasets_text = (
+                ", ".join(d.dataset_name for d in methodology_result.datasets[:5])
+                if methodology_result.datasets
+                else "none"
+            )
 
             content = await self._llm.generate(
                 prompt=_HYPOTHESIS_USER.format(
@@ -153,13 +167,16 @@ class HypothesisGenerator:
             )
             return self._parse_hypotheses(content)
         except Exception as exc:
-            logger.warning("LLM hypothesis generation failed", extra={"error": str(exc)})
+            logger.warning(
+                "LLM hypothesis generation failed", extra={"error": str(exc)}
+            )
             return []
 
     def _parse_hypotheses(self, content: str) -> list[ExperimentHypothesis]:
         import re
+
         results: list[ExperimentHypothesis] = []
-        blocks = re.split(r'\n\s*\n', content.strip())
+        blocks = re.split(r"\n\s*\n", content.strip())
         current: dict = {}
         for block in blocks:
             block = block.strip()
@@ -171,7 +188,9 @@ class HypothesisGenerator:
             elif low.startswith("rationale:"):
                 current["rationale"] = block.split(":", 1)[1].strip()
             elif low.startswith("evidence:"):
-                current["evidence"] = [e.strip() for e in block.split(":", 1)[1].split(",") if e.strip()]
+                current["evidence"] = [
+                    e.strip() for e in block.split(":", 1)[1].split(",") if e.strip()
+                ]
             elif low.startswith("confidence:"):
                 try:
                     current["confidence"] = float(block.split(":", 1)[1].strip())

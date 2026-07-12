@@ -24,7 +24,9 @@ async def _get_approval_or_404(
     execution_id: str, current_user: User, db: AsyncSession
 ) -> HumanApproval:
     result = await db.execute(
-        select(HumanApproval).where(HumanApproval.execution_id == uuid.UUID(execution_id))
+        select(HumanApproval).where(
+            HumanApproval.execution_id == uuid.UUID(execution_id)
+        )
     )
     approval = result.scalar_one_or_none()
     if approval is None:
@@ -48,12 +50,16 @@ async def list_pending_approvals(
     db: AsyncSession = Depends(get_db),
 ) -> list[dict[str, Any]]:
     """List all pending human approvals for the current user's projects."""
-    user_project_ids = select(ResearchProject.id).where(
-        ResearchProject.created_by == current_user.id
-    ).scalar_subquery()
-    user_exec_ids = select(AgentExecution.id).where(
-        AgentExecution.project_id.in_(user_project_ids)
-    ).scalar_subquery()
+    user_project_ids = (
+        select(ResearchProject.id)
+        .where(ResearchProject.created_by == current_user.id)
+        .scalar_subquery()
+    )
+    user_exec_ids = (
+        select(AgentExecution.id)
+        .where(AgentExecution.project_id.in_(user_project_ids))
+        .scalar_subquery()
+    )
     result = await db.execute(
         select(HumanApproval)
         .where(
@@ -89,8 +95,12 @@ async def get_approval_status(
         "id": str(approval.id),
         "execution_id": str(approval.execution_id),
         "status": approval.status.value,
-        "requested_at": approval.requested_at.isoformat() if approval.requested_at else None,
-        "reviewed_at": approval.reviewed_at.isoformat() if approval.reviewed_at else None,
+        "requested_at": approval.requested_at.isoformat()
+        if approval.requested_at
+        else None,
+        "reviewed_at": approval.reviewed_at.isoformat()
+        if approval.reviewed_at
+        else None,
         "reviewed_by": approval.reviewed_by,
         "feedback": approval.feedback,
     }
@@ -130,7 +140,9 @@ async def reject_execution(
     approval.reviewed_by = reviewed_by or current_user.name or str(current_user.id)
     approval.feedback = feedback
     await db.flush()
-    logger.info("execution rejected", extra={"execution_id": execution_id, "feedback": feedback})
+    logger.info(
+        "execution rejected", extra={"execution_id": execution_id, "feedback": feedback}
+    )
     return {"status": "rejected", "execution_id": execution_id}
 
 
@@ -149,5 +161,8 @@ async def rerun_execution(
     approval.reviewed_by = reviewed_by or current_user.name or str(current_user.id)
     approval.feedback = feedback
     await db.flush()
-    logger.info("execution rerun requested", extra={"execution_id": execution_id, "feedback": feedback})
+    logger.info(
+        "execution rerun requested",
+        extra={"execution_id": execution_id, "feedback": feedback},
+    )
     return {"status": "rerun_requested", "execution_id": execution_id}

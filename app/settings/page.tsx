@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Save, AlertCircle, CheckCircle, Loader2 } from 'lucide-react'
 import { GlassCard } from '@/components/ui/glass-card'
-import { PageTransition, childVariants } from '@/components/page-transition'
+import { PageTransition } from '@/components/page-transition'
 import { apiClient } from '@/lib/api-client'
 
 export default function SettingsPage() {

@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { apiClient } from '@/lib/api-client'
 import type { User } from '@/lib/types'
+import { safeGetItem, safeSetItem, safeRemoveItem } from '@/lib/utils'
 
 interface AuthState {
   user: User | null
@@ -17,7 +18,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  token: typeof window !== 'undefined' ? localStorage.getItem('authToken') : null,
+  token: safeGetItem('authToken'),
   isLoading: false,
   error: null,
 
@@ -32,10 +33,13 @@ export const useAuthStore = create<AuthState>((set) => ({
         token: data.access_token,
         isLoading: false,
       })
-      localStorage.setItem('authToken', data.access_token)
-      if (data.refresh_token) localStorage.setItem('refreshToken', data.refresh_token)
-    } catch (err: any) {
-      set({ isLoading: false, error: err?.response?.data?.detail || 'Login failed' })
+      safeSetItem('authToken', data.access_token)
+      if (data.refresh_token) safeSetItem('refreshToken', data.refresh_token)
+    } catch (err: unknown) {
+      const msg = err && typeof err === 'object' && 'response' in err
+        ? (err as { response?: { data?: { detail?: string } } }).response?.data?.detail
+        : undefined
+      set({ isLoading: false, error: msg || 'Login failed' })
       throw err
     }
   },
@@ -50,18 +54,21 @@ export const useAuthStore = create<AuthState>((set) => ({
         token: data.access_token,
         isLoading: false,
       })
-      localStorage.setItem('authToken', data.access_token)
-      if (data.refresh_token) localStorage.setItem('refreshToken', data.refresh_token)
-    } catch (err: any) {
-      set({ isLoading: false, error: err?.response?.data?.detail || 'Signup failed' })
+      safeSetItem('authToken', data.access_token)
+      if (data.refresh_token) safeSetItem('refreshToken', data.refresh_token)
+    } catch (err: unknown) {
+      const msg = err && typeof err === 'object' && 'response' in err
+        ? (err as { response?: { data?: { detail?: string } } }).response?.data?.detail
+        : undefined
+      set({ isLoading: false, error: msg || 'Signup failed' })
       throw err
     }
   },
 
   logout: () => {
     set({ user: null, token: null, error: null })
-    localStorage.removeItem('authToken')
-    localStorage.removeItem('refreshToken')
+    safeRemoveItem('authToken')
+    safeRemoveItem('refreshToken')
     document.cookie = 'auth_token=; path=/; max-age=0'
   },
 
@@ -78,7 +85,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   clearError: () => set({ error: null }),
 
   hydrate: () => {
-    const token = localStorage.getItem('authToken')
+    const token = safeGetItem('authToken')
     if (token) {
       set({ token })
     }
@@ -114,8 +121,11 @@ export const useResearchStore = create<ResearchState>((set) => ({
     try {
       const res = await apiClient.listProjects()
       set({ projects: res.data.projects || res.data, isLoading: false })
-    } catch (err: any) {
-      set({ isLoading: false, error: err?.response?.data?.detail || 'Failed to fetch projects' })
+    } catch (err: unknown) {
+      const msg = err && typeof err === 'object' && 'response' in err
+        ? (err as { response?: { data?: { detail?: string } } }).response?.data?.detail
+        : undefined
+      set({ isLoading: false, error: msg || 'Failed to fetch projects' })
     }
   },
 
@@ -125,8 +135,11 @@ export const useResearchStore = create<ResearchState>((set) => ({
       const res = await apiClient.createProject(title, description)
       set({ isLoading: false })
       return res.data
-    } catch (err: any) {
-      set({ isLoading: false, error: err?.response?.data?.detail || 'Failed to create project' })
+    } catch (err: unknown) {
+      const msg = err && typeof err === 'object' && 'response' in err
+        ? (err as { response?: { data?: { detail?: string } } }).response?.data?.detail
+        : undefined
+      set({ isLoading: false, error: msg || 'Failed to create project' })
       return null
     }
   },

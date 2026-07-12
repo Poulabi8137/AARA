@@ -50,12 +50,16 @@ class SessionConsolidationStrategy:
         for mem in raw_memories:
             if str(mem.id) in already_ids:
                 continue
-            groups.setdefault(mem.session_id, []).append({
-                "id": mem.id,
-                "content": mem.content,
-                "memory_type": mem.memory_type.value if hasattr(mem, "memory_type") else "unknown",
-                "confidence": mem.confidence,
-            })
+            groups.setdefault(mem.session_id, []).append(
+                {
+                    "id": mem.id,
+                    "content": mem.content,
+                    "memory_type": mem.memory_type.value
+                    if hasattr(mem, "memory_type")
+                    else "unknown",
+                    "confidence": mem.confidence,
+                }
+            )
 
         if not groups:
             logger.info("all session memories already consolidated")
@@ -63,7 +67,9 @@ class SessionConsolidationStrategy:
 
         for session_id, memories in groups.items():
             try:
-                await self._consolidate_group(manager, session_id, memories, config, result)
+                await self._consolidate_group(
+                    manager, session_id, memories, config, result
+                )
             except Exception as exc:
                 result.errors.append(f"session {session_id}: {exc}")
 
@@ -106,9 +112,7 @@ class SessionConsolidationStrategy:
             result.skipped_count += 1
             return
 
-        content = "\n\n".join(
-            f"[{m['memory_type']}] {m['content']}" for m in unique
-        )
+        content = "\n\n".join(f"[{m['memory_type']}] {m['content']}" for m in unique)
         source_ids = [str(m["id"]) for m in unique]
         max_conf = max(m["confidence"] for m in unique)
 
@@ -116,20 +120,22 @@ class SessionConsolidationStrategy:
             result.skipped_count += 1
             return
 
-        await manager.store_long_term_memory(LongTermMemoryCreate(
-            user_id=config.user_id,
-            category=config.target_category,
-            content=content,
-            summary=f"Session consolidation ({len(unique)} memories from session {session_id})",
-            source_session_ids=source_ids,
-            importance=config.importance,
-            confidence=max_conf,
-            memory_metadata={
-                "consolidated_source_ids": source_ids,
-                "session_id": str(session_id),
-                "consolidated_at": datetime.now(timezone.utc).isoformat(),
-                "source_count": len(unique),
-                "strategy": self.name,
-            },
-        ))
+        await manager.store_long_term_memory(
+            LongTermMemoryCreate(
+                user_id=config.user_id,
+                category=config.target_category,
+                content=content,
+                summary=f"Session consolidation ({len(unique)} memories from session {session_id})",
+                source_session_ids=source_ids,
+                importance=config.importance,
+                confidence=max_conf,
+                memory_metadata={
+                    "consolidated_source_ids": source_ids,
+                    "session_id": str(session_id),
+                    "consolidated_at": datetime.now(timezone.utc).isoformat(),
+                    "source_count": len(unique),
+                    "strategy": self.name,
+                },
+            )
+        )
         result.created_count += 1

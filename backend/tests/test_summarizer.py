@@ -24,7 +24,10 @@ from app.schemas.summarizer import (
 
 # ── Fixtures ──────────────────────────────────────────────
 
-def _sample_bundle(subtopic: str = "Architecture security", n: int = 5) -> dict[str, Any]:
+
+def _sample_bundle(
+    subtopic: str = "Architecture security", n: int = 5
+) -> dict[str, Any]:
     return {
         "subtopic": subtopic,
         "title": f"Evidence for: {subtopic}",
@@ -33,8 +36,8 @@ def _sample_bundle(subtopic: str = "Architecture security", n: int = 5) -> dict[
                 "query": "AI security",
                 "source": "arxiv",
                 "content": f"Agentic AI systems introduce novel security challenges in {subtopic.lower()}. "
-                           f"Research shows that 73% of organisations report concerns about autonomous agent risks. "
-                           f"However, some studies suggest current frameworks are adequate for known threats.",
+                f"Research shows that 73% of organisations report concerns about autonomous agent risks. "
+                f"However, some studies suggest current frameworks are adequate for known threats.",
                 "relevance_score": 85.0 - i * 5,
                 "collection": "research_papers",
                 "metadata": {"source": "arxiv", "year": 2025},
@@ -59,12 +62,21 @@ def _sample_bundles() -> list[dict[str, Any]]:
 
 def _state_with_bundles() -> Any:
     state = make_initial_state(query="agentic AI security")
-    state["planner_output"] = json.dumps({"subtopics": ["Architecture security", "Threat models", "Governance compliance"]})
+    state["planner_output"] = json.dumps(
+        {
+            "subtopics": [
+                "Architecture security",
+                "Threat models",
+                "Governance compliance",
+            ]
+        }
+    )
     state["retrieved_documents"] = _sample_bundles()
     return state
 
 
 # ── Citation / Extraction Tests ──────────────────────────
+
 
 class TestExtraction:
     def test_key_phrases_extracted(self) -> None:
@@ -96,8 +108,20 @@ class TestExtraction:
 
     def test_citation_index_built(self) -> None:
         evidence = [
-            {"chunk_id": "c1", "content": "doc1", "source": "src1", "query": "q1", "collection": "col1"},
-            {"chunk_id": "c2", "content": "doc2", "source": "src2", "query": "q2", "collection": "col2"},
+            {
+                "chunk_id": "c1",
+                "content": "doc1",
+                "source": "src1",
+                "query": "q1",
+                "collection": "col1",
+            },
+            {
+                "chunk_id": "c2",
+                "content": "doc2",
+                "source": "src2",
+                "query": "q2",
+                "collection": "col2",
+            },
         ]
         index = build_citation_index(evidence)
         assert "c1" in index
@@ -111,6 +135,7 @@ class TestExtraction:
 
 
 # ── Quality Scoring Tests ────────────────────────────────
+
 
 class TestScoring:
     def test_full_summary_scores_high(self) -> None:
@@ -173,6 +198,7 @@ class TestScoring:
 
 
 # ── SummarizerAgent Tests ────────────────────────────────
+
 
 class TestSummarizerAgent:
     @pytest.mark.asyncio
@@ -254,7 +280,15 @@ class TestSummarizerAgent:
         provider = MockProvider()
         agent = SummarizerAgent(llm_provider=provider)
         bundles = _sample_bundles()
-        bundles.append({"subtopic": "empty", "evidence": [], "sources": [], "confidence_score": 0.0, "coverage": False})
+        bundles.append(
+            {
+                "subtopic": "empty",
+                "evidence": [],
+                "sources": [],
+                "confidence_score": 0.0,
+                "coverage": False,
+            }
+        )
         state = _state_with_bundles()
         state["retrieved_documents"] = bundles
         await agent.run(state)
@@ -283,9 +317,13 @@ class TestSummarizerAgent:
 
 # ── Debug Endpoint Test ──────────────────────────────────
 
+
 class TestDebugEndpoint:
     def test_debug_request_model(self) -> None:
         from app.api.summarizer_debug import DebugSummarizerRequest
-        req = DebugSummarizerRequest(retrieved_documents=_sample_bundles(), query="test")
+
+        req = DebugSummarizerRequest(
+            retrieved_documents=_sample_bundles(), query="test"
+        )
         assert len(req.retrieved_documents) == 3
         assert req.query == "test"

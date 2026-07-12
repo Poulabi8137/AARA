@@ -63,15 +63,13 @@ def generate_scorecard(state: dict[str, Any]) -> dict[str, Any]:
 
     try:
         import json
+
         po = json.loads(planner_output) if isinstance(planner_output, str) else {}
         planner_questions = po.get("research_questions", [])
     except (json.JSONDecodeError, TypeError, ValueError):
         planner_questions = []
 
-    answered_questions = [
-        s.get("subtopic", "") for s in summaries if s.get("subtopic")
-    ]
-
+    answered_questions = [s.get("subtopic", "") for s in summaries if s.get("subtopic")]
 
     scores: dict[str, float] = {}
     details: dict[str, Any] = {}
@@ -99,7 +97,9 @@ def generate_scorecard(state: dict[str, Any]) -> dict[str, Any]:
         "total_citations": len(citations),
     }
 
-    scores["evidence_strength"] = compute_evidence_strength(evidence_chunks, key_findings)
+    scores["evidence_strength"] = compute_evidence_strength(
+        evidence_chunks, key_findings
+    )
     details["evidence_strength"] = {
         "evidence_chunks": len(evidence_chunks),
         "key_findings": len(key_findings),
@@ -169,6 +169,7 @@ def _safe_parse_report(report_data: Any) -> dict[str, Any] | None:
     if isinstance(report_data, str):
         try:
             import json
+
             return json.loads(report_data)
         except (json.JSONDecodeError, TypeError, ValueError):
             return None

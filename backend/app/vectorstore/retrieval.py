@@ -41,9 +41,13 @@ async def add_document(
         documents=[content],
         metadatas=[metadata or {}],
     )
-    logger.debug("added document to collection", extra={
-        "collection": collection, "doc_id": doc_id,
-    })
+    logger.debug(
+        "added document to collection",
+        extra={
+            "collection": collection,
+            "doc_id": doc_id,
+        },
+    )
 
 
 async def add_documents_batch(
@@ -59,9 +63,13 @@ async def add_documents_batch(
         documents=contents,
         metadatas=metadatas or [{} for _ in contents],
     )
-    logger.info("batch added documents", extra={
-        "collection": collection, "count": len(ids),
-    })
+    logger.info(
+        "batch added documents",
+        extra={
+            "collection": collection,
+            "count": len(ids),
+        },
+    )
 
 
 async def update_document(
@@ -101,11 +109,14 @@ async def delete_documents_by_filter(
     results = await col.get(where=filter)
     if results["ids"]:
         await col.delete(ids=results["ids"])
-        logger.info("deleted documents by filter", extra={
-            "collection": collection,
-            "filter": filter,
-            "count": len(results["ids"]),
-        })
+        logger.info(
+            "deleted documents by filter",
+            extra={
+                "collection": collection,
+                "filter": filter,
+                "count": len(results["ids"]),
+            },
+        )
 
 
 async def similarity_search(
@@ -133,13 +144,15 @@ async def similarity_search(
         for i in range(len(ids)):
             score = 1.0 - distances[i]  # convert distance to similarity
             meta = metadatas[i] or {}
-            chunks.append(RetrievedChunk(
-                content=documents[i],
-                source=meta.get("source", "unknown"),
-                score=round(score, 4),
-                metadata=meta,
-                chunk_id=ids[i],
-            ))
+            chunks.append(
+                RetrievedChunk(
+                    content=documents[i],
+                    source=meta.get("source", "unknown"),
+                    score=round(score, 4),
+                    metadata=meta,
+                    chunk_id=ids[i],
+                )
+            )
 
     chunks.sort(key=lambda c: c.score, reverse=True)
     return RetrievalResult(query=query, results=chunks, total=len(chunks))
@@ -165,11 +178,15 @@ async def multi_collection_search(
             )
             results[col_name if isinstance(col_name, str) else col_name.value] = result
         except Exception as e:
-            logger.warning("search failed for collection", extra={
-                "collection": col_name, "error": str(e),
-            })
-            results[col_name if isinstance(col_name, str) else col_name.value] = RetrievalResult(
-                query=query, results=[], total=0
+            logger.warning(
+                "search failed for collection",
+                extra={
+                    "collection": col_name,
+                    "error": str(e),
+                },
+            )
+            results[col_name if isinstance(col_name, str) else col_name.value] = (
+                RetrievalResult(query=query, results=[], total=0)
             )
 
     return results

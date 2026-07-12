@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-from typing import Any
 
 from app.analysis.models import AnalysisResult
 from app.core.logging import get_logger
@@ -67,7 +66,9 @@ class RelationshipDiscovery:
         start = time.monotonic()
         discovered: list[GraphEdge] = []
 
-        rule_based = self._rule_based_discovery(graph, analysis_result, methodology_result)
+        rule_based = self._rule_based_discovery(
+            graph, analysis_result, methodology_result
+        )
         discovered.extend(rule_based)
 
         if self._llm and settings.enable_llm:
@@ -114,52 +115,82 @@ class RelationshipDiscovery:
         for cn in consensus_nodes:
             for fn in finding_nodes:
                 if self._text_overlap(cn.description, fn.description) > 0.3:
-                    edges.append(self._make_edge(
-                        cn.node_id, fn.node_id, RelationshipType.SUPPORTS,
-                        confidence=0.6, source="rule_overlap",
-                        reason="Consensus and finding share content overlap",
-                    ))
+                    edges.append(
+                        self._make_edge(
+                            cn.node_id,
+                            fn.node_id,
+                            RelationshipType.SUPPORTS,
+                            confidence=0.6,
+                            source="rule_overlap",
+                            reason="Consensus and finding share content overlap",
+                        )
+                    )
 
         for cn in contradiction_nodes:
             for cn_node in consensus_nodes:
-                edges.append(self._make_edge(
-                    cn.node_id, cn_node.node_id, RelationshipType.CONTRADICTS,
-                    confidence=0.5, source="rule_contradiction",
-                    reason="Contradiction opposes consensus",
-                ))
+                edges.append(
+                    self._make_edge(
+                        cn.node_id,
+                        cn_node.node_id,
+                        RelationshipType.CONTRADICTS,
+                        confidence=0.5,
+                        source="rule_contradiction",
+                        reason="Contradiction opposes consensus",
+                    )
+                )
 
         for rn in recommendation_nodes:
             for mn in method_nodes:
-                edges.append(self._make_edge(
-                    rn.node_id, mn.node_id, RelationshipType.RECOMMENDS,
-                    confidence=0.5, source="rule_recommendation",
-                    reason="Recommendation suggests method",
-                ))
+                edges.append(
+                    self._make_edge(
+                        rn.node_id,
+                        mn.node_id,
+                        RelationshipType.RECOMMENDS,
+                        confidence=0.5,
+                        source="rule_recommendation",
+                        reason="Recommendation suggests method",
+                    )
+                )
 
         for hn in hypothesis_nodes:
             for tn in trend_nodes:
-                edges.append(self._make_edge(
-                    hn.node_id, tn.node_id, RelationshipType.CORRELATED_WITH,
-                    confidence=0.4, source="rule_hypothesis_trend",
-                    reason="Hypothesis relates to identified trend",
-                ))
+                edges.append(
+                    self._make_edge(
+                        hn.node_id,
+                        tn.node_id,
+                        RelationshipType.CORRELATED_WITH,
+                        confidence=0.4,
+                        source="rule_hypothesis_trend",
+                        reason="Hypothesis relates to identified trend",
+                    )
+                )
 
         for dn in dataset_nodes:
             for mn in method_nodes:
-                edges.append(self._make_edge(
-                    dn.node_id, mn.node_id, RelationshipType.USES,
-                    confidence=0.5, source="rule_dataset_method",
-                    reason="Dataset commonly used with method",
-                ))
+                edges.append(
+                    self._make_edge(
+                        dn.node_id,
+                        mn.node_id,
+                        RelationshipType.USES,
+                        confidence=0.5,
+                        source="rule_dataset_method",
+                        reason="Dataset commonly used with method",
+                    )
+                )
 
         for pn in paper_nodes:
             for mn in method_nodes:
                 if self._text_overlap(pn.description, mn.description) > 0.2:
-                    edges.append(self._make_edge(
-                        pn.node_id, mn.node_id, RelationshipType.PROPOSES,
-                        confidence=0.4, source="rule_paper_method",
-                        reason="Paper likely proposes method",
-                    ))
+                    edges.append(
+                        self._make_edge(
+                            pn.node_id,
+                            mn.node_id,
+                            RelationshipType.PROPOSES,
+                            confidence=0.4,
+                            source="rule_paper_method",
+                            reason="Paper likely proposes method",
+                        )
+                    )
 
         return edges
 
@@ -173,6 +204,7 @@ class RelationshipDiscovery:
             return edges
 
         import asyncio
+
         batch_size = min(5, len(candidates))
         sem = asyncio.Semaphore(batch_size)
 
@@ -208,7 +240,12 @@ class RelationshipDiscovery:
                     continue
                 if a.node_id == b.node_id:
                     continue
-                if self._text_overlap(f"{a.label} {a.description}", f"{b.label} {b.description}") > threshold:
+                if (
+                    self._text_overlap(
+                        f"{a.label} {a.description}", f"{b.label} {b.description}"
+                    )
+                    > threshold
+                ):
                     candidates.append((a.node_id, b.node_id))
                     count += 1
             if count >= max_pairs:
@@ -255,6 +292,7 @@ class RelationshipDiscovery:
         target_id: str,
     ) -> GraphEdge | None:
         import re
+
         rel_match = re.search(r"Relationship:\s*(\w+)", content)
         conf_match = re.search(r"Confidence:\s*([0-9.]+)", content)
         reason_match = re.search(r"Reason:\s*(.+)", content, re.DOTALL)
@@ -271,7 +309,11 @@ class RelationshipDiscovery:
             return None
 
         confidence = float(conf_match.group(1)) if conf_match else 0.5
-        reason = reason_match.group(1).strip() if reason_match else "LLM discovered relationship"
+        reason = (
+            reason_match.group(1).strip()
+            if reason_match
+            else "LLM discovered relationship"
+        )
 
         return GraphEdge(
             edge_id=_edge_id(source_id, target_id, rel_type),

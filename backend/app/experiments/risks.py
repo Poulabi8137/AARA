@@ -68,7 +68,10 @@ class ExperimentRiskAnalyzer:
                 seen.add(key)
                 merged.append(r)
 
-        merged.sort(key=lambda x: {"high": 3, "medium": 2, "low": 1}.get(x.severity, 0), reverse=True)
+        merged.sort(
+            key=lambda x: {"high": 3, "medium": 2, "low": 1}.get(x.severity, 0),
+            reverse=True,
+        )
 
         logger.info(
             "risk analysis complete",
@@ -88,10 +91,7 @@ class ExperimentRiskAnalyzer:
     ) -> list[RiskMitigation]:
         risks: list[RiskMitigation] = []
 
-        has_gpu = any(
-            p.phase_type in ("training", "evaluation")
-            for p in phases
-        )
+        has_gpu = any(p.phase_type in ("training", "evaluation") for p in phases)
         if has_gpu:
             risks.append(
                 RiskMitigation(
@@ -129,7 +129,8 @@ class ExperimentRiskAnalyzer:
                         severity=existing.severity,
                         likelihood=existing.confidence,
                         impact=existing.severity,
-                        mitigation=existing.mitigation or "Address via experiment design",
+                        mitigation=existing.mitigation
+                        or "Address via experiment design",
                         fallback="Revisit methodology",
                     )
                 )
@@ -143,10 +144,14 @@ class ExperimentRiskAnalyzer:
         phases: list[ExperimentPhase],
     ) -> list[RiskMitigation]:
         try:
-            methods_text = ", ".join(m.method for m in mr.methods[:5]) if mr.methods else "none"
-            existing_risks = "; ".join(
-                f"[{r.severity}] {r.risk[:60]}" for r in mr.risks[:5]
-            ) if mr.risks else "none"
+            methods_text = (
+                ", ".join(m.method for m in mr.methods[:5]) if mr.methods else "none"
+            )
+            existing_risks = (
+                "; ".join(f"[{r.severity}] {r.risk[:60]}" for r in mr.risks[:5])
+                if mr.risks
+                else "none"
+            )
 
             content = await self._llm.generate(
                 prompt=_RISK_USER.format(
@@ -167,8 +172,9 @@ class ExperimentRiskAnalyzer:
 
     def _parse_risks(self, content: str) -> list[RiskMitigation]:
         import re
+
         results: list[RiskMitigation] = []
-        blocks = re.split(r'\n\s*\n', content.strip())
+        blocks = re.split(r"\n\s*\n", content.strip())
         current: dict = {}
         for block in blocks:
             block = block.strip()

@@ -34,7 +34,9 @@ class EvidenceGrouper:
         if strategy == GroupingStrategy.YEAR:
             return self._group_by_year(evidence)
         if strategy == GroupingStrategy.METHODOLOGY:
-            return self._group_by_metadata(evidence, "methodology", "Unknown Methodology")
+            return self._group_by_metadata(
+                evidence, "methodology", "Unknown Methodology"
+            )
         if strategy == GroupingStrategy.DATASET:
             return self._group_by_metadata(evidence, "dataset", "Unknown Dataset")
         if strategy == GroupingStrategy.BENCHMARK:
@@ -42,25 +44,38 @@ class EvidenceGrouper:
         if strategy == GroupingStrategy.AUTHOR:
             return self._group_by_metadata(evidence, "author", "Unknown Author")
         if strategy == GroupingStrategy.INSTITUTION:
-            return self._group_by_metadata(evidence, "institution", "Unknown Institution")
+            return self._group_by_metadata(
+                evidence, "institution", "Unknown Institution"
+            )
         if strategy == GroupingStrategy.DOMAIN:
             return self._group_by_metadata(evidence, "domain", "General")
 
         return [EvidenceGroup(label="All Evidence", evidence=evidence)]
 
-    def _group_by_topic(
-        self, evidence: list[RetrievedEvidence]
-    ) -> list[EvidenceGroup]:
+    def _group_by_topic(self, evidence: list[RetrievedEvidence]) -> list[EvidenceGroup]:
         buckets: dict[str, list[RetrievedEvidence]] = defaultdict(list)
         for ev in evidence:
-            topic = ev.metadata.get("topic", "") or ev.metadata.get("category", "") or ev.metadata.get("domain", "")
+            topic = (
+                ev.metadata.get("topic", "")
+                or ev.metadata.get("category", "")
+                or ev.metadata.get("domain", "")
+            )
             if not topic:
                 source = ev.source_type.value.replace("_", " ").title()
-                if any(kw in ev.content[:100].lower() for kw in ["method", "approach", "technique"]):
+                if any(
+                    kw in ev.content[:100].lower()
+                    for kw in ["method", "approach", "technique"]
+                ):
                     topic = "Methodology"
-                elif any(kw in ev.content[:100].lower() for kw in ["result", "finding", "performance"]):
+                elif any(
+                    kw in ev.content[:100].lower()
+                    for kw in ["result", "finding", "performance"]
+                ):
                     topic = "Results"
-                elif any(kw in ev.content[:100].lower() for kw in ["dataset", "data", "corpus"]):
+                elif any(
+                    kw in ev.content[:100].lower()
+                    for kw in ["dataset", "data", "corpus"]
+                ):
                     topic = "Datasets"
                 else:
                     topic = source
@@ -81,9 +96,7 @@ class EvidenceGrouper:
         )
         return groups
 
-    def _group_by_year(
-        self, evidence: list[RetrievedEvidence]
-    ) -> list[EvidenceGroup]:
+    def _group_by_year(self, evidence: list[RetrievedEvidence]) -> list[EvidenceGroup]:
         buckets: dict[str, list[RetrievedEvidence]] = defaultdict(list)
         for ev in evidence:
             year = ev.metadata.get("year", "")

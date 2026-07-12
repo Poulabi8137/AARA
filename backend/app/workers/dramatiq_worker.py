@@ -37,9 +37,17 @@ def setup_worker() -> dramatiq.Broker:
 
         broker.add_middleware(Results(backend=result_backend))
 
-        logger.info("Dramatiq broker initialized with Redis", extra={"redis_url": redis_url.replace("://", "://...@") if "@" in redis_url else redis_url})
+        logger.info(
+            "Dramatiq broker initialized with Redis",
+            extra={
+                "redis_url": redis_url.replace("://", "://...@")
+                if "@" in redis_url
+                else redis_url
+            },
+        )
     else:
         from dramatiq.brokers.stub import StubBroker
+
         broker = StubBroker()
         logger.info("Dramatiq broker initialized with StubBroker (no Redis)")
 
@@ -72,7 +80,10 @@ def run_workflow_actor(
     from app.core.logging import get_logger
 
     log = get_logger("workers.workflow")
-    log.info("starting workflow execution", extra={"execution_id": execution_id, "query": query})
+    log.info(
+        "starting workflow execution",
+        extra={"execution_id": execution_id, "query": query},
+    )
 
     result = asyncio.run(_execute_workflow(execution_id, query, project_id, objective))
 
@@ -156,7 +167,9 @@ async def _update_execution_node(execution_id: str, node_name: str) -> None:
         meta = dict(exec_obj.execution_metadata or {})
         meta["current_node"] = node_name
         history = meta.get("execution_history", [])
-        history.append({"node": node_name, "timestamp": datetime.now(timezone.utc).isoformat()})
+        history.append(
+            {"node": node_name, "timestamp": datetime.now(timezone.utc).isoformat()}
+        )
         meta["execution_history"] = history
         stmt = (
             update(AgentExecution)
@@ -182,7 +195,9 @@ async def _update_execution_complete(execution_id: str, state: dict) -> None:
             .values(
                 execution_status=ExecutionStatus.COMPLETED,
                 end_time=datetime.now(timezone.utc),
-                output_report=json.dumps(state.get("generated_report", ""), default=str),
+                output_report=json.dumps(
+                    state.get("generated_report", ""), default=str
+                ),
                 execution_metadata={
                     "summary_count": len(state.get("summaries", [])),
                     "gap_count": len(state.get("research_gaps", [])),
@@ -224,6 +239,7 @@ async def _update_execution_failed(execution_id: str, error: str) -> None:
 def cancel_workflow_actor(execution_id: str) -> None:
     """Cancel a running workflow by execution ID."""
     import asyncio
+
     asyncio.run(_cancel_execution(execution_id))
 
 

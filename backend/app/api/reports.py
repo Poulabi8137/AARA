@@ -23,9 +23,11 @@ async def list_reports(
 ) -> ReportListResponse:
     from app.models.research_report import ResearchReport
 
-    user_project_ids = select(ResearchProject.id).where(
-        ResearchProject.created_by == current_user.id
-    ).scalar_subquery()
+    user_project_ids = (
+        select(ResearchProject.id)
+        .where(ResearchProject.created_by == current_user.id)
+        .scalar_subquery()
+    )
 
     count_q = select(func.count(ResearchReport.id)).where(
         ResearchReport.project_id.in_(user_project_ids)
@@ -63,6 +65,7 @@ async def create_report(
     )
     if project_check.scalar_one_or_none() is None:
         from fastapi import HTTPException, status
+
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Project not found",

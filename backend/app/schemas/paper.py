@@ -157,7 +157,9 @@ class PaperResponse(BaseModel):
 
 
 class SectionRewriteRequest(BaseModel):
-    operation: str = Field(description="rewrite, expand, condense, improve_tone, regenerate, add_citations, improve_depth")
+    operation: str = Field(
+        description="rewrite, expand, condense, improve_tone, regenerate, add_citations, improve_depth"
+    )
 
 
 class SectionRewriteResponse(BaseModel):

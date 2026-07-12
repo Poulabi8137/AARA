@@ -20,7 +20,10 @@ _PROVIDER_REGISTRY: dict[str, type[EmbeddingProvider]] = {
 
 def register_provider(name: str, provider_cls: type[EmbeddingProvider]) -> None:
     _PROVIDER_REGISTRY[name] = provider_cls
-    logger.info("registered embedding provider", extra={"name": name, "cls": provider_cls.__name__})
+    logger.info(
+        "registered embedding provider",
+        extra={"name": name, "cls": provider_cls.__name__},
+    )
 
 
 def get_embedding_provider(
@@ -42,7 +45,9 @@ def get_embedding_provider(
         key = api_key or settings.openai_api_key or ""
         return cls(api_key=key, model=model)
 
-    logger.info("created embedding provider", extra={"provider": name, "cls": cls.__name__})
+    logger.info(
+        "created embedding provider", extra={"provider": name, "cls": cls.__name__}
+    )
     return cls()
 
 

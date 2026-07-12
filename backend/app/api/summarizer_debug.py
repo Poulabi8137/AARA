@@ -7,7 +7,8 @@ from pydantic import BaseModel
 
 from app.agents.state import make_initial_state
 from app.agents.summarizer_agent import SummarizerAgent
-from app.llm.mock_provider import MockProvider
+from app.llm.factory import get_llm_provider
+from app.core.config import get_settings
 from app.models.user import User
 from app.core.logging import get_logger
 from app.services.auth_service import require_role
@@ -36,7 +37,7 @@ async def debug_summarizer(
     current_user: User = Depends(require_role(UserRole.ADMIN)),
 ) -> DebugSummarizerResponse:
     """Run the summarizer pipeline on provided bundles."""
-    provider = MockProvider()
+    provider = get_llm_provider(get_settings())
     agent = SummarizerAgent(llm_provider=provider)
     state = make_initial_state(query=body.query)
     state["retrieved_documents"] = body.retrieved_documents or []

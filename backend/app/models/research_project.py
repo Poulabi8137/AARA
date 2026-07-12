@@ -3,9 +3,8 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import String, Text, DateTime, ForeignKey, Enum as SAEnum
+from sqlalchemy import String, Text, DateTime, ForeignKey, Enum as SAEnum, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID
 import enum
 
 from app.db.session import Base
@@ -39,9 +38,30 @@ class ResearchProject(Base):
     )
 
     creator = relationship("User", back_populates="projects")
-    sessions = relationship("ResearchSession", back_populates="project", cascade="all, delete-orphan")
-    reports = relationship("ResearchReport", back_populates="project", cascade="all, delete-orphan")
-    agent_executions = relationship("AgentExecution", back_populates="project", cascade="all, delete-orphan")
+    sessions = relationship(
+        "ResearchSession", back_populates="project", cascade="all, delete-orphan"
+    )
+    reports = relationship(
+        "ResearchReport", back_populates="project", cascade="all, delete-orphan"
+    )
+    agent_executions = relationship(
+        "AgentExecution", back_populates="project", cascade="all, delete-orphan"
+    )
+    proposals = relationship(
+        "Proposal", back_populates="project", cascade="all, delete-orphan"
+    )
+    papers = relationship(
+        "Paper", back_populates="project", cascade="all, delete-orphan"
+    )
+    base_paper_analyses = relationship(
+        "BasePaperAnalysis", back_populates="project", cascade="all, delete-orphan"
+    )
+    project_memories = relationship(
+        "ProjectMemory", back_populates="project", cascade="all, delete-orphan"
+    )
+    paper_memories = relationship(
+        "PaperMemory", back_populates="project", cascade="all, delete-orphan"
+    )
 
     def __repr__(self) -> str:
         return f"<ResearchProject id={self.id} title={self.title} status={self.status}>"

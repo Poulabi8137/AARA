@@ -38,7 +38,9 @@ MAX_RETRIES = 2
 @AgentRegistry.register
 class RetrievalAgent(BaseAgent):
     agent_name = "retrieval"
-    description = "Multi-collection retrieval with ranking, dedup, bundling, coverage validation"
+    description = (
+        "Multi-collection retrieval with ranking, dedup, bundling, coverage validation"
+    )
     requires_human_approval = False
 
     async def arun(self, state: ResearchState) -> ResearchState:
@@ -86,7 +88,9 @@ class RetrievalAgent(BaseAgent):
             try:
                 results = await self._search_collections(q, project_id)
                 for col_name, col_result in results.items():
-                    collection_hits[col_name] = collection_hits.get(col_name, 0) + col_result.total
+                    collection_hits[col_name] = (
+                        collection_hits.get(col_name, 0) + col_result.total
+                    )
                     for chunk in col_result.results:
                         metadata = dict(chunk.metadata) if chunk.metadata else {}
                         source_quality = compute_source_quality(metadata)
@@ -98,18 +102,23 @@ class RetrievalAgent(BaseAgent):
                             source_quality=source_quality,
                             metadata_match=50.0,
                         )
-                        all_raw.append({
-                            "query": q,
-                            "source": chunk.source,
-                            "content": chunk.content,
-                            "relevance_score": relevance,
-                            "collection": col_name,
-                            "metadata": metadata,
-                            "retrieval_reason": f"matched query: {q[:60]}",
-                            "chunk_id": chunk.chunk_id,
-                        })
+                        all_raw.append(
+                            {
+                                "query": q,
+                                "source": chunk.source,
+                                "content": chunk.content,
+                                "relevance_score": relevance,
+                                "collection": col_name,
+                                "metadata": metadata,
+                                "retrieval_reason": f"matched query: {q[:60]}",
+                                "chunk_id": chunk.chunk_id,
+                            }
+                        )
             except Exception as exc:
-                logger.warning("search failed for query", extra={"query": q[:40], "error": str(exc)})
+                logger.warning(
+                    "search failed for query",
+                    extra={"query": q[:40], "error": str(exc)},
+                )
                 errors.append(f"{q[:30]}: {str(exc)[:60]}")
                 if len(errors) > MAX_RETRIES:
                     break
@@ -145,11 +154,13 @@ class RetrievalAgent(BaseAgent):
         # Build context bundles grouped by subtopic
         bundles: list[RetrievalBundle] = []
         for subtopic in subtopics:
-            matched = [d for d in deduped if self._matches_subtopic(d["content"], subtopic)]
+            matched = [
+                d for d in deduped if self._matches_subtopic(d["content"], subtopic)
+            ]
             if not matched:
-                matched = deduped[:min(3, len(deduped))]
+                matched = deduped[: min(3, len(deduped))]
 
-            top_n = matched[:MIN_SOURCES_PER_SUBTOPIC + 2]
+            top_n = matched[: MIN_SOURCES_PER_SUBTOPIC + 2]
             evidence = [RetrievedChunkSchema(**d) for d in top_n]
             sources = list(set(e.source for e in evidence if e.source))
             avg_score = sum(e.relevance_score for e in evidence) / max(len(evidence), 1)
@@ -176,13 +187,16 @@ class RetrievalAgent(BaseAgent):
         state["agent_metrics"]["retrieval"] = metrics.model_dump()
         state["agent_metrics"]["retrieval_debug"] = debug.model_dump()
 
-        logger.info("retrieval complete", extra={
-            "bundles": len(bundles),
-            "deduped": len(deduped),
-            "avg_relevance": metrics.average_relevance,
-            "coverage": metrics.coverage_ratio,
-            "latency": metrics.latency_seconds,
-        })
+        logger.info(
+            "retrieval complete",
+            extra={
+                "bundles": len(bundles),
+                "deduped": len(deduped),
+                "avg_relevance": metrics.average_relevance,
+                "coverage": metrics.coverage_ratio,
+                "latency": metrics.latency_seconds,
+            },
+        )
 
         return state
 
@@ -190,6 +204,7 @@ class RetrievalAgent(BaseAgent):
 
     async def _search_collections(self, query: str, project_id: str) -> dict[str, Any]:
         from app.vectorstore.retrieval import multi_collection_search
+
         try:
             return await multi_collection_search(
                 query=query,

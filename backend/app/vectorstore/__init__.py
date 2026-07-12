@@ -21,6 +21,17 @@ from app.vectorstore.retrieval import (
     similarity_search,
     multi_collection_search,
 )
+from app.vectorstore.memory_indexer import MemoryIndexer
+from app.vectorstore.memory_search import (
+    MemorySearch,
+    MemorySearchHit,
+    MemorySearchResult,
+)
+from app.vectorstore.provider_factory import (
+    get_embedding_provider,
+    register_provider,
+    list_providers,
+)
 
 __all__ = [
     "get_chroma_client",
@@ -41,4 +52,11 @@ __all__ = [
     "delete_documents_by_filter",
     "similarity_search",
     "multi_collection_search",
+    "MemoryIndexer",
+    "MemorySearch",
+    "MemorySearchHit",
+    "MemorySearchResult",
+    "get_embedding_provider",
+    "register_provider",
+    "list_providers",
 ]

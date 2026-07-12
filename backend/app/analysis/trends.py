@@ -65,9 +65,7 @@ class TrendAnalyzer:
         )
         return merged[: settings.max_trends]
 
-    def _rule_based_trends(
-        self, groups: list[EvidenceGroup]
-    ) -> list[ResearchTrend]:
+    def _rule_based_trends(self, groups: list[EvidenceGroup]) -> list[ResearchTrend]:
         year_buckets: dict[str, int] = defaultdict(int)
         topic_years: dict[str, list[str]] = defaultdict(list)
 
@@ -113,7 +111,9 @@ class TrendAnalyzer:
                 ResearchTrend(
                     trend="General research activity in the topic area",
                     direction="stable",
-                    time_range=(years[0], years[-1]) if len(years) >= 2 else (years[0], years[0]),
+                    time_range=(years[0], years[-1])
+                    if len(years) >= 2
+                    else (years[0], years[0]),
                     confidence=0.3,
                 )
             )
@@ -148,14 +148,18 @@ class TrendAnalyzer:
             header = f"Group {i}: {group.label}"
             texts: list[str] = []
             for j, ev in enumerate(group.evidence):
-                key = group.citation_keys[j] if j < len(group.citation_keys) else f"[{j + 1}]"
+                key = (
+                    group.citation_keys[j]
+                    if j < len(group.citation_keys)
+                    else f"[{j + 1}]"
+                )
                 texts.append(f"{key} {ev.content[:400]}")
             parts.append(f"{header}\n" + "\n".join(texts))
         return "\n\n".join(parts)
 
     def _parse_trends(self, content: str) -> list[ResearchTrend]:
         results: list[ResearchTrend] = []
-        blocks = re.split(r'\n\s*\n', content)
+        blocks = re.split(r"\n\s*\n", content)
         current: dict = {}
         for block in blocks:
             block = block.strip()
@@ -167,7 +171,7 @@ class TrendAnalyzer:
             elif low.startswith("direction:"):
                 current["direction"] = block.split(":", 1)[1].strip().lower()
             elif low.startswith("sources:"):
-                current["sources"] = re.findall(r'\[\d+\]', block)
+                current["sources"] = re.findall(r"\[\d+\]", block)
             elif low.startswith("time range:"):
                 parts = block.split(":", 1)[1].strip().split("-")
                 if len(parts) == 2:

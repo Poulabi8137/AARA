@@ -138,10 +138,13 @@ class ResearchWorkflow:
 
         try:
             result = await self._graph.ainvoke(state, config)
-            logger.info("workflow completed", extra={
-                "thread_id": config["configurable"]["thread_id"],
-                "status": result.get("status"),
-            })
+            logger.info(
+                "workflow completed",
+                extra={
+                    "thread_id": config["configurable"]["thread_id"],
+                    "status": result.get("status"),
+                },
+            )
             return result
         except Exception as exc:
             logger.error("workflow failed", extra={"error": str(exc)})

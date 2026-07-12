@@ -6,7 +6,6 @@ from app.core.logging import get_logger
 from app.planner.models import (
     AgentType,
     DependencyType,
-    ExecutionStep,
     ResearchGoal,
     ResearchStrategyType,
     ResearchTask,
@@ -23,24 +22,23 @@ logger = get_logger("planner.strategies")
 class ResearchStrategy(ABC):
     @property
     @abstractmethod
-    def strategy_type(self) -> ResearchStrategyType:
-        ...
+    def strategy_type(self) -> ResearchStrategyType: ...
 
     @abstractmethod
-    def decompose(self, goal: ResearchGoal, keywords: list[str]) -> list[ResearchTask]:
-        ...
+    def decompose(
+        self, goal: ResearchGoal, keywords: list[str]
+    ) -> list[ResearchTask]: ...
 
     @abstractmethod
-    def create_dependencies(self, tasks: list[ResearchTask]) -> list[TaskDependency]:
-        ...
+    def create_dependencies(
+        self, tasks: list[ResearchTask]
+    ) -> list[TaskDependency]: ...
 
     @abstractmethod
-    def create_retrieval_plan(self, tasks: list[ResearchTask]) -> RetrievalPlan:
-        ...
+    def create_retrieval_plan(self, tasks: list[ResearchTask]) -> RetrievalPlan: ...
 
     @abstractmethod
-    def assign_agents(self, tasks: list[ResearchTask]) -> dict[str, AgentType]:
-        ...
+    def assign_agents(self, tasks: list[ResearchTask]) -> dict[str, AgentType]: ...
 
 
 class LiteratureReviewStrategy(ResearchStrategy):
@@ -76,8 +74,16 @@ class LiteratureReviewStrategy(ResearchStrategy):
 
     def create_dependencies(self, tasks: list[ResearchTask]) -> list[TaskDependency]:
         return [
-            TaskDependency(task_id=tasks[1].task_id, depends_on=tasks[0].task_id, dependency_type=DependencyType.BLOCKING),
-            TaskDependency(task_id=tasks[2].task_id, depends_on=tasks[1].task_id, dependency_type=DependencyType.BLOCKING),
+            TaskDependency(
+                task_id=tasks[1].task_id,
+                depends_on=tasks[0].task_id,
+                dependency_type=DependencyType.BLOCKING,
+            ),
+            TaskDependency(
+                task_id=tasks[2].task_id,
+                depends_on=tasks[1].task_id,
+                dependency_type=DependencyType.BLOCKING,
+            ),
         ]
 
     def create_retrieval_plan(self, tasks: list[ResearchTask]) -> RetrievalPlan:
@@ -137,8 +143,16 @@ class ComparativeAnalysisStrategy(ResearchStrategy):
 
     def create_dependencies(self, tasks: list[ResearchTask]) -> list[TaskDependency]:
         return [
-            TaskDependency(task_id=tasks[1].task_id, depends_on=tasks[0].task_id, dependency_type=DependencyType.BLOCKING),
-            TaskDependency(task_id=tasks[2].task_id, depends_on=tasks[1].task_id, dependency_type=DependencyType.BLOCKING),
+            TaskDependency(
+                task_id=tasks[1].task_id,
+                depends_on=tasks[0].task_id,
+                dependency_type=DependencyType.BLOCKING,
+            ),
+            TaskDependency(
+                task_id=tasks[2].task_id,
+                depends_on=tasks[1].task_id,
+                dependency_type=DependencyType.BLOCKING,
+            ),
         ]
 
     def create_retrieval_plan(self, tasks: list[ResearchTask]) -> RetrievalPlan:
@@ -198,9 +212,21 @@ class ExperimentalStrategy(ResearchStrategy):
 
     def create_dependencies(self, tasks: list[ResearchTask]) -> list[TaskDependency]:
         return [
-            TaskDependency(task_id=tasks[1].task_id, depends_on=tasks[0].task_id, dependency_type=DependencyType.BLOCKING),
-            TaskDependency(task_id=tasks[2].task_id, depends_on=tasks[0].task_id, dependency_type=DependencyType.PARALLEL),
-            TaskDependency(task_id=tasks[2].task_id, depends_on=tasks[1].task_id, dependency_type=DependencyType.SEQUENTIAL),
+            TaskDependency(
+                task_id=tasks[1].task_id,
+                depends_on=tasks[0].task_id,
+                dependency_type=DependencyType.BLOCKING,
+            ),
+            TaskDependency(
+                task_id=tasks[2].task_id,
+                depends_on=tasks[0].task_id,
+                dependency_type=DependencyType.PARALLEL,
+            ),
+            TaskDependency(
+                task_id=tasks[2].task_id,
+                depends_on=tasks[1].task_id,
+                dependency_type=DependencyType.SEQUENTIAL,
+            ),
         ]
 
     def create_retrieval_plan(self, tasks: list[ResearchTask]) -> RetrievalPlan:
@@ -260,8 +286,16 @@ class SurveyStrategy(ResearchStrategy):
 
     def create_dependencies(self, tasks: list[ResearchTask]) -> list[TaskDependency]:
         return [
-            TaskDependency(task_id=tasks[1].task_id, depends_on=tasks[0].task_id, dependency_type=DependencyType.BLOCKING),
-            TaskDependency(task_id=tasks[2].task_id, depends_on=tasks[1].task_id, dependency_type=DependencyType.BLOCKING),
+            TaskDependency(
+                task_id=tasks[1].task_id,
+                depends_on=tasks[0].task_id,
+                dependency_type=DependencyType.BLOCKING,
+            ),
+            TaskDependency(
+                task_id=tasks[2].task_id,
+                depends_on=tasks[1].task_id,
+                dependency_type=DependencyType.BLOCKING,
+            ),
         ]
 
     def create_retrieval_plan(self, tasks: list[ResearchTask]) -> RetrievalPlan:
@@ -321,8 +355,16 @@ class BenchmarkStrategy(ResearchStrategy):
 
     def create_dependencies(self, tasks: list[ResearchTask]) -> list[TaskDependency]:
         return [
-            TaskDependency(task_id=tasks[1].task_id, depends_on=tasks[0].task_id, dependency_type=DependencyType.BLOCKING),
-            TaskDependency(task_id=tasks[2].task_id, depends_on=tasks[1].task_id, dependency_type=DependencyType.BLOCKING),
+            TaskDependency(
+                task_id=tasks[1].task_id,
+                depends_on=tasks[0].task_id,
+                dependency_type=DependencyType.BLOCKING,
+            ),
+            TaskDependency(
+                task_id=tasks[2].task_id,
+                depends_on=tasks[1].task_id,
+                dependency_type=DependencyType.BLOCKING,
+            ),
         ]
 
     def create_retrieval_plan(self, tasks: list[ResearchTask]) -> RetrievalPlan:
@@ -373,7 +415,11 @@ class MethodologyStrategy(ResearchStrategy):
 
     def create_dependencies(self, tasks: list[ResearchTask]) -> list[TaskDependency]:
         return [
-            TaskDependency(task_id=tasks[1].task_id, depends_on=tasks[0].task_id, dependency_type=DependencyType.BLOCKING),
+            TaskDependency(
+                task_id=tasks[1].task_id,
+                depends_on=tasks[0].task_id,
+                dependency_type=DependencyType.BLOCKING,
+            ),
         ]
 
     def create_retrieval_plan(self, tasks: list[ResearchTask]) -> RetrievalPlan:
@@ -439,9 +485,21 @@ class NoveltyInvestigationStrategy(ResearchStrategy):
 
     def create_dependencies(self, tasks: list[ResearchTask]) -> list[TaskDependency]:
         return [
-            TaskDependency(task_id=tasks[1].task_id, depends_on=tasks[0].task_id, dependency_type=DependencyType.BLOCKING),
-            TaskDependency(task_id=tasks[2].task_id, depends_on=tasks[1].task_id, dependency_type=DependencyType.BLOCKING),
-            TaskDependency(task_id=tasks[3].task_id, depends_on=tasks[2].task_id, dependency_type=DependencyType.BLOCKING),
+            TaskDependency(
+                task_id=tasks[1].task_id,
+                depends_on=tasks[0].task_id,
+                dependency_type=DependencyType.BLOCKING,
+            ),
+            TaskDependency(
+                task_id=tasks[2].task_id,
+                depends_on=tasks[1].task_id,
+                dependency_type=DependencyType.BLOCKING,
+            ),
+            TaskDependency(
+                task_id=tasks[3].task_id,
+                depends_on=tasks[2].task_id,
+                dependency_type=DependencyType.BLOCKING,
+            ),
         ]
 
     def create_retrieval_plan(self, tasks: list[ResearchTask]) -> RetrievalPlan:
@@ -494,7 +552,11 @@ class GeneralStrategy(ResearchStrategy):
 
     def create_dependencies(self, tasks: list[ResearchTask]) -> list[TaskDependency]:
         return [
-            TaskDependency(task_id=tasks[1].task_id, depends_on=tasks[0].task_id, dependency_type=DependencyType.BLOCKING),
+            TaskDependency(
+                task_id=tasks[1].task_id,
+                depends_on=tasks[0].task_id,
+                dependency_type=DependencyType.BLOCKING,
+            ),
         ]
 
     def create_retrieval_plan(self, tasks: list[ResearchTask]) -> RetrievalPlan:
@@ -566,8 +628,14 @@ class StrategySelector:
         goal: ResearchGoal,
         current: ResearchStrategyType,
     ) -> ResearchStrategyType:
-        if goal.complexity == TaskComplexity.COMPLEX and goal.estimated_difficulty >= 0.7:
+        if (
+            goal.complexity == TaskComplexity.COMPLEX
+            and goal.estimated_difficulty >= 0.7
+        ):
             return ResearchStrategyType.EXPERIMENTAL
-        if "comparison" in goal.required_outputs or "methodology" in goal.required_outputs:
+        if (
+            "comparison" in goal.required_outputs
+            or "methodology" in goal.required_outputs
+        ):
             return ResearchStrategyType.COMPARATIVE_ANALYSIS
         return current

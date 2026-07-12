@@ -22,7 +22,9 @@ def compute_report_quality(
     completeness = _compute_completeness(n_sections, n_refs, bool(gaps), avg_conf)
 
     # Evidence strength: citations per section + stats coverage
-    evidence_strength = _compute_evidence_strength(n_sections, total_cites, total_stats, avg_conf)
+    evidence_strength = _compute_evidence_strength(
+        n_sections, total_cites, total_stats, avg_conf
+    )
 
     # Citation strength: reference count / citation count quality
     citation_strength = _compute_citation_strength(n_refs, total_cites, n_sections)
@@ -32,10 +34,10 @@ def compute_report_quality(
 
     # Overall quality: weighted composite
     quality = round(
-        completeness * 0.25 +
-        evidence_strength * 0.25 +
-        citation_strength * 0.15 +
-        coverage * 0.35,
+        completeness * 0.25
+        + evidence_strength * 0.25
+        + citation_strength * 0.15
+        + coverage * 0.35,
         2,
     )
 
@@ -54,13 +56,19 @@ def compute_report_quality(
 def _average_confidence(sections: list[dict[str, Any]]) -> float:
     if not sections:
         return 0.0
-    scores = [s.get("confidence_score", 0) for s in sections if s.get("confidence_score", 0) > 0]
+    scores = [
+        s.get("confidence_score", 0)
+        for s in sections
+        if s.get("confidence_score", 0) > 0
+    ]
     if not scores:
         return 0.0
     return sum(scores) / len(scores)
 
 
-def _compute_completeness(n_sections: int, n_refs: int, has_gaps: bool, avg_conf: float) -> float:
+def _compute_completeness(
+    n_sections: int, n_refs: int, has_gaps: bool, avg_conf: float
+) -> float:
     score = 0.0
     # Sections (40%)
     score += min(40.0, n_sections * 10.0)
@@ -74,7 +82,9 @@ def _compute_completeness(n_sections: int, n_refs: int, has_gaps: bool, avg_conf
     return min(100.0, score)
 
 
-def _compute_evidence_strength(n_sections: int, total_cites: int, stats_count: int, avg_conf: float) -> float:
+def _compute_evidence_strength(
+    n_sections: int, total_cites: int, stats_count: int, avg_conf: float
+) -> float:
     if n_sections == 0:
         return 0.0
     score = 0.0

@@ -3,9 +3,8 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import String, DateTime, Enum as SAEnum
+from sqlalchemy import String, DateTime, Enum as SAEnum, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID
 import enum
 
 from app.db.session import Base
@@ -38,6 +37,17 @@ class User(Base):
     )
 
     projects = relationship("ResearchProject", back_populates="creator")
+    research_profile = relationship(
+        "UserResearchProfile",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+    session_memories = relationship("SessionMemory", back_populates="user")
+    long_term_memories = relationship("LongTermMemory", back_populates="user")
+    paper_memories = relationship("PaperMemory", back_populates="user")
+    project_memories = relationship("ProjectMemory", back_populates="user")
+    semantic_memory_indices = relationship("SemanticMemoryIndex", back_populates="user")
 
     def __repr__(self) -> str:
         return f"<User id={self.id} email={self.email} role={self.role}>"

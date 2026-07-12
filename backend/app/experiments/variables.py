@@ -127,12 +127,16 @@ class VariablePlanner:
         hypotheses: list[ExperimentHypothesis],
     ) -> list[VariableDefinition]:
         try:
-            hypo_text = "; ".join(
-                f"[{h.category}] {h.hypothesis[:80]}" for h in hypotheses[:5]
-            ) if hypotheses else "none"
-            methods_text = ", ".join(
-                m.method for m in methodology_result.methods[:5]
-            ) if methodology_result.methods else "none"
+            hypo_text = (
+                "; ".join(f"[{h.category}] {h.hypothesis[:80]}" for h in hypotheses[:5])
+                if hypotheses
+                else "none"
+            )
+            methods_text = (
+                ", ".join(m.method for m in methodology_result.methods[:5])
+                if methodology_result.methods
+                else "none"
+            )
 
             content = await self._llm.generate(
                 prompt=_VARIABLE_USER.format(
@@ -151,8 +155,9 @@ class VariablePlanner:
 
     def _parse_variables(self, content: str) -> list[VariableDefinition]:
         import re
+
         results: list[VariableDefinition] = []
-        blocks = re.split(r'\n\s*\n', content.strip())
+        blocks = re.split(r"\n\s*\n", content.strip())
         current: dict = {}
         for block in blocks:
             block = block.strip()
@@ -170,7 +175,9 @@ class VariablePlanner:
             elif low.startswith("reasoning:"):
                 current["reasoning"] = block.split(":", 1)[1].strip()
             elif low.startswith("values:"):
-                vals = [v.strip() for v in block.split(":", 1)[1].split(",") if v.strip()]
+                vals = [
+                    v.strip() for v in block.split(":", 1)[1].split(",") if v.strip()
+                ]
                 current["values"] = vals
         if current.get("name"):
             results.append(self._build_variable(current))

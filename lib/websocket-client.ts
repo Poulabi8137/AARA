@@ -20,15 +20,12 @@ export const initWebSocket = (token?: string): Socket => {
   });
 
   socket.on('connect', () => {
-    console.log('[v0] WebSocket connected');
   });
 
   socket.on('disconnect', () => {
-    console.log('[v0] WebSocket disconnected');
   });
 
-  socket.on('error', (error: any) => {
-    console.error('[v0] WebSocket error:', error);
+  socket.on('error', () => {
   });
 
   return socket;
@@ -46,11 +43,10 @@ export const disconnectWebSocket = (): void => {
 };
 
 export const subscribeToAgentUpdates = (
-  callback: (data: any) => void
+  callback: (data: unknown) => void
 ): (() => void) => {
   const ws = getWebSocket();
   if (!ws) {
-    console.warn('[v0] WebSocket not initialized');
     return () => {};
   }
 
@@ -63,7 +59,7 @@ export const subscribeToAgentUpdates = (
 
 export const subscribeToMonitoringDashboard = (
   researchId: string,
-  callback: (data: any) => void
+  callback: (data: unknown) => void
 ): (() => void) => {
   const ws = getWebSocket();
   if (!ws) return () => {};
@@ -77,10 +73,9 @@ export const subscribeToMonitoringDashboard = (
   };
 };
 
-export const sendAgentCommand = (command: string, payload: any): void => {
+export const sendAgentCommand = (command: string, payload: unknown): void => {
   const ws = getWebSocket();
   if (!ws) {
-    console.warn('[v0] WebSocket not initialized');
     return;
   }
 

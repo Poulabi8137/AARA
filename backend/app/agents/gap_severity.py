@@ -42,7 +42,9 @@ def _base_severity(gap_type: GapType) -> int:
     return mapping.get(gap_type, 3)
 
 
-def _planner_importance_modifier(gap_type: GapType, planner: dict[str, Any] | None) -> int:
+def _planner_importance_modifier(
+    gap_type: GapType, planner: dict[str, Any] | None
+) -> int:
     if not planner:
         return 0
     modifier = 0

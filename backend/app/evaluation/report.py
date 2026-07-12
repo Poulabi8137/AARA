@@ -19,6 +19,7 @@ def build_evaluation_report(
     if format == "markdown":
         return _build_markdown(evaluation_result)
     import json
+
     return json.dumps(evaluation_result, indent=2, default=str)
 
 
@@ -50,11 +51,13 @@ def _build_markdown(result: dict[str, Any]) -> str:
         bar = _score_bar(score)
         lines.append(f"| {name.replace('_', ' ').title()} | {score:.1f} {bar} |")
 
-    lines.extend([
-        "",
-        f"**Overall Quality:** {composite:.1f}/100",
-        "",
-    ])
+    lines.extend(
+        [
+            "",
+            f"**Overall Quality:** {composite:.1f}/100",
+            "",
+        ]
+    )
 
     return "\n".join(lines)
 
@@ -64,6 +67,7 @@ def build_trend_report(
 ) -> str:
     """Build a trend report from WorkflowEvaluator.compute_trend() output."""
     import json
+
     return json.dumps(trend_data, indent=2, default=str)
 
 

@@ -1,7 +1,13 @@
 from __future__ import annotations
 
 from app.core.logging import get_logger
-from app.planner.models import AgentType, ExecutionStep, ResearchTask, TaskStatus, TaskType
+from app.planner.models import (
+    AgentType,
+    ExecutionStep,
+    ResearchTask,
+    TaskStatus,
+    TaskType,
+)
 
 logger = get_logger("planner.agent_assignment")
 

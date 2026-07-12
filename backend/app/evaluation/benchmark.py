@@ -157,14 +157,20 @@ class BenchmarkRunner:
         subtopics = _collect_subtopics(state)
         references = _collect_references(state)
 
-        finding_match_rate = self.compute_match_rate(benchmark.expected_findings, findings)
-        subtopic_match_rate = self.compute_match_rate(benchmark.expected_subtopics, subtopics)
+        finding_match_rate = self.compute_match_rate(
+            benchmark.expected_findings, findings
+        )
+        subtopic_match_rate = self.compute_match_rate(
+            benchmark.expected_subtopics, subtopics
+        )
         reference_match_rate = self.compute_reference_match_rate(
             benchmark.expected_references, references
         )
 
         overall_benchmark_score = round(
-            finding_match_rate * 0.4 + subtopic_match_rate * 0.3 + reference_match_rate * 0.3,
+            finding_match_rate * 0.4
+            + subtopic_match_rate * 0.3
+            + reference_match_rate * 0.3,
             2,
         )
 
@@ -261,7 +267,9 @@ def _collect_findings(state: dict[str, Any]) -> list[str]:
                     if isinstance(kf, str):
                         findings.append(kf)
     for s in state.get("summaries", []):
-        content = s.get("content") or s.get("summary") or s.get("executive_summary") or ""
+        content = (
+            s.get("content") or s.get("summary") or s.get("executive_summary") or ""
+        )
         if content:
             findings.append(content)
     for d in state.get("retrieved_documents", []):
@@ -302,12 +310,58 @@ def _collect_references(state: dict[str, Any]) -> list[str]:
 def _significant_words(text: str) -> list[str]:
     words = re.findall(r"[a-zA-Z]\w*", text.lower())
     stop_words = {
-        "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for",
-        "of", "with", "by", "from", "is", "are", "was", "were", "be", "been",
-        "being", "have", "has", "had", "do", "does", "did", "will", "would",
-        "can", "could", "may", "might", "shall", "should", "not", "no", "nor",
-        "it", "its", "this", "that", "these", "those", "what", "which", "who",
-        "how", "when", "where", "why",
+        "the",
+        "a",
+        "an",
+        "and",
+        "or",
+        "but",
+        "in",
+        "on",
+        "at",
+        "to",
+        "for",
+        "of",
+        "with",
+        "by",
+        "from",
+        "is",
+        "are",
+        "was",
+        "were",
+        "be",
+        "been",
+        "being",
+        "have",
+        "has",
+        "had",
+        "do",
+        "does",
+        "did",
+        "will",
+        "would",
+        "can",
+        "could",
+        "may",
+        "might",
+        "shall",
+        "should",
+        "not",
+        "no",
+        "nor",
+        "it",
+        "its",
+        "this",
+        "that",
+        "these",
+        "those",
+        "what",
+        "which",
+        "who",
+        "how",
+        "when",
+        "where",
+        "why",
     }
     return [w for w in words if w not in stop_words and len(w) > 1]
 

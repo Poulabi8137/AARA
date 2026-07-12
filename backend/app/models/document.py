@@ -4,9 +4,8 @@ import uuid
 from datetime import datetime, timezone
 import enum
 
-from sqlalchemy import String, Integer, DateTime, ForeignKey, Enum as SAEnum
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import String, Integer, DateTime, ForeignKey, Enum as SAEnum, UUID
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.session import Base
 
@@ -40,6 +39,8 @@ class Document(Base):
     uploaded_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
+
+    paper_memories = relationship("PaperMemory", back_populates="document")
 
     def __repr__(self) -> str:
         return f"<Document id={self.id} filename={self.filename} status={self.status}>"

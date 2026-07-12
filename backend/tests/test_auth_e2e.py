@@ -53,6 +53,7 @@ def app(mock_session):
 
     async def _get_mock_db():
         yield mock_session
+
     _app.dependency_overrides[get_db] = _get_mock_db
 
     _app.include_router(auth_router)
@@ -83,11 +84,14 @@ class TestRegister:
     async def test_register_success(self, client, mock_session):
         mock_session.execute.return_value = _make_mock_result(None)
 
-        response = await client.post("/auth/register", json={
-            "name": "New User",
-            "email": "new@example.com",
-            "password": "SecurePass123!",
-        })
+        response = await client.post(
+            "/auth/register",
+            json={
+                "name": "New User",
+                "email": "new@example.com",
+                "password": "SecurePass123!",
+            },
+        )
 
         assert response.status_code == 201
         data = response.json()
@@ -101,45 +105,60 @@ class TestRegister:
         existing = _make_user(email="dup@example.com")
         mock_session.execute.return_value = _make_mock_result(existing)
 
-        response = await client.post("/auth/register", json={
-            "name": "Duplicate",
-            "email": "dup@example.com",
-            "password": "SecurePass123!",
-        })
+        response = await client.post(
+            "/auth/register",
+            json={
+                "name": "Duplicate",
+                "email": "dup@example.com",
+                "password": "SecurePass123!",
+            },
+        )
 
         assert response.status_code == 409
         assert "already exists" in response.json()["detail"].lower()
 
     async def test_register_invalid_email_returns_422(self, client):
-        response = await client.post("/auth/register", json={
-            "name": "Bad Email",
-            "email": "not-an-email",
-            "password": "SecurePass123!",
-        })
+        response = await client.post(
+            "/auth/register",
+            json={
+                "name": "Bad Email",
+                "email": "not-an-email",
+                "password": "SecurePass123!",
+            },
+        )
         assert response.status_code == 422
 
     async def test_register_no_uppercase_password_returns_422(self, client):
-        response = await client.post("/auth/register", json={
-            "name": "No Upper",
-            "email": "noupper@example.com",
-            "password": "securepass123!",
-        })
+        response = await client.post(
+            "/auth/register",
+            json={
+                "name": "No Upper",
+                "email": "noupper@example.com",
+                "password": "securepass123!",
+            },
+        )
         assert response.status_code == 422
 
     async def test_register_no_digit_password_returns_422(self, client):
-        response = await client.post("/auth/register", json={
-            "name": "No Digit",
-            "email": "nodigit@example.com",
-            "password": "SecurePass!",
-        })
+        response = await client.post(
+            "/auth/register",
+            json={
+                "name": "No Digit",
+                "email": "nodigit@example.com",
+                "password": "SecurePass!",
+            },
+        )
         assert response.status_code == 422
 
     async def test_register_empty_name_returns_422(self, client):
-        response = await client.post("/auth/register", json={
-            "name": "",
-            "email": "emptyname@example.com",
-            "password": "SecurePass123!",
-        })
+        response = await client.post(
+            "/auth/register",
+            json={
+                "name": "",
+                "email": "emptyname@example.com",
+                "password": "SecurePass123!",
+            },
+        )
         assert response.status_code == 422
 
 
@@ -150,10 +169,13 @@ class TestLogin:
         user = _make_user(password_hash=hash_password(password))
         mock_session.execute.return_value = _make_mock_result(user)
 
-        response = await client.post("/auth/login", json={
-            "email": user.email,
-            "password": password,
-        })
+        response = await client.post(
+            "/auth/login",
+            json={
+                "email": user.email,
+                "password": password,
+            },
+        )
 
         assert response.status_code == 200
         data = response.json()
@@ -165,20 +187,26 @@ class TestLogin:
         user = _make_user(password_hash=hash_password("SecurePass123!"))
         mock_session.execute.return_value = _make_mock_result(user)
 
-        response = await client.post("/auth/login", json={
-            "email": user.email,
-            "password": "WrongPassword123!",
-        })
+        response = await client.post(
+            "/auth/login",
+            json={
+                "email": user.email,
+                "password": "WrongPassword123!",
+            },
+        )
 
         assert response.status_code == 401
 
     async def test_login_nonexistent_email_returns_401(self, client, mock_session):
         mock_session.execute.return_value = _make_mock_result(None)
 
-        response = await client.post("/auth/login", json={
-            "email": "nobody@example.com",
-            "password": "SecurePass123!",
-        })
+        response = await client.post(
+            "/auth/login",
+            json={
+                "email": "nobody@example.com",
+                "password": "SecurePass123!",
+            },
+        )
 
         assert response.status_code == 401
 
@@ -190,9 +218,12 @@ class TestRefresh:
         token = create_refresh_token(str(user.id))
         mock_session.execute.return_value = _make_mock_result(user)
 
-        response = await client.post("/auth/refresh", json={
-            "refresh_token": token,
-        })
+        response = await client.post(
+            "/auth/refresh",
+            json={
+                "refresh_token": token,
+            },
+        )
 
         assert response.status_code == 200
         data = response.json()
@@ -208,16 +239,22 @@ class TestRefresh:
         }
         expired = jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
 
-        response = await client.post("/auth/refresh", json={
-            "refresh_token": expired,
-        })
+        response = await client.post(
+            "/auth/refresh",
+            json={
+                "refresh_token": expired,
+            },
+        )
 
         assert response.status_code == 401
 
     async def test_refresh_invalid_token_returns_401(self, client):
-        response = await client.post("/auth/refresh", json={
-            "refresh_token": "invalid.jwt.here",
-        })
+        response = await client.post(
+            "/auth/refresh",
+            json={
+                "refresh_token": "invalid.jwt.here",
+            },
+        )
 
         assert response.status_code == 401
 
@@ -225,9 +262,12 @@ class TestRefresh:
         user = _make_user()
         access = create_access_token(str(user.id))
 
-        response = await client.post("/auth/refresh", json={
-            "refresh_token": access,
-        })
+        response = await client.post(
+            "/auth/refresh",
+            json={
+                "refresh_token": access,
+            },
+        )
 
         assert response.status_code == 401
 
@@ -299,7 +339,10 @@ class TestCORS:
             },
         )
         assert response.status_code == 200
-        assert response.headers.get("access-control-allow-origin") == "http://localhost:3000"
+        assert (
+            response.headers.get("access-control-allow-origin")
+            == "http://localhost:3000"
+        )
 
     async def test_cors_preflight_disallowed_origin(self, client):
         response = await client.options(

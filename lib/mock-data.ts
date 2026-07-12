@@ -2,7 +2,7 @@
  * Mock data for development and demonstration
  */
 
-import { EvidencePanel as EvidencePanelType, Paper, Citation } from './types';
+import { EvidencePanel as EvidencePanelType } from './types';
 
 const mockPapers = {
   transformers: {

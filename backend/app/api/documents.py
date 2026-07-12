@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 import uuid
 
-from fastapi import APIRouter, Depends, Query, UploadFile, File, HTTPException, status, Response
+from fastapi import APIRouter, Depends, Query, UploadFile, File, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -135,7 +135,7 @@ async def list_documents(
     )
 
 
-@router.delete("/documents/{document_id}", status_code=204, response_class=Response)
+@router.delete("/documents/{document_id}", status_code=204, response_model=None)
 async def delete_document(
     document_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
@@ -145,7 +145,9 @@ async def delete_document(
 
     doc = await db.get(Document, document_id)
     if doc is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
+        )
     if doc.project_id:
         project_check = await db.execute(
             select(ResearchProject).where(
@@ -154,10 +156,11 @@ async def delete_document(
             )
         )
         if project_check.scalar_one_or_none() is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
+            )
     service = IngestionService(db)
     await service.delete_document(document_id)
-    return Response(status_code=204)
 
 
 @router.post("/retrieval/search", response_model=SearchResponse)

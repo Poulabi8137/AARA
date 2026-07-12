@@ -4,7 +4,6 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any
 
 from app.rag.models import RetrievedEvidence
 
@@ -119,7 +118,9 @@ class SummaryStatistics:
 
 @dataclass
 class SummaryMetadata:
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     duration_ms: float = 0.0
     level: SummaryLevel = SummaryLevel.STANDARD
     model: str = ""

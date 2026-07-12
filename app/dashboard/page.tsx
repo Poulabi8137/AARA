@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Plus, Search, Clock, TrendingUp, Sparkles, ArrowRight, Layers, Loader2, AlertCircle } from 'lucide-react'
+import { Plus, Search, TrendingUp, Sparkles, ArrowRight, Layers, Loader2, AlertCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { GlassCard } from '@/components/ui/glass-card'
 import { ResearchFlow } from '@/components/research-flow'
@@ -21,7 +21,7 @@ interface ProjectSummary {
 }
 
 const stagger = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.06 } } }
-const fadeUp = { hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 200, damping: 25 } } }
+const fadeUp = { hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 200, damping: 25 } } }
 
 export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState('')

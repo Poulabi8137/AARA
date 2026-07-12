@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import time
 import re
-from collections import defaultdict
 
 from app.core.logging import get_logger
 from app.analysis.config import get_analysis_settings
 from app.analysis.models import ConsensusResult
 from app.rag.llm import RAGLLMProvider
-from app.summarization.models import EvidenceGroup, SummaryResult
+from app.summarization.models import EvidenceGroup
 
 logger = get_logger("analysis.consensus")
 settings = get_analysis_settings()
@@ -128,14 +127,18 @@ class ConsensusDetector:
             header = f"Group {i}: {group.label}"
             texts: list[str] = []
             for j, ev in enumerate(group.evidence):
-                key = group.citation_keys[j] if j < len(group.citation_keys) else f"[{j + 1}]"
+                key = (
+                    group.citation_keys[j]
+                    if j < len(group.citation_keys)
+                    else f"[{j + 1}]"
+                )
                 texts.append(f"{key} {ev.content[:400]}")
             parts.append(f"{header}\n" + "\n".join(texts))
         return "\n\n".join(parts)
 
     def _parse_consensus(self, content: str) -> list[ConsensusResult]:
         results: list[ConsensusResult] = []
-        blocks = re.split(r'\n\s*\n', content)
+        blocks = re.split(r"\n\s*\n", content)
         current: dict = {}
         for block in blocks:
             block = block.strip()
@@ -146,7 +149,7 @@ class ConsensusDetector:
                     results.append(self._build_consensus(current))
                 current = {"statement": block.split(":", 1)[1].strip()}
             elif block.lower().startswith("sources:"):
-                current["sources"] = re.findall(r'\[\d+\]', block)
+                current["sources"] = re.findall(r"\[\d+\]", block)
             elif block.lower().startswith("category:"):
                 current["category"] = block.split(":", 1)[1].strip()
         if current.get("statement"):

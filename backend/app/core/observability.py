@@ -5,7 +5,13 @@ import time
 from typing import Callable
 
 from fastapi import FastAPI, Request, Response
-from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import (
+    Counter,
+    Histogram,
+    Gauge,
+    generate_latest,
+    CONTENT_TYPE_LATEST,
+)
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.core.config import get_settings
@@ -74,6 +80,12 @@ RATE_LIMIT_VIOLATIONS = Counter(
     ["client_type", "path"],
 )
 
+REQUEST_RATE = Counter(
+    "request_rate_total",
+    "Request rate per second",
+    ["endpoint"],
+)
+
 QUEUE_DEPTH = Gauge(
     "queue_depth",
     "Current task queue depth",
@@ -101,13 +113,17 @@ class MetricsMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
             elapsed = time.monotonic() - start
             status_group = f"{response.status_code // 100}xx"
-            HTTP_REQUEST_COUNT.labels(method=method, path=path, status=status_group).inc()
+            HTTP_REQUEST_COUNT.labels(
+                method=method, path=path, status=status_group
+            ).inc()
             HTTP_REQUEST_DURATION.labels(method=method, path=path).observe(elapsed)
+            REQUEST_RATE.labels(endpoint=path).inc()
             return response
         except Exception:
             elapsed = time.monotonic() - start
             HTTP_REQUEST_COUNT.labels(method=method, path=path, status="5xx").inc()
             HTTP_REQUEST_DURATION.labels(method=method, path=path).observe(elapsed)
+            REQUEST_RATE.labels(endpoint=path).inc()
             raise
 
 
@@ -181,6 +197,10 @@ def record_auth_failure(reason: str) -> None:
 
 def record_rate_limit_violation(client_type: str, path: str) -> None:
     RATE_LIMIT_VIOLATIONS.labels(client_type=client_type, path=path).inc()
+
+
+def record_request_rate(endpoint: str) -> None:
+    REQUEST_RATE.labels(endpoint=endpoint).inc()
 
 
 def set_queue_depth(queue_name: str, depth: int) -> None:

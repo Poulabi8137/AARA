@@ -1,23 +1,18 @@
 from __future__ import annotations
 
-import copy
 import time
 import uuid
-from typing import Any
 
 from app.core.logging import get_logger
 from app.knowledge_graph.config import get_knowledge_graph_settings
 from app.knowledge_graph.models import (
     EdgeMetadata,
     GraphEdge,
-    GraphMetadata,
     GraphNode,
     GraphOperation,
     GraphStatistics,
     KnowledgeGraph,
     NodeMetadata,
-    NodeType,
-    RelationshipType,
 )
 
 logger = get_logger("knowledge_graph.graph_builder")
@@ -46,13 +41,18 @@ class GraphBuilder:
             if merge:
                 merged = self._merge_nodes(existing, node)
                 graph.nodes[node.node_id] = merged
-                logger.debug("node merged", extra={"node_id": node.node_id, "type": node.node_type.value})
+                logger.debug(
+                    "node merged",
+                    extra={"node_id": node.node_id, "type": node.node_type.value},
+                )
                 return True
             return False
         graph.nodes[node.node_id] = node
         if node.node_id not in graph.adjacency:
             graph.adjacency[node.node_id] = []
-        logger.debug("node added", extra={"node_id": node.node_id, "type": node.node_type.value})
+        logger.debug(
+            "node added", extra={"node_id": node.node_id, "type": node.node_type.value}
+        )
         return True
 
     def add_edge(
@@ -78,12 +78,15 @@ class GraphBuilder:
         graph.edges[edge.edge_id] = edge
         if edge.source_id in graph.adjacency:
             graph.adjacency[edge.source_id].append(edge)
-        logger.debug("edge added", extra={
-            "edge_id": edge.edge_id,
-            "source": edge.source_id,
-            "target": edge.target_id,
-            "type": edge.relationship_type.value,
-        })
+        logger.debug(
+            "edge added",
+            extra={
+                "edge_id": edge.edge_id,
+                "source": edge.source_id,
+                "target": edge.target_id,
+                "type": edge.relationship_type.value,
+            },
+        )
         return True
 
     def add_nodes_batch(
@@ -117,8 +120,12 @@ class GraphBuilder:
     ) -> KnowledgeGraph:
         start = time.monotonic()
 
-        node_count = self.add_nodes_batch(target, list(source.nodes.values()), merge=True)
-        edge_count = self.add_edges_batch(target, list(source.edges.values()), merge=True)
+        node_count = self.add_nodes_batch(
+            target, list(source.nodes.values()), merge=True
+        )
+        edge_count = self.add_edges_batch(
+            target, list(source.edges.values()), merge=True
+        )
 
         target.metadata.last_operation = GraphOperation.MERGE
         target.metadata.node_count = len(target.nodes)
@@ -189,7 +196,11 @@ class GraphBuilder:
 
         if cascade:
             for adj_list in graph.adjacency.values():
-                adj_list[:] = [e for e in adj_list if e.source_id != node_id and e.target_id != node_id]
+                adj_list[:] = [
+                    e
+                    for e in adj_list
+                    if e.source_id != node_id and e.target_id != node_id
+                ]
 
         logger.debug("node removed", extra={"node_id": node_id, "cascade": cascade})
         return True
@@ -221,8 +232,10 @@ class GraphBuilder:
 
         avg_degree = (2.0 * total_edges / total_nodes) if total_nodes > 0 else 0.0
         avg_confidence = (
-            sum(e.metadata.confidence for e in graph.edges.values()) / total_edges
-        ) if total_edges > 0 else 0.0
+            (sum(e.metadata.confidence for e in graph.edges.values()) / total_edges)
+            if total_edges > 0
+            else 0.0
+        )
 
         max_possible = total_nodes * (total_nodes - 1) / 2.0
         graph_density = (total_edges / max_possible) if max_possible > 0 else 0.0
@@ -253,7 +266,11 @@ class GraphBuilder:
                         continue
                     visited.add(current)
                     for edge in graph.adjacency.get(current, []):
-                        neighbor = edge.target_id if edge.source_id == current else edge.source_id
+                        neighbor = (
+                            edge.target_id
+                            if edge.source_id == current
+                            else edge.source_id
+                        )
                         if neighbor not in visited and neighbor in graph.nodes:
                             stack.append(neighbor)
         return components
@@ -272,7 +289,9 @@ class GraphBuilder:
             node_id=a.node_id,
             node_type=a.node_type,
             label=b.label if len(b.label) > len(a.label) else a.label,
-            description=b.description if len(b.description) > len(a.description) else a.description,
+            description=b.description
+            if len(b.description) > len(a.description)
+            else a.description,
             metadata=merged_meta,
         )
 

@@ -3,9 +3,8 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import String, DateTime, ForeignKey, Enum as SAEnum
+from sqlalchemy import String, DateTime, ForeignKey, Enum as SAEnum, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID
 import enum
 
 from app.db.session import Base
@@ -38,6 +37,9 @@ class ResearchSession(Base):
     )
 
     project = relationship("ResearchProject", back_populates="sessions")
+    session_memories = relationship(
+        "SessionMemory", back_populates="session", cascade="all, delete-orphan"
+    )
 
     def __repr__(self) -> str:
         return f"<ResearchSession id={self.id} name={self.session_name} status={self.status}>"

@@ -55,7 +55,9 @@ def deduplicate_chunks(chunks: list[dict[str, Any]]) -> list[dict[str, Any]]:
             continue
         src_chunks.sort(key=lambda c: c.get("relevance_score", 0), reverse=True)
         for other in src_chunks[1:]:
-            if is_near_duplicate(src_chunks[0].get("content", ""), other.get("content", "")):
+            if is_near_duplicate(
+                src_chunks[0].get("content", ""), other.get("content", "")
+            ):
                 deduper.removed_count += 1
 
     result: list[dict[str, Any]] = []

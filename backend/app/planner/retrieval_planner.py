@@ -7,7 +7,7 @@ from app.planner.models import (
     RetrievalPlan,
     TaskType,
 )
-from app.rag.models import ALL_COLLECTIONS, RetrievalStrategy, SearchIntent, SourceType
+from app.rag.models import ALL_COLLECTIONS, RetrievalStrategy, SourceType
 
 logger = get_logger("planner.retrieval_planner")
 settings = get_planner_settings()
@@ -81,11 +81,14 @@ class RetrievalPlanner:
             confidence_threshold=settings.confidence_threshold,
             citation_required=self._needs_citations(task),
             memory_usage=True,
-            external_search=(task.type in {
-                TaskType.SURVEY,
-                TaskType.DATASET_DISCOVERY,
-                TaskType.LITERATURE_REVIEW,
-            }),
+            external_search=(
+                task.type
+                in {
+                    TaskType.SURVEY,
+                    TaskType.DATASET_DISCOVERY,
+                    TaskType.LITERATURE_REVIEW,
+                }
+            ),
         )
         return plan
 

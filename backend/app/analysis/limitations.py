@@ -73,13 +73,18 @@ class LimitationAnalyzer:
         )
         return merged[: settings.max_limitations]
 
-    def _rule_based_limitations(
-        self, groups: list[EvidenceGroup]
-    ) -> list[Limitation]:
+    def _rule_based_limitations(self, groups: list[EvidenceGroup]) -> list[Limitation]:
         limitations: list[Limitation] = []
         keywords = [
-            "limitation", "weakness", "drawback", "shortcoming", "limitation",
-            "not considered", "not evaluated", "future work", "TODO",
+            "limitation",
+            "weakness",
+            "drawback",
+            "shortcoming",
+            "limitation",
+            "not considered",
+            "not evaluated",
+            "future work",
+            "TODO",
         ]
 
         for group in groups:
@@ -129,14 +134,18 @@ class LimitationAnalyzer:
             header = f"Group {i}: {group.label}"
             texts: list[str] = []
             for j, ev in enumerate(group.evidence):
-                key = group.citation_keys[j] if j < len(group.citation_keys) else f"[{j + 1}]"
+                key = (
+                    group.citation_keys[j]
+                    if j < len(group.citation_keys)
+                    else f"[{j + 1}]"
+                )
                 texts.append(f"{key} {ev.content[:400]}")
             parts.append(f"{header}\n" + "\n".join(texts))
         return "\n\n".join(parts)
 
     def _parse_limitations(self, content: str) -> list[Limitation]:
         results: list[Limitation] = []
-        blocks = re.split(r'\n\s*\n', content)
+        blocks = re.split(r"\n\s*\n", content)
         current: dict = {}
         for block in blocks:
             block = block.strip()
@@ -148,7 +157,7 @@ class LimitationAnalyzer:
             elif low.startswith("category:"):
                 current["category"] = block.split(":", 1)[1].strip().lower()
             elif low.startswith("sources:"):
-                current["sources"] = re.findall(r'\[\d+\]', block)
+                current["sources"] = re.findall(r"\[\d+\]", block)
             elif low.startswith("severity:"):
                 current["severity"] = block.split(":", 1)[1].strip().lower()
         if current.get("limitation"):
@@ -167,7 +176,7 @@ class LimitationAnalyzer:
         )
 
     def _extract_sentence(self, text: str, keyword: str) -> str:
-        sentences = re.split(r'[.!?\n]', text)
+        sentences = re.split(r"[.!?\n]", text)
         for sent in sentences:
             if keyword in sent.lower():
                 return sent.strip()[:200]

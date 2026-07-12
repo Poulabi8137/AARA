@@ -97,7 +97,10 @@ class ResourcePlanner:
             memory_gb=32 if has_deep_learning else 16,
             storage_gb=50,
             estimated_cost_usd=compute_hours * 1.5 if has_deep_learning else 0.0,
-            software_dependencies=["python", "pytorch" if has_deep_learning else "scikit-learn"],
+            software_dependencies=[
+                "python",
+                "pytorch" if has_deep_learning else "scikit-learn",
+            ],
             notes=f"Estimated based on {len(phases)} phases totaling {total_minutes} minutes",
         )
 
@@ -108,8 +111,14 @@ class ResourcePlanner:
         phases: list[ExperimentPhase],
     ) -> ResourceEstimate | None:
         try:
-            methods_text = ", ".join(m.method for m in mr.methods[:5]) if mr.methods else "none"
-            datasets_text = ", ".join(d.dataset_name for d in mr.datasets[:5]) if mr.datasets else "none"
+            methods_text = (
+                ", ".join(m.method for m in mr.methods[:5]) if mr.methods else "none"
+            )
+            datasets_text = (
+                ", ".join(d.dataset_name for d in mr.datasets[:5])
+                if mr.datasets
+                else "none"
+            )
             total_minutes = sum(p.estimated_duration_minutes for p in phases)
 
             content = await self._llm.generate(
@@ -130,7 +139,6 @@ class ResourcePlanner:
             return None
 
     def _parse_estimate(self, content: str) -> ResourceEstimate:
-        import re
         result = ResourceEstimate()
         for line in content.split("\n"):
             line = line.strip()
@@ -149,7 +157,9 @@ class ResourcePlanner:
                 elif low.startswith("estimated cost usd:"):
                     result.estimated_cost_usd = float(line.split(":")[1].strip())
                 elif low.startswith("dependencies:"):
-                    result.software_dependencies = [d.strip() for d in line.split(":")[1].split(",") if d.strip()]
+                    result.software_dependencies = [
+                        d.strip() for d in line.split(":")[1].split(",") if d.strip()
+                    ]
                 elif low.startswith("notes:"):
                     result.notes = line.split(":", 1)[1].strip()
             except (ValueError, TypeError, IndexError):
@@ -164,14 +174,20 @@ class ResourcePlanner:
         if not llm_estimate:
             return rule_based
 
-        deps = list(set(rule_based.software_dependencies + llm_estimate.software_dependencies))
+        deps = list(
+            set(rule_based.software_dependencies + llm_estimate.software_dependencies)
+        )
         return ResourceEstimate(
             compute_hours=max(rule_based.compute_hours, llm_estimate.compute_hours),
             gpu_hours=max(rule_based.gpu_hours, llm_estimate.gpu_hours),
             cpu_cores=max(rule_based.cpu_cores, llm_estimate.cpu_cores),
             memory_gb=max(rule_based.memory_gb, llm_estimate.memory_gb),
             storage_gb=max(rule_based.storage_gb, llm_estimate.storage_gb),
-            estimated_cost_usd=max(rule_based.estimated_cost_usd, llm_estimate.estimated_cost_usd),
+            estimated_cost_usd=max(
+                rule_based.estimated_cost_usd, llm_estimate.estimated_cost_usd
+            ),
             software_dependencies=deps,
-            notes=f"Rule-based: {rule_based.notes} | LLM: {llm_estimate.notes}" if llm_estimate.notes else rule_based.notes,
+            notes=f"Rule-based: {rule_based.notes} | LLM: {llm_estimate.notes}"
+            if llm_estimate.notes
+            else rule_based.notes,
         )

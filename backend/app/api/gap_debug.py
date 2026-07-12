@@ -48,7 +48,9 @@ async def debug_gaps(
     """Run gap detection on provided planner output, summaries, and bundles."""
     planner = _parse_planner(body.planner_output)
 
-    gaps = detect_all_gaps(body.planner_output, body.summaries, body.retrieved_documents)
+    gaps = detect_all_gaps(
+        body.planner_output, body.summaries, body.retrieved_documents
+    )
     metrics = compute_coverage_metrics(gaps, planner, body.summaries)
 
     question_mapping = build_question_mapping(

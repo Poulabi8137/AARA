@@ -38,6 +38,7 @@ from app.schemas.gap_detection import (
 
 # ── Fixtures ──────────────────────────────────────────────
 
+
 def _sample_planner() -> dict[str, Any]:
     return {
         "research_goal": "Analyze security in agentic AI systems",
@@ -55,11 +56,22 @@ def _sample_planner() -> dict[str, Any]:
             "Human oversight",
             "Framework evaluation",
         ],
-        "priority_areas": ["Architecture security", "Threat models", "Governance compliance"],
-        "risk_areas": ["Autonomous decision risks", "Data privacy", "Adversarial attacks"],
+        "priority_areas": [
+            "Architecture security",
+            "Threat models",
+            "Governance compliance",
+        ],
+        "risk_areas": [
+            "Autonomous decision risks",
+            "Data privacy",
+            "Adversarial attacks",
+        ],
         "search_queries": [
-            "AI security 2025", "agent vulnerabilities", "autonomous risks",
-            "governance frameworks", "threat modeling AI",
+            "AI security 2025",
+            "agent vulnerabilities",
+            "autonomous risks",
+            "governance frameworks",
+            "threat modeling AI",
         ],
         "planning_score": 85,
         "completeness": 80,
@@ -68,12 +80,17 @@ def _sample_planner() -> dict[str, Any]:
     }
 
 
-def _sample_summary(subtopic: str, citations: int = 3, sources: int = 2,
-                    conf: float = 70.0, contradictions: int = 0) -> dict[str, Any]:
+def _sample_summary(
+    subtopic: str,
+    citations: int = 3,
+    sources: int = 2,
+    conf: float = 70.0,
+    contradictions: int = 0,
+) -> dict[str, Any]:
     s: dict[str, Any] = {
         "subtopic": subtopic,
         "executive_summary": f"Analysis of {subtopic} reveals significant findings "
-                             f"with high confidence based on multiple sources.",
+        f"with high confidence based on multiple sources.",
         "key_findings": [
             f"Key finding about {subtopic} number one",
             f"Another important finding regarding {subtopic}",
@@ -88,7 +105,8 @@ def _sample_summary(subtopic: str, citations: int = 3, sources: int = 2,
         "contradictions": [],
         "citations": [
             {"claim": f"Claim about {subtopic}", "supporting_chunk_ids": ["c1"]},
-        ] * max(0, citations),
+        ]
+        * max(0, citations),
         "confidence_score": conf,
         "citation_count": citations,
         "source_count": sources,
@@ -114,7 +132,11 @@ def _sample_bundle(subtopic: str) -> dict[str, Any]:
     return {
         "subtopic": subtopic,
         "evidence": [
-            {"content": f"Content about {subtopic}", "chunk_id": f"c_{subtopic}", "relevance_score": 85.0},
+            {
+                "content": f"Content about {subtopic}",
+                "chunk_id": f"c_{subtopic}",
+                "relevance_score": 85.0,
+            },
         ],
         "sources": ["arxiv"],
         "confidence_score": 70.0,
@@ -139,6 +161,7 @@ def _full_state() -> Any:
 
 
 # ── Model / Schema Tests ────────────────────────────────
+
 
 class TestGapSchemas:
     def test_research_gap_creation(self) -> None:
@@ -188,6 +211,7 @@ class TestGapSchemas:
 
 # ── Planner Parsing Tests ───────────────────────────────
 
+
 class TestPlannerParsing:
     def test_parse_valid_json(self) -> None:
         data = '{"subtopics": ["a", "b"], "research_questions": ["q1"]}'
@@ -208,10 +232,14 @@ class TestPlannerParsing:
 
 # ── Gap Detection Tests ─────────────────────────────────
 
+
 class TestGapDetection:
     def test_detect_missing_subtopics(self) -> None:
         planner = _sample_planner()
-        summaries = [_sample_summary("Architecture security"), _sample_summary("Threat models")]
+        summaries = [
+            _sample_summary("Architecture security"),
+            _sample_summary("Threat models"),
+        ]
         gaps = _detect_missing_subtopics(planner, summaries, [])
         missing_subtopics = [g.description for g in gaps]
         assert any("Governance compliance" in d for d in missing_subtopics)
@@ -278,11 +306,29 @@ class TestGapDetection:
         planner = _sample_planner()
         # All summaries have the same source -> triggers diversity gap
         summaries = [
-            {"subtopic": "a", "supporting_evidence": ["arxiv paper"], "citation_count": 1, "source_count": 1, "confidence_score": 50, "contradictions": [], "key_findings": []},
-            {"subtopic": "b", "supporting_evidence": ["arxiv paper"], "citation_count": 1, "source_count": 1, "confidence_score": 50, "contradictions": [], "key_findings": []},
+            {
+                "subtopic": "a",
+                "supporting_evidence": ["arxiv paper"],
+                "citation_count": 1,
+                "source_count": 1,
+                "confidence_score": 50,
+                "contradictions": [],
+                "key_findings": [],
+            },
+            {
+                "subtopic": "b",
+                "supporting_evidence": ["arxiv paper"],
+                "citation_count": 1,
+                "source_count": 1,
+                "confidence_score": 50,
+                "contradictions": [],
+                "key_findings": [],
+            },
         ]
         gaps = _detect_insufficient_source_diversity(planner, summaries, [])
-        div_gaps = [g for g in gaps if g.gap_type == GapType.INSUFFICIENT_SOURCE_DIVERSITY]
+        div_gaps = [
+            g for g in gaps if g.gap_type == GapType.INSUFFICIENT_SOURCE_DIVERSITY
+        ]
         assert len(div_gaps) >= 1
 
     def test_full_detection_pipeline(self) -> None:
@@ -296,14 +342,21 @@ class TestGapDetection:
         assert len(gaps) > 0
         types_found = {g.gap_type for g in gaps}
         assert GapType.MISSING_SUBTOPIC in types_found
-        assert any(g.severity in (SeverityLevel.CRITICAL, SeverityLevel.HIGH, SeverityLevel.MEDIUM) for g in gaps)
+        assert any(
+            g.severity
+            in (SeverityLevel.CRITICAL, SeverityLevel.HIGH, SeverityLevel.MEDIUM)
+            for g in gaps
+        )
 
 
 # ── Severity Scoring Tests ──────────────────────────────
 
+
 class TestSeverityScoring:
     def test_base_severity_values(self) -> None:
-        assert _base_severity(GapType.MISSING_RESEARCH_QUESTION) >= _base_severity(GapType.LOW_CONFIDENCE_SUMMARY)
+        assert _base_severity(GapType.MISSING_RESEARCH_QUESTION) >= _base_severity(
+            GapType.LOW_CONFIDENCE_SUMMARY
+        )
         assert _base_severity(GapType.MISSING_RISK_ANALYSIS) == 7
         assert _base_severity(GapType.LOW_CONFIDENCE_SUMMARY) == 2
 
@@ -322,12 +375,15 @@ class TestSeverityScoring:
         assert sev in (SeverityLevel.LOW, SeverityLevel.MEDIUM)
 
     def test_severity_contradiction_modifier(self) -> None:
-        summary = {"contradictions": [{"topic": "t1"}, {"topic": "t2"}, {"topic": "t3"}]}
+        summary = {
+            "contradictions": [{"topic": "t1"}, {"topic": "t2"}, {"topic": "t3"}]
+        }
         sev = compute_severity(GapType.CONTRADICTION, None, summary)
         assert sev in (SeverityLevel.CRITICAL, SeverityLevel.HIGH, SeverityLevel.MEDIUM)
 
 
 # ── Coverage Metrics Tests ──────────────────────────────
+
 
 class TestCoverageMetrics:
     def test_coverage_metrics_values(self) -> None:
@@ -368,6 +424,7 @@ class TestCoverageMetrics:
 
 
 # ── State Integration Tests ──────────────────────────────
+
 
 class TestStateIntegration:
     @pytest.mark.asyncio
@@ -436,9 +493,11 @@ class TestStateIntegration:
 
 # ── Debug Endpoint Test ─────────────────────────────────
 
+
 class TestDebugEndpoint:
     def test_debug_request_model(self) -> None:
         from app.api.gap_debug import DebugGapRequest
+
         req = DebugGapRequest(
             planner_output=json.dumps(_sample_planner()),
             summaries=[_sample_summary("Architecture security")],
@@ -450,11 +509,16 @@ class TestDebugEndpoint:
 
     def test_debug_response_model(self) -> None:
         from app.api.gap_debug import DebugGapResponse
+
         resp = DebugGapResponse(
-            gaps=[ResearchGap(
-                gap_id="test", gap_type=GapType.MISSING_SUBTOPIC,
-                description="x", severity=SeverityLevel.LOW,
-            ).model_dump()],
+            gaps=[
+                ResearchGap(
+                    gap_id="test",
+                    gap_type=GapType.MISSING_SUBTOPIC,
+                    description="x",
+                    severity=SeverityLevel.LOW,
+                ).model_dump()
+            ],
             metrics=CoverageMetrics(total_gaps=1),
             question_mapping={"q1": "uncovered"},
             priority_mapping={"p1": "covered"},
@@ -469,10 +533,12 @@ class TestDebugEndpoint:
 
 # ── Graph Node Test ─────────────────────────────────────
 
+
 class TestGraphNode:
     @pytest.mark.asyncio
     async def test_gap_detection_node(self) -> None:
         from app.graphs.nodes import gap_detection_node
+
         state = _full_state()
         result = await gap_detection_node(state)
         assert "research_gaps" in result
@@ -480,11 +546,14 @@ class TestGraphNode:
         assert result["status"] == "gap_detection_complete"
         assert len(result.get("execution_history", [])) > 0
         # Verify at least one entry has the node name
-        node_entries = [e for e in result["execution_history"] if e.get("node") == "gap_detection"]
+        node_entries = [
+            e for e in result["execution_history"] if e.get("node") == "gap_detection"
+        ]
         assert len(node_entries) >= 1
 
 
 # ── Edge Cases and Error Handling ───────────────────────
+
 
 class TestEdgeCases:
     def test_empty_planner(self) -> None:

@@ -41,15 +41,24 @@ def chunk_text(
     for i, chunk_text_content in enumerate(chunks):
         start = text.find(chunk_text_content[:50])
         end = start + len(chunk_text_content) if start >= 0 else 0
-        result.append(Chunk(
-            content=chunk_text_content,
-            index=i,
-            start_char=max(start, 0),
-            end_char=end,
-            metadata=dict(metadata or {}),
-        ))
+        result.append(
+            Chunk(
+                content=chunk_text_content,
+                index=i,
+                start_char=max(start, 0),
+                end_char=end,
+                metadata=dict(metadata or {}),
+            )
+        )
 
-    logger.debug("chunked text", extra={"total_chunks": len(result), "chunk_size": chunk_size, "overlap": chunk_overlap})
+    logger.debug(
+        "chunked text",
+        extra={
+            "total_chunks": len(result),
+            "chunk_size": chunk_size,
+            "overlap": chunk_overlap,
+        },
+    )
     return result
 
 
@@ -80,7 +89,9 @@ def _recursive_split(
                 else:
                     if current_chunk:
                         chunks.append("".join(current_chunk).strip())
-                    overlap_text = _get_overlap_text("".join(current_chunk), chunk_overlap)
+                    overlap_text = _get_overlap_text(
+                        "".join(current_chunk), chunk_overlap
+                    )
                     current_chunk = [overlap_text, seg_with_sep]
                     current_len = len(overlap_text) + seg_len
 
@@ -96,14 +107,18 @@ def _recursive_split(
                         if c.strip():
                             result.append(c)
                     else:
-                        result.extend(_recursive_split(
-                            c, separators[separators.index(sep) + 1:],
-                            chunk_size, chunk_overlap,
-                        ))
+                        result.extend(
+                            _recursive_split(
+                                c,
+                                separators[separators.index(sep) + 1 :],
+                                chunk_size,
+                                chunk_overlap,
+                            )
+                        )
                 return [r for r in result if r.strip()]
 
     for i in range(0, len(text), chunk_size - chunk_overlap):
-        chunk = text[i:i + chunk_size]
+        chunk = text[i : i + chunk_size]
         if chunk.strip():
             chunks.append(chunk)
 

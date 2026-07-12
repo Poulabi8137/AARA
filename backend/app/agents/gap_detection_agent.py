@@ -76,15 +76,18 @@ class GapDetectionAgent(BaseAgent):
         state["status"] = "gap_detection_complete"
         state["agent_metrics"]["gap_detection"] = result.model_dump()
 
-        logger.info("gap detection complete", extra={
-            "total_gaps": len(gaps),
-            "coverage_score": metrics.coverage_score,
-            "question_completion": metrics.question_completion_score,
-            "risk_coverage": metrics.risk_coverage_score,
-            "priority_coverage": metrics.priority_coverage_score,
-            "latency": latency,
-            "used_fallback": not bool(summaries),
-        })
+        logger.info(
+            "gap detection complete",
+            extra={
+                "total_gaps": len(gaps),
+                "coverage_score": metrics.coverage_score,
+                "question_completion": metrics.question_completion_score,
+                "risk_coverage": metrics.risk_coverage_score,
+                "priority_coverage": metrics.priority_coverage_score,
+                "latency": latency,
+                "used_fallback": not bool(summaries),
+            },
+        )
 
         return state
 
@@ -94,30 +97,37 @@ class GapDetectionAgent(BaseAgent):
         bundles: list[dict[str, Any]],
     ) -> list[ResearchGap]:
         """Generate basic gaps when no summaries are available."""
-        from app.schemas.gap_detection import ResearchGap, GapType, SeverityLevel, RemediationSuggestion
+        from app.schemas.gap_detection import (
+            ResearchGap,
+            GapType,
+            SeverityLevel,
+            RemediationSuggestion,
+        )
 
         gaps: list[ResearchGap] = []
         if planner:
             subs = planner.get("subtopics", [])
             if subs:
-                gaps.append(ResearchGap(
-                    gap_id="fallback_no_summaries",
-                    gap_type=GapType.LOW_EVIDENCE,
-                    description="No summaries generated — all subtopics lack evidence synthesis",
-                    severity=SeverityLevel.CRITICAL,
-                    affected_subtopics=subs[:5],
-                    supporting_evidence="Summariser produced no output; gap detection running in fallback mode",
-                    remediation=RemediationSuggestion(
-                        recommended_queries=planner.get("search_queries", [])[:3],
-                        recommended_sources=["arxiv", "google scholar"],
-                        recommended_actions=[
-                            "Check summariser agent for errors",
-                            "Verify retrieval pipeline produced bundles",
-                            "Re-run workflow with debug logging enabled",
-                        ],
-                    ),
-                    confidence=90.0,
-                ))
+                gaps.append(
+                    ResearchGap(
+                        gap_id="fallback_no_summaries",
+                        gap_type=GapType.LOW_EVIDENCE,
+                        description="No summaries generated — all subtopics lack evidence synthesis",
+                        severity=SeverityLevel.CRITICAL,
+                        affected_subtopics=subs[:5],
+                        supporting_evidence="Summariser produced no output; gap detection running in fallback mode",
+                        remediation=RemediationSuggestion(
+                            recommended_queries=planner.get("search_queries", [])[:3],
+                            recommended_sources=["arxiv", "google scholar"],
+                            recommended_actions=[
+                                "Check summariser agent for errors",
+                                "Verify retrieval pipeline produced bundles",
+                                "Re-run workflow with debug logging enabled",
+                            ],
+                        ),
+                        confidence=90.0,
+                    )
+                )
         return gaps
 
 

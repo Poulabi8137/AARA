@@ -1,7 +1,8 @@
 """Upload validation service with magic byte verification."""
+
 import magic
 from pathlib import Path
-from typing import Tuple, Union
+from typing import Tuple
 
 from app.schemas.document import DocumentCreate
 from app.core.logging import get_logger
@@ -25,7 +26,10 @@ class UploadValidator:
     # Each entry contains (file_extension, mime_type, magic_number_bytes)
     _file_signatures = {
         ".pdf": ("application/pdf", b"%PDF"),
-        ".docx": ("application/vnd.openxmlformats-officedocument.wordprocessingml.document", b"PK\\x03\\x04\\x14\\x00\\x06\\x00\\xa5\\xe0"),
+        ".docx": (
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            b"PK\\x03\\x04\\x14\\x00\\x06\\x00\\xa5\\xe0",
+        ),
         ".txt": ("text/plain", None),  # No magic bytes for plain text
         ".md": ("text/markdown", None),  # No magic bytes for markdown
     }
@@ -71,9 +75,7 @@ class UploadValidator:
 
         # Use python-magic to detect actual content type
         try:
-            detected_content_type = magic.from_buffer(
-                content, mime=True
-            ).lower()
+            detected_content_type = magic.from_buffer(content, mime=True).lower()
 
             if detected_content_type != expected_content_type:
                 # Provide helpful error message
@@ -87,7 +89,10 @@ class UploadValidator:
 
         except Exception as e:
             # If magic detection fails, fall back to basic validation
-            logger.warning("Magic byte detection failed, falling back to basic validation", extra={"error": str(e)})
+            logger.warning(
+                "Magic byte detection failed, falling back to basic validation",
+                extra={"error": str(e)},
+            )
             return expected_content_type, ext
 
     def validate_file(self, content: bytes, filename: str) -> DocumentCreate:

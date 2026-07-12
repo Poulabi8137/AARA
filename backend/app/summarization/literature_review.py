@@ -75,7 +75,7 @@ class LiteratureReviewSynthesizer:
             title="Literature Review",
             content=content,
             evidence_count=sum(len(g.evidence) for g in groups),
-            citations=re.findall(r'\[\d+\]', content),
+            citations=re.findall(r"\[\d+\]", content),
         )
 
         logger.info(
@@ -96,7 +96,11 @@ class LiteratureReviewSynthesizer:
             header = f"Group {i}: {group.label}"
             texts: list[str] = []
             for j, ev in enumerate(group.evidence):
-                key = group.citation_keys[j] if j < len(group.citation_keys) else f"[{j + 1}]"
+                key = (
+                    group.citation_keys[j]
+                    if j < len(group.citation_keys)
+                    else f"[{j + 1}]"
+                )
                 texts.append(f"{key} {ev.content[:500]}")
             parts.append(f"{header}\n" + "\n".join(texts))
         return "\n\n".join(parts)
@@ -106,11 +110,15 @@ class LiteratureReviewSynthesizer:
         lines = content.split("\n")
         for line in lines:
             lower = line.lower().strip()
-            if any(kw in lower for kw in ["finding:", "key finding:", "major finding:"]):
-                citations = re.findall(r'\[\d+\]', line)
+            if any(
+                kw in lower for kw in ["finding:", "key finding:", "major finding:"]
+            ):
+                citations = re.findall(r"\[\d+\]", line)
                 findings.append(
                     ExtractedFinding(
-                        finding=line.split(":", 1)[1].strip() if ":" in line else line.strip(),
+                        finding=line.split(":", 1)[1].strip()
+                        if ":" in line
+                        else line.strip(),
                         citations=citations,
                         category="extracted",
                     )
@@ -122,7 +130,10 @@ class LiteratureReviewSynthesizer:
         lines = content.split("\n")
         for line in lines:
             lower = line.lower().strip()
-            if any(kw in lower for kw in ["gap:", "research gap:", "open question:", "unanswered:"]):
+            if any(
+                kw in lower
+                for kw in ["gap:", "research gap:", "open question:", "unanswered:"]
+            ):
                 gap_type = "unanswered_question"
                 if "conflicting" in lower or "disagreement" in lower:
                     gap_type = "conflicting_finding"
@@ -132,7 +143,9 @@ class LiteratureReviewSynthesizer:
                     gap_type = "underexplored_topic"
                 gaps.append(
                     ResearchGap(
-                        gap=line.split(":", 1)[1].strip() if ":" in line else line.strip(),
+                        gap=line.split(":", 1)[1].strip()
+                        if ":" in line
+                        else line.strip(),
                         gap_type=gap_type,
                     )
                 )

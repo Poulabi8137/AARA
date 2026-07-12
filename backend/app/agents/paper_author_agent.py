@@ -38,7 +38,9 @@ class PaperAuthorAgent(BaseAgent):
             logger.warning("no proposal available, using fallback")
             paper = self._fallback_paper(query)
         else:
-            paper = await self._generate_paper(proposal, state.get("base_paper_context", ""))
+            paper = await self._generate_paper(
+                proposal, state.get("base_paper_context", "")
+            )
 
         state["paper_draft"] = paper
         state["status"] = "paper_generated"
@@ -50,18 +52,23 @@ class PaperAuthorAgent(BaseAgent):
         }
 
         history = state.get("execution_history", [])
-        history.append({
-            "node": "paper_author_agent",
-            "timestamp": state.get("timestamp"),
-            "status": "paper_generated",
-            "paper_title": paper.get("title", ""),
-        })
+        history.append(
+            {
+                "node": "paper_author_agent",
+                "timestamp": state.get("timestamp"),
+                "status": "paper_generated",
+                "paper_title": paper.get("title", ""),
+            }
+        )
         state["execution_history"] = history
 
-        logger.info("paper generation complete", extra={
-            "title": paper.get("title", ""),
-            "sections": len(paper.get("sections", [])),
-        })
+        logger.info(
+            "paper generation complete",
+            extra={
+                "title": paper.get("title", ""),
+                "sections": len(paper.get("sections", [])),
+            },
+        )
         return state
 
     async def _generate_paper(
@@ -71,10 +78,14 @@ class PaperAuthorAgent(BaseAgent):
             proposed_title=proposal.get("proposed_title", "Research Paper"),
             problem_statement=proposal.get("problem_statement", ""),
             motivation=proposal.get("motivation", ""),
-            research_questions="\n".join(f"- {q}" for q in proposal.get("research_questions", [])),
+            research_questions="\n".join(
+                f"- {q}" for q in proposal.get("research_questions", [])
+            ),
             hypothesis=proposal.get("hypothesis", ""),
             objectives="\n".join(f"- {o}" for o in proposal.get("objectives", [])),
-            expected_contributions="\n".join(f"- {c}" for c in proposal.get("expected_contributions", [])),
+            expected_contributions="\n".join(
+                f"- {c}" for c in proposal.get("expected_contributions", [])
+            ),
             proposed_methodology=proposal.get("proposed_methodology", ""),
             evaluation_strategy=proposal.get("evaluation_strategy", ""),
             keywords=", ".join(proposal.get("keywords", [])),
@@ -91,12 +102,12 @@ class PaperAuthorAgent(BaseAgent):
                 raw = raw.rsplit("\n```", 1)[0]
             return json.loads(raw)
         except Exception as exc:
-            logger.warning("LLM paper generation failed, using template", extra={"error": str(exc)})
+            logger.warning(
+                "LLM paper generation failed, using template", extra={"error": str(exc)}
+            )
             return self._template_paper(proposal)
 
-    async def rewrite_section(
-        self, section_title: str, content: str
-    ) -> str | None:
+    async def rewrite_section(self, section_title: str, content: str) -> str | None:
         prompt = SECTION_REWRITE_PROMPT.format(
             section_title=section_title, content=content
         )
@@ -107,9 +118,7 @@ class PaperAuthorAgent(BaseAgent):
             logger.warning("section rewrite failed", extra={"error": str(exc)})
             return None
 
-    async def expand_section(
-        self, section_title: str, content: str
-    ) -> str | None:
+    async def expand_section(self, section_title: str, content: str) -> str | None:
         prompt = SECTION_EXPAND_PROMPT.format(
             section_title=section_title, content=content
         )
@@ -120,9 +129,7 @@ class PaperAuthorAgent(BaseAgent):
             logger.warning("section expand failed", extra={"error": str(exc)})
             return None
 
-    async def condense_section(
-        self, section_title: str, content: str
-    ) -> str | None:
+    async def condense_section(self, section_title: str, content: str) -> str | None:
         prompt = SECTION_CONDENSE_PROMPT.format(
             section_title=section_title, content=content
         )
@@ -133,9 +140,7 @@ class PaperAuthorAgent(BaseAgent):
             logger.warning("section condense failed", extra={"error": str(exc)})
             return None
 
-    async def improve_tone(
-        self, section_title: str, content: str
-    ) -> str | None:
+    async def improve_tone(self, section_title: str, content: str) -> str | None:
         prompt = ACADEMIC_TONE_IMPROVE_PROMPT.format(
             section_title=section_title, content=content
         )
@@ -159,9 +164,7 @@ class PaperAuthorAgent(BaseAgent):
             logger.warning("citation integration failed", extra={"error": str(exc)})
             return None
 
-    async def improve_depth(
-        self, section_title: str, content: str
-    ) -> str | None:
+    async def improve_depth(self, section_title: str, content: str) -> str | None:
         prompt = TECHNICAL_DEPTH_PROMPT.format(
             section_title=section_title, content=content
         )
@@ -177,18 +180,22 @@ class PaperAuthorAgent(BaseAgent):
         sections = []
         for sec in IEEE_TEMPLATE_SECTIONS:
             content = self._template_section_content(sec["title"], proposal)
-            sections.append({
-                "section_number": sec["number"],
-                "section_title": sec["title"],
-                "content": content,
-            })
+            sections.append(
+                {
+                    "section_number": sec["number"],
+                    "section_title": sec["title"],
+                    "content": content,
+                }
+            )
         return {
             "title": title,
             "abstract": f"This paper addresses {title.lower()}. "
-                        f"We propose a novel approach to address the research gap identified in the literature. "
-                        f"Our methodology builds on existing work while introducing key innovations. "
-                        f"Expected results demonstrate the effectiveness of the proposed approach.",
-            "keywords": proposal.get("keywords", ["research", "methodology", "analysis"]),
+            f"We propose a novel approach to address the research gap identified in the literature. "
+            f"Our methodology builds on existing work while introducing key innovations. "
+            f"Expected results demonstrate the effectiveness of the proposed approach.",
+            "keywords": proposal.get(
+                "keywords", ["research", "methodology", "analysis"]
+            ),
             "sections": sections,
             "references": [
                 {
@@ -210,7 +217,9 @@ class PaperAuthorAgent(BaseAgent):
             ],
         }
 
-    def _template_section_content(self, section_title: str, proposal: dict[str, Any]) -> str:
+    def _template_section_content(
+        self, section_title: str, proposal: dict[str, Any]
+    ) -> str:
         templates = {
             "Introduction": (
                 f"The field of {proposal.get('key_domain', 'research')} has seen significant advances in recent years. "
@@ -233,7 +242,9 @@ class PaperAuthorAgent(BaseAgent):
                 f"The core problem can be stated as follows:\n\n"
                 f"{proposal.get('problem_statement', 'Problem definition')}\n\n"
                 f"Specifically, we address the following research questions:\n"
-                + "\n".join(f"• {q}" for q in proposal.get("research_questions", [])[:3])
+                + "\n".join(
+                    f"• {q}" for q in proposal.get("research_questions", [])[:3]
+                )
             ),
             "Research Gap": (
                 "Through our literature analysis, we identify the following key research gaps:\n\n"
@@ -247,7 +258,9 @@ class PaperAuthorAgent(BaseAgent):
                 "Figure 1 provides an overview of the proposed approach.\n\n"
                 "[Figure 1: Overview of the proposed solution architecture]\n\n"
                 "The key innovations of our approach include:\n"
-                + "\n".join(f"• {c}" for c in proposal.get("expected_contributions", [])[:3])
+                + "\n".join(
+                    f"• {c}" for c in proposal.get("expected_contributions", [])[:3]
+                )
             ),
             "System Architecture": (
                 "The proposed system architecture consists of several interconnected components. "
@@ -346,11 +359,16 @@ class PaperAuthorAgent(BaseAgent):
                 f"Our methodology addresses key limitations of existing approaches. "
                 f"The expected results demonstrate the effectiveness of our proposed solution.\n\n"
                 f"Key contributions include:\n"
-                + "\n".join(f"• {c}" for c in proposal.get("expected_contributions", [])[:3]) +
-                "\n\nOur work opens several avenues for future research in this domain."
+                + "\n".join(
+                    f"• {c}" for c in proposal.get("expected_contributions", [])[:3]
+                )
+                + "\n\nOur work opens several avenues for future research in this domain."
             ),
         }
-        return templates.get(section_title, f"Content for {section_title} section. [Figure/Tables/Equations to be added].")
+        return templates.get(
+            section_title,
+            f"Content for {section_title} section. [Figure/Tables/Equations to be added].",
+        )
 
     def _fallback_paper(self, query: str) -> dict[str, Any]:
         return {
@@ -358,8 +376,11 @@ class PaperAuthorAgent(BaseAgent):
             "abstract": f"This paper investigates {query[:200]}.",
             "keywords": query.split()[:5],
             "sections": [
-                {"section_number": i, "section_title": s["title"],
-                 "content": f"Content for {s['title']}."}
+                {
+                    "section_number": i,
+                    "section_title": s["title"],
+                    "content": f"Content for {s['title']}.",
+                }
                 for i, s in enumerate(IEEE_TEMPLATE_SECTIONS, 1)
             ],
             "references": [],

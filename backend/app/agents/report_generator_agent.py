@@ -36,7 +36,9 @@ class ReportGeneratorAgent(BaseAgent):
             logger.warning("no summaries available, using fallback report")
             report = self._fallback_report(query, planner_output, gaps)
         else:
-            report = build_report_from_state(query, planner_output, summaries, gaps, objective)
+            report = build_report_from_state(
+                query, planner_output, summaries, gaps, objective
+            )
             if summaries:
                 llm_enhanced = await self._enhance_report_with_llm(
                     query=query,
@@ -46,11 +48,19 @@ class ReportGeneratorAgent(BaseAgent):
                     citations=report.references,
                 )
                 if llm_enhanced is not None:
-                    report.executive_summary = llm_enhanced.get("executive_summary", report.executive_summary)
-                    report.introduction = llm_enhanced.get("introduction", report.introduction)
-                    report.conclusion = llm_enhanced.get("conclusion", report.conclusion)
+                    report.executive_summary = llm_enhanced.get(
+                        "executive_summary", report.executive_summary
+                    )
+                    report.introduction = llm_enhanced.get(
+                        "introduction", report.introduction
+                    )
+                    report.conclusion = llm_enhanced.get(
+                        "conclusion", report.conclusion
+                    )
                     report.markdown = build_markdown(report)
-                    report.report_json = json.dumps(report.model_dump(), indent=2, default=str)
+                    report.report_json = json.dumps(
+                        report.model_dump(), indent=2, default=str
+                    )
 
         report.metrics.generation_latency = round(time.monotonic() - start, 3)
 
@@ -67,21 +77,26 @@ class ReportGeneratorAgent(BaseAgent):
 
         # Store full structured report in execution_history for API access
         history = state.get("execution_history", [])
-        history.append({
-            "node": "report_generator",
-            "timestamp": report.generated_at,
-            "status": "report_generation_complete",
-            "report_metrics": report.metrics.model_dump(),
-        })
+        history.append(
+            {
+                "node": "report_generator",
+                "timestamp": report.generated_at,
+                "status": "report_generation_complete",
+                "report_metrics": report.metrics.model_dump(),
+            }
+        )
         state["execution_history"] = history
 
-        logger.info("report generation complete", extra={
-            "title": report.title,
-            "sections": len(report.sections),
-            "references": len(report.references),
-            "quality_score": report.metrics.research_quality_score,
-            "latency": report.metrics.generation_latency,
-        })
+        logger.info(
+            "report generation complete",
+            extra={
+                "title": report.title,
+                "sections": len(report.sections),
+                "references": len(report.references),
+                "quality_score": report.metrics.research_quality_score,
+                "latency": report.metrics.generation_latency,
+            },
+        )
 
         return state
 
@@ -107,14 +122,22 @@ class ReportGeneratorAgent(BaseAgent):
             f"Findings: {'; '.join(s.get('key_findings', [])[:3])}"
             for s in summaries[:8]
         )
-        gaps_text = "\n".join(
-            f"- [{g.get('severity', 'unknown')}] {g.get('description', '')[:200]}"
-            for g in gaps[:5]
-        ) if gaps else "None identified"
-        citations_text = "\n".join(
-            f"- {r.source if hasattr(r, 'source') else r.get('source', '')}"
-            for r in citations[:10]
-        ) if citations else "None"
+        gaps_text = (
+            "\n".join(
+                f"- [{g.get('severity', 'unknown')}] {g.get('description', '')[:200]}"
+                for g in gaps[:5]
+            )
+            if gaps
+            else "None identified"
+        )
+        citations_text = (
+            "\n".join(
+                f"- {r.source if hasattr(r, 'source') else r.get('source', '')}"
+                for r in citations[:10]
+            )
+            if citations
+            else "None"
+        )
 
         prompt = REPORT_GENERATOR_USER_PROMPT_TEMPLATE.format(
             query=query,
@@ -152,14 +175,22 @@ class ReportGeneratorAgent(BaseAgent):
     ) -> ResearchReport:
         """Generate a minimal report when no summaries are available."""
         from app.schemas.report_generator import (
-            ResearchReport, ReportSection, ReportReference, ReportMetrics,
+            ResearchReport,
+            ReportSection,
+            ReportReference,
+            ReportMetrics,
         )
 
         planner = {}
         if planner_output:
             import json
+
             try:
-                planner = json.loads(planner_output) if isinstance(planner_output, str) else planner_output
+                planner = (
+                    json.loads(planner_output)
+                    if isinstance(planner_output, str)
+                    else planner_output
+                )
             except (json.JSONDecodeError, TypeError):
                 planner = {}
 
@@ -178,19 +209,22 @@ class ReportGeneratorAgent(BaseAgent):
                 elif gap_type == "MISSING_RESEARCH_QUESTION":
                     key_findings.append(f"Unanswered: {desc[:150]}")
 
-        recommendations.append("Complete retrieval and summarisation pipeline before generating final report.")
+        recommendations.append(
+            "Complete retrieval and summarisation pipeline before generating final report."
+        )
         recommendations.append("Verify all pipeline agents executed without errors.")
 
         import datetime
+
         now = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
         report = ResearchReport(
             title=f"Incomplete Report: {query}",
             query=query,
             executive_summary=f"Report generation for '{query}' could not complete due to missing summary data. "
-                              f"The pipeline did not produce any section summaries.",
+            f"The pipeline did not produce any section summaries.",
             introduction=f"This report was automatically generated in fallback mode for: {query}. "
-                         f"Section summaries were unavailable, indicating a pipeline failure.",
+            f"Section summaries were unavailable, indicating a pipeline failure.",
             research_objectives=planner.get("research_questions", []),
             methodology=planner.get("methodology", "literature review"),
             sections=sections,
@@ -201,7 +235,7 @@ class ReportGeneratorAgent(BaseAgent):
             recommendations=recommendations,
             future_research=planner.get("research_questions", [])[:3],
             conclusion=f"Cannot draw conclusions for '{query}' without completed analysis. "
-                       f"Address the {len(gaps)} identified gaps and re-run the research pipeline.",
+            f"Address the {len(gaps)} identified gaps and re-run the research pipeline.",
             references=references,
             metrics=ReportMetrics(
                 report_completeness=10.0,
@@ -215,6 +249,8 @@ class ReportGeneratorAgent(BaseAgent):
             generated_at=now,
         )
 
-        report.markdown = f"# Incomplete Report: {query}\n\nFallback mode — no summaries available.\n"
+        report.markdown = (
+            f"# Incomplete Report: {query}\n\nFallback mode — no summaries available.\n"
+        )
         report.report_json = "{}"
         return report

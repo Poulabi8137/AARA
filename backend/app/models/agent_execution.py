@@ -3,9 +3,17 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import String, Text, DateTime, ForeignKey, Enum as SAEnum, JSON, Integer
+from sqlalchemy import (
+    String,
+    Text,
+    DateTime,
+    ForeignKey,
+    Enum as SAEnum,
+    JSON,
+    Integer,
+    UUID,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID
 import enum
 
 from app.db.session import Base
@@ -37,8 +45,12 @@ class AgentExecution(Base):
         default=ExecutionStatus.PENDING,
         nullable=False,
     )
-    start_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    end_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    start_time: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    end_time: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     execution_log: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     input_query: Mapped[str | None] = mapped_column(Text, nullable=True)

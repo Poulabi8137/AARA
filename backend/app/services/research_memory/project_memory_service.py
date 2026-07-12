@@ -84,9 +84,7 @@ class ProjectMemoryService:
             await self._indexer.index_project_memory(memory)
         return memory
 
-    async def update_summary(
-        self, memory_id: uuid.UUID, summary: str
-    ) -> ProjectMemory:
+    async def update_summary(self, memory_id: uuid.UUID, summary: str) -> ProjectMemory:
         memory = await self.get_memory(memory_id)
         memory.summary = summary
         await self.db.flush()
@@ -99,6 +97,7 @@ class ProjectMemoryService:
         logger.info("deleted project memory", extra={"memory_id": str(memory_id)})
         if self._indexer is not None:
             await self._indexer.remove_project_memory(memory_id)
+
     async def aggregate_memories(
         self,
         project_id: uuid.UUID,
@@ -142,9 +141,7 @@ class ProjectMemoryService:
             category=category,
             content=combined_content,
             importance=MemoryImportance.HIGH,
-            confidence=min(
-                (s.confidence for s in sources), default=1.0
-            ),
+            confidence=min((s.confidence for s in sources), default=1.0),
             memory_metadata={
                 "aggregated": True,
                 "aggregated_at": datetime.now(timezone.utc).isoformat(),

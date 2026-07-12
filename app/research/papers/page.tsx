@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { Search, Filter, Download, Star, ExternalLink, ChevronDown, Loader2, AlertTriangle } from 'lucide-react'
+import { Search, Filter, Download, Star, ExternalLink, ChevronDown, AlertTriangle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { GlassCard } from '@/components/ui/glass-card'
 import { PageTransition, childVariants } from '@/components/page-transition'
@@ -48,7 +48,7 @@ export default function PapersPage() {
 
   const toggleStar = (id: string) => {
     const next = new Set(starred)
-    next.has(id) ? next.delete(id) : next.add(id)
+    if (next.has(id)) { next.delete(id) } else { next.add(id) }
     setStarred(next)
   }
 
@@ -81,7 +81,7 @@ export default function PapersPage() {
         </div>
         <div className="flex gap-2">
           <div className="relative">
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value as any)}
+            <select value={sortBy} onChange={(e) => setSortBy(e.target.value as 'relevance' | 'citations' | 'year')}
               className="appearance-none px-3 py-2 rounded-xl bg-background/40 backdrop-blur-xl border border-border/50 text-sm text-foreground focus:outline-none focus:border-primary/50 pr-7 cursor-pointer"
             >
               <option value="relevance">Relevance</option>

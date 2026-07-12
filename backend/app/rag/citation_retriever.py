@@ -27,8 +27,10 @@ class CitationRetriever:
         k = top_k or self._citation_collection_max
 
         paper_evidence = [
-            ev for ev in evidence
-            if ev.source_type in {
+            ev
+            for ev in evidence
+            if ev.source_type
+            in {
                 SourceType.CHROMA_PAPER,
                 SourceType.MEMORY_PAPER,
             }
@@ -39,7 +41,9 @@ class CitationRetriever:
 
         citation_queries = []
         for ev in paper_evidence:
-            paper_title = ev.metadata.get("title", "") or ev.metadata.get("paper_title", "")
+            paper_title = ev.metadata.get("title", "") or ev.metadata.get(
+                "paper_title", ""
+            )
             if paper_title:
                 citation_queries.append(paper_title[:200])
             elif ev.content:

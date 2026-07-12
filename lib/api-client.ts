@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { safeGetItem, safeSetItem, safeRemoveItem } from '@/lib/utils';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -25,9 +26,9 @@ function processQueue(error: unknown, token: string | null): void {
 }
 
 function clearPersistedAuth(): void {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
-  localStorage.removeItem(REFRESH_KEY);
+  safeRemoveItem(TOKEN_KEY);
+  safeRemoveItem(USER_KEY);
+  safeRemoveItem(REFRESH_KEY);
   document.cookie = `${COOKIE_NAME}=; path=/; max-age=0`;
 }
 
@@ -51,7 +52,7 @@ class APIClient {
     });
 
     this.client.interceptors.request.use((config) => {
-      const token = localStorage.getItem(TOKEN_KEY);
+      const token = safeGetItem(TOKEN_KEY);
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -80,7 +81,7 @@ class APIClient {
         isRefreshing = true;
         originalRequest._isRetry = true;
 
-        const refreshToken = localStorage.getItem(REFRESH_KEY);
+        const refreshToken = safeGetItem(REFRESH_KEY);
 
         if (!refreshToken) {
           clearPersistedAuth();
@@ -94,9 +95,9 @@ class APIClient {
           });
           const { access_token, refresh_token } = response.data;
 
-          localStorage.setItem(TOKEN_KEY, access_token);
+          safeSetItem(TOKEN_KEY, access_token);
           if (refresh_token) {
-            localStorage.setItem(REFRESH_KEY, refresh_token);
+            safeSetItem(REFRESH_KEY, refresh_token);
           }
           setCookie(COOKIE_NAME, access_token, 1800);
 

@@ -36,6 +36,7 @@ from app.evaluation.report import build_evaluation_report
 # Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 def sample_planner_questions() -> list[str]:
     return [
@@ -57,11 +58,21 @@ def sample_summaries() -> list[dict[str, Any]]:
                 "Reward hacking can lead to unintended behaviors",
             ],
             "citations": [
-                {"claim": "Sample efficiency is a bottleneck", "source": "arxiv.org/abs/2101.03958", "supporting_chunk_ids": ["c1"]},
-                {"claim": "Reward hacking causes issues", "source": "arxiv.org/abs/2005.08691", "supporting_chunk_ids": ["c2"]},
+                {
+                    "claim": "Sample efficiency is a bottleneck",
+                    "source": "arxiv.org/abs/2101.03958",
+                    "supporting_chunk_ids": ["c1"],
+                },
+                {
+                    "claim": "Reward hacking causes issues",
+                    "source": "arxiv.org/abs/2005.08691",
+                    "supporting_chunk_ids": ["c2"],
+                },
             ],
             "sources": ["arxiv.org/abs/2101.03958", "arxiv.org/abs/2005.08691"],
-            "supporting_evidence": [{"content": "Evidence content 1", "relevance_score": 85.0}],
+            "supporting_evidence": [
+                {"content": "Evidence content 1", "relevance_score": 85.0}
+            ],
             "coverage_score": 80.0,
             "citation_strength": 70.0,
             "consistency_score": 90.0,
@@ -78,10 +89,16 @@ def sample_summaries() -> list[dict[str, Any]]:
                 "Pre-training on large datasets improves downstream task performance",
             ],
             "citations": [
-                {"claim": "Pre-training improves performance", "source": "arxiv.org/abs/1905.05583", "supporting_chunk_ids": ["c3"]},
+                {
+                    "claim": "Pre-training improves performance",
+                    "source": "arxiv.org/abs/1905.05583",
+                    "supporting_chunk_ids": ["c3"],
+                },
             ],
             "sources": ["arxiv.org/abs/1905.05583"],
-            "supporting_evidence": [{"content": "Evidence content 2", "relevance_score": 90.0}],
+            "supporting_evidence": [
+                {"content": "Evidence content 2", "relevance_score": 90.0}
+            ],
             "coverage_score": 75.0,
             "citation_strength": 65.0,
             "consistency_score": 85.0,
@@ -97,8 +114,24 @@ def sample_summaries() -> list[dict[str, Any]]:
 @pytest.fixture
 def sample_gaps() -> list[dict[str, Any]]:
     return [
-        {"gap_id": "g1", "gap_type": "LOW_EVIDENCE", "severity": "high", "description": "Low evidence for RL subtopic", "affected_subtopics": ["RL"], "supporting_evidence": "", "confidence": 85.0},
-        {"gap_id": "g2", "gap_type": "MISSING_SUBTOPIC", "severity": "medium", "description": "Missing safety considerations", "affected_subtopics": ["safety"], "supporting_evidence": "", "confidence": 70.0},
+        {
+            "gap_id": "g1",
+            "gap_type": "LOW_EVIDENCE",
+            "severity": "high",
+            "description": "Low evidence for RL subtopic",
+            "affected_subtopics": ["RL"],
+            "supporting_evidence": "",
+            "confidence": 85.0,
+        },
+        {
+            "gap_id": "g2",
+            "gap_type": "MISSING_SUBTOPIC",
+            "severity": "medium",
+            "description": "Missing safety considerations",
+            "affected_subtopics": ["safety"],
+            "supporting_evidence": "",
+            "confidence": 70.0,
+        },
     ]
 
 
@@ -118,9 +151,16 @@ def sample_report() -> dict[str, Any]:
             {
                 "title": "RL Challenges",
                 "summary": "Details about RL challenges.",
-                "key_findings": ["Sample efficiency bottleneck", "Reward design complexity"],
+                "key_findings": [
+                    "Sample efficiency bottleneck",
+                    "Reward design complexity",
+                ],
                 "citations": [
-                    {"claim": "Sample efficiency is hard", "source": "arxiv.org/abs/2101.03958", "supporting_chunk_ids": ["c1"]},
+                    {
+                        "claim": "Sample efficiency is hard",
+                        "source": "arxiv.org/abs/2101.03958",
+                        "supporting_chunk_ids": ["c1"],
+                    },
                 ],
             },
             {
@@ -128,7 +168,11 @@ def sample_report() -> dict[str, Any]:
                 "summary": "Details about transfer learning.",
                 "key_findings": ["Pre-training helps", "Fine-tuning requires care"],
                 "citations": [
-                    {"claim": "Pre-training works", "source": "arxiv.org/abs/1905.05583", "supporting_chunk_ids": ["c3"]},
+                    {
+                        "claim": "Pre-training works",
+                        "source": "arxiv.org/abs/1905.05583",
+                        "supporting_chunk_ids": ["c3"],
+                    },
                 ],
             },
         ],
@@ -142,22 +186,24 @@ def sample_state(
     sample_gaps: list[dict[str, Any]],
     sample_report: dict[str, Any],
 ) -> dict[str, Any]:
-    planner_output = json.dumps({
-        "research_questions": sample_planner_questions,
-        "subtopics": ["RL Challenges", "Transfer Learning", "Ethics"],
-        "search_queries": ["query1", "query2", "query3", "query4", "query5"],
-        "keywords": ["RL", "transfer", "ethics"],
-        "research_goal": "Test research goal",
-        "expected_deliverables": ["report"],
-        "priority_areas": ["safety"],
-        "risk_areas": ["bias"],
-        "methodology": "literature review",
-        "estimated_steps": 5,
-        "planning_score": 80,
-        "completeness": 85,
-        "coverage": 75,
-        "specificity": 80,
-    })
+    planner_output = json.dumps(
+        {
+            "research_questions": sample_planner_questions,
+            "subtopics": ["RL Challenges", "Transfer Learning", "Ethics"],
+            "search_queries": ["query1", "query2", "query3", "query4", "query5"],
+            "keywords": ["RL", "transfer", "ethics"],
+            "research_goal": "Test research goal",
+            "expected_deliverables": ["report"],
+            "priority_areas": ["safety"],
+            "risk_areas": ["bias"],
+            "methodology": "literature review",
+            "estimated_steps": 5,
+            "planning_score": 80,
+            "completeness": 85,
+            "coverage": 75,
+            "specificity": 80,
+        }
+    )
     return {
         "query": "Test query about AI research",
         "planner_output": planner_output,
@@ -166,7 +212,10 @@ def sample_state(
         "generated_report": sample_report,
         "retrieved_documents": [
             {"source": "arxiv.org/abs/2101.03958", "content": "RL challenges content"},
-            {"source": "arxiv.org/abs/1905.05583", "content": "Transfer learning content"},
+            {
+                "source": "arxiv.org/abs/1905.05583",
+                "content": "Transfer learning content",
+            },
             {"source": "arxiv.org/abs/2005.08691", "content": "Reward hacking content"},
         ],
         "status": "report_generation_complete",
@@ -181,12 +230,21 @@ def sample_state(
 # Metric Tests
 # =============================================================================
 
+
 class TestQuestionCoverage:
     def test_full_coverage(self):
         questions = ["What is deep learning?", "How does RL work?"]
         summaries = [
-            {"subtopic": "Deep Learning", "executive_summary": "Deep learning uses neural networks", "key_findings": []},
-            {"subtopic": "RL", "executive_summary": "RL uses rewards", "key_findings": ["RL works with rewards"]},
+            {
+                "subtopic": "Deep Learning",
+                "executive_summary": "Deep learning uses neural networks",
+                "key_findings": [],
+            },
+            {
+                "subtopic": "RL",
+                "executive_summary": "RL uses rewards",
+                "key_findings": ["RL works with rewards"],
+            },
         ]
         score = compute_question_coverage(questions, [], summaries)
         assert 0 <= score <= 100
@@ -226,9 +284,12 @@ class TestCitationDensity:
 class TestSourceDiversity:
     def test_high_diversity(self):
         citations = [
-            {"source": "src1"}, {"source": "src2"},
-            {"source": "src3"}, {"source": "src4"},
-            {"source": "src5"}, {"source": "src6"},
+            {"source": "src1"},
+            {"source": "src2"},
+            {"source": "src3"},
+            {"source": "src4"},
+            {"source": "src5"},
+            {"source": "src6"},
         ]
         score = compute_source_diversity(["src1", "src2", "src3"], citations)
         assert 50 <= score <= 100
@@ -300,7 +361,9 @@ class TestGapCoverage:
 
 class TestReportCompleteness:
     def test_complete_report(self, sample_report):
-        score = compute_report_completeness(sample_report, sample_report.get("sections", []))
+        score = compute_report_completeness(
+            sample_report, sample_report.get("sections", [])
+        )
         assert score == 100.0
 
     def test_none_report(self):
@@ -329,8 +392,16 @@ class TestHallucinationProxy:
                     "key_findings": ["This is finding one about AI alignment"],
                     "evidence_highlights": ["evidence highlight content"],
                     "citations": [
-                        {"claim": "finding one about AI alignment", "source": "src1", "supporting_chunk_ids": ["c1"]},
-                        {"claim": "evidence highlight content", "source": "src2", "supporting_chunk_ids": ["c2"]},
+                        {
+                            "claim": "finding one about AI alignment",
+                            "source": "src1",
+                            "supporting_chunk_ids": ["c1"],
+                        },
+                        {
+                            "claim": "evidence highlight content",
+                            "source": "src2",
+                            "supporting_chunk_ids": ["c2"],
+                        },
                     ],
                 },
             ],
@@ -338,7 +409,9 @@ class TestHallucinationProxy:
         sections = report.get("sections", [])
         citations = sections[0].get("citations", [])
         score = compute_hallucination_proxy(
-            report, sections, citations,
+            report,
+            sections,
+            citations,
             ["finding one about AI alignment", "evidence highlight content"],
         )
         assert score <= 50.0
@@ -382,9 +455,15 @@ class TestResearchQuality:
 class TestMetricRegistry:
     def test_all_metrics_present(self):
         expected = {
-            "question_coverage", "citation_density", "source_diversity",
-            "evidence_strength", "summary_quality", "gap_coverage",
-            "report_completeness", "hallucination_risk", "research_quality",
+            "question_coverage",
+            "citation_density",
+            "source_diversity",
+            "evidence_strength",
+            "summary_quality",
+            "gap_coverage",
+            "report_completeness",
+            "hallucination_risk",
+            "research_quality",
         }
         assert set(METRIC_REGISTRY.keys()) == expected
 
@@ -396,6 +475,7 @@ class TestMetricRegistry:
 # =============================================================================
 # Scorecard Tests
 # =============================================================================
+
 
 class TestScorecard:
     def test_generate_scorecard(self, sample_state):
@@ -437,6 +517,7 @@ class TestSafeParseReport:
 # =============================================================================
 # Benchmark Tests
 # =============================================================================
+
 
 class TestBenchmarkDefinition:
     def test_create_benchmark(self):
@@ -533,7 +614,10 @@ class TestBenchmarkRunner:
     def test_compute_match_rate(self):
         rate = BenchmarkRunner.compute_match_rate(
             ["reinforcement learning challenges", "transfer learning"],
-            ["reinforcement learning is about rewards", "transfer learning improves models"],
+            [
+                "reinforcement learning is about rewards",
+                "transfer learning improves models",
+            ],
         )
         assert rate > 50.0
         assert rate <= 100.0
@@ -583,13 +667,17 @@ class TestBenchmarkHelpers:
         assert "the" not in words
 
     def test_normalize_reference(self):
-        assert _normalize_reference("HTTPS://ARXIV.ORG/ABS/2101.03958/") == "arxiv.org/abs/2101.03958"
+        assert (
+            _normalize_reference("HTTPS://ARXIV.ORG/ABS/2101.03958/")
+            == "arxiv.org/abs/2101.03958"
+        )
         assert _normalize_reference("") == ""
 
 
 # =============================================================================
 # Evaluator Tests
 # =============================================================================
+
 
 class TestWorkflowEvaluator:
     @pytest.mark.asyncio
@@ -617,43 +705,84 @@ class TestWorkflowEvaluator:
     @pytest.mark.asyncio
     async def test_compute_trend_single(self):
         evaluator = WorkflowEvaluator()
-        planner_output = json.dumps({
-            "research_questions": ["q1", "q2"],
-            "subtopics": ["s1", "s2"],
-            "search_queries": ["q1", "q2", "q3", "q4", "q5"],
-            "keywords": ["k1"],
-            "research_goal": "goal",
-            "expected_deliverables": ["report"],
-            "priority_areas": ["p1"],
-            "risk_areas": ["r1"],
-            "methodology": "lit review",
-            "estimated_steps": 5,
-            "planning_score": 80,
-            "completeness": 85,
-            "coverage": 75,
-            "specificity": 80,
-        })
+        planner_output = json.dumps(
+            {
+                "research_questions": ["q1", "q2"],
+                "subtopics": ["s1", "s2"],
+                "search_queries": ["q1", "q2", "q3", "q4", "q5"],
+                "keywords": ["k1"],
+                "research_goal": "goal",
+                "expected_deliverables": ["report"],
+                "priority_areas": ["p1"],
+                "risk_areas": ["r1"],
+                "methodology": "lit review",
+                "estimated_steps": 5,
+                "planning_score": 80,
+                "completeness": 85,
+                "coverage": 75,
+                "specificity": 80,
+            }
+        )
         state = {
             "query": "test",
             "planner_output": planner_output,
             "summaries": [
-                {"subtopic": "s1", "executive_summary": "S1 content", "key_findings": ["f1"],
-                 "citations": [{"claim": "c1", "source": "src1", "supporting_chunk_ids": ["c1"]}],
-                 "sources": ["src1"], "supporting_evidence": [],
-                 "coverage_score": 80, "citation_strength": 70, "consistency_score": 90,
-                 "summary_score": 85, "evidence_density": 75},
-                {"subtopic": "s2", "executive_summary": "S2 content", "key_findings": ["f2"],
-                 "citations": [{"claim": "c2", "source": "src2", "supporting_chunk_ids": ["c2"]}],
-                 "sources": ["src2"], "supporting_evidence": [],
-                 "coverage_score": 75, "citation_strength": 65, "consistency_score": 85,
-                 "summary_score": 80, "evidence_density": 70},
+                {
+                    "subtopic": "s1",
+                    "executive_summary": "S1 content",
+                    "key_findings": ["f1"],
+                    "citations": [
+                        {
+                            "claim": "c1",
+                            "source": "src1",
+                            "supporting_chunk_ids": ["c1"],
+                        }
+                    ],
+                    "sources": ["src1"],
+                    "supporting_evidence": [],
+                    "coverage_score": 80,
+                    "citation_strength": 70,
+                    "consistency_score": 90,
+                    "summary_score": 85,
+                    "evidence_density": 75,
+                },
+                {
+                    "subtopic": "s2",
+                    "executive_summary": "S2 content",
+                    "key_findings": ["f2"],
+                    "citations": [
+                        {
+                            "claim": "c2",
+                            "source": "src2",
+                            "supporting_chunk_ids": ["c2"],
+                        }
+                    ],
+                    "sources": ["src2"],
+                    "supporting_evidence": [],
+                    "coverage_score": 75,
+                    "citation_strength": 65,
+                    "consistency_score": 85,
+                    "summary_score": 80,
+                    "evidence_density": 70,
+                },
             ],
             "research_gaps": [],
             "generated_report": {
-                "executive_summary": "yes", "introduction": "yes", "methodology": "yes",
-                "conclusion": "yes", "key_findings": ["f1"], "limitations": "yes",
-                "recommendations": ["r1"], "future_research": ["fr"],
-                "sections": [{"title": "s1", "key_findings": ["f1"], "citations": [{"claim": "c1"}]}],
+                "executive_summary": "yes",
+                "introduction": "yes",
+                "methodology": "yes",
+                "conclusion": "yes",
+                "key_findings": ["f1"],
+                "limitations": "yes",
+                "recommendations": ["r1"],
+                "future_research": ["fr"],
+                "sections": [
+                    {
+                        "title": "s1",
+                        "key_findings": ["f1"],
+                        "citations": [{"claim": "c1"}],
+                    }
+                ],
             },
             "retrieved_documents": [],
             "status": "completed",
@@ -700,10 +829,12 @@ class TestWorkflowEvaluator:
 # Report Tests
 # =============================================================================
 
+
 class TestEvaluationReport:
     @pytest.mark.asyncio
     async def test_build_json(self, sample_state):
         import json
+
         evaluator = WorkflowEvaluator()
         result = await evaluator.evaluate(sample_state)
         report = build_evaluation_report(result, format="json")
@@ -737,19 +868,31 @@ class TestEvaluationReport:
 # Edge Cases
 # =============================================================================
 
+
 class TestEdgeCases:
     def test_generate_scorecard_no_planner(self):
-        result = generate_scorecard({"summaries": [], "research_gaps": [], "generated_report": None})
-        assert result["composite"] < 20  # all 0s except gap_coverage=100*0.1=10, hallucination_risk=100 gives 0
+        result = generate_scorecard(
+            {"summaries": [], "research_gaps": [], "generated_report": None}
+        )
+        assert (
+            result["composite"] < 20
+        )  # all 0s except gap_coverage=100*0.1=10, hallucination_risk=100 gives 0
 
     def test_generate_scorecard_string_report(self):
         state = {
-            "generated_report": json.dumps({
-                "executive_summary": "yes", "introduction": "yes", "methodology": "yes",
-                "conclusion": "yes", "key_findings": ["f1"], "limitations": "yes",
-                "recommendations": ["r1"], "future_research": ["fr"],
-                "sections": [],
-            }),
+            "generated_report": json.dumps(
+                {
+                    "executive_summary": "yes",
+                    "introduction": "yes",
+                    "methodology": "yes",
+                    "conclusion": "yes",
+                    "key_findings": ["f1"],
+                    "limitations": "yes",
+                    "recommendations": ["r1"],
+                    "future_research": ["fr"],
+                    "sections": [],
+                }
+            ),
         }
         result = generate_scorecard(state)
         assert result["composite"] >= 0
@@ -783,8 +926,45 @@ class TestEdgeCases:
     async def test_run_benchmark_with_scorecard(self):
         state = {
             "query": "test",
-            "planner_output": json.dumps({"research_questions": ["q1"], "subtopics": ["s1"], "search_queries": ["q1","q2","q3","q4","q5"], "keywords": ["k1"], "research_goal": "g", "expected_deliverables": ["r"], "priority_areas": ["p"], "risk_areas": ["r"], "methodology": "m", "estimated_steps": 5, "planning_score": 80, "completeness": 80, "coverage": 80, "specificity": 80}),
-            "summaries": [{"subtopic": "alignment", "executive_summary": "alignment research covers X", "key_findings": ["alignment problem is key"], "citations": [{"claim": "c1", "source": "src1", "supporting_chunk_ids": ["c1"]}], "sources": ["src1"], "supporting_evidence": [{"content": "evidence"}], "coverage_score": 80, "citation_strength": 80, "consistency_score": 80, "summary_score": 80, "evidence_density": 80}],
+            "planner_output": json.dumps(
+                {
+                    "research_questions": ["q1"],
+                    "subtopics": ["s1"],
+                    "search_queries": ["q1", "q2", "q3", "q4", "q5"],
+                    "keywords": ["k1"],
+                    "research_goal": "g",
+                    "expected_deliverables": ["r"],
+                    "priority_areas": ["p"],
+                    "risk_areas": ["r"],
+                    "methodology": "m",
+                    "estimated_steps": 5,
+                    "planning_score": 80,
+                    "completeness": 80,
+                    "coverage": 80,
+                    "specificity": 80,
+                }
+            ),
+            "summaries": [
+                {
+                    "subtopic": "alignment",
+                    "executive_summary": "alignment research covers X",
+                    "key_findings": ["alignment problem is key"],
+                    "citations": [
+                        {
+                            "claim": "c1",
+                            "source": "src1",
+                            "supporting_chunk_ids": ["c1"],
+                        }
+                    ],
+                    "sources": ["src1"],
+                    "supporting_evidence": [{"content": "evidence"}],
+                    "coverage_score": 80,
+                    "citation_strength": 80,
+                    "consistency_score": 80,
+                    "summary_score": 80,
+                    "evidence_density": 80,
+                }
+            ],
             "research_gaps": [],
             "generated_report": None,
             "retrieved_documents": [],

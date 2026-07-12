@@ -38,9 +38,17 @@ class SecretManager:
     def _load_env_secrets(self) -> None:
         """Load secrets from environment variables."""
         secret_keys = [
-            "SECRET_KEY", "DATABASE_URL", "OPENAI_API_KEY", "GEMINI_API_KEY",
-            "REDIS_URL", "SENTRY_DSN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY",
-            "AZURE_TENANT_ID", "AZURE_CLIENT_ID", "AZURE_CLIENT_SECRET",
+            "SECRET_KEY",
+            "DATABASE_URL",
+            "OPENAI_API_KEY",
+            "GEMINI_API_KEY",
+            "REDIS_URL",
+            "SENTRY_DSN",
+            "AWS_ACCESS_KEY_ID",
+            "AWS_SECRET_ACCESS_KEY",
+            "AZURE_TENANT_ID",
+            "AZURE_CLIENT_ID",
+            "AZURE_CLIENT_SECRET",
         ]
         for key in secret_keys:
             val = os.environ.get(key)
@@ -63,7 +71,10 @@ class SecretManager:
             for key, val in secrets.items():
                 self._secrets[key.lower()] = str(val)
 
-            logger.info("loaded secrets from AWS Secrets Manager", extra={"secret_name": secret_name})
+            logger.info(
+                "loaded secrets from AWS Secrets Manager",
+                extra={"secret_name": secret_name},
+            )
         except Exception as exc:
             logger.error("failed to load AWS secrets", extra={"error": str(exc)})
             raise
@@ -82,15 +93,21 @@ class SecretManager:
             client = SecretClient(vault_url=vault_url, credential=credential)
 
             secret_names = [
-                "secret-key", "database-url", "openai-api-key", "gemini-api-key",
-                "redis-url", "sentry-dsn",
+                "secret-key",
+                "database-url",
+                "openai-api-key",
+                "gemini-api-key",
+                "redis-url",
+                "sentry-dsn",
             ]
             for name in secret_names:
                 try:
                     secret = client.get_secret(name)
                     self._secrets[name.replace("-", "_")] = secret.value
                 except Exception:
-                    logger.warning("secret not found in Key Vault", extra={"secret_name": name})
+                    logger.warning(
+                        "secret not found in Key Vault", extra={"secret_name": name}
+                    )
 
             logger.info("loaded secrets from Azure Key Vault")
         except Exception as exc:
@@ -109,16 +126,28 @@ class SecretManager:
             client = secretmanager.SecretManagerServiceClient()
 
             secret_names = [
-                "secret-key", "database-url", "openai-api-key", "gemini-api-key",
-                "redis-url", "sentry-dsn",
+                "secret-key",
+                "database-url",
+                "openai-api-key",
+                "gemini-api-key",
+                "redis-url",
+                "sentry-dsn",
             ]
             for name in secret_names:
                 try:
-                    resource_name = f"projects/{project_id}/secrets/{name}/versions/latest"
-                    response = client.access_secret_version(request={"name": resource_name})
-                    self._secrets[name.replace("-", "_")] = response.payload.data.decode("UTF-8")
+                    resource_name = (
+                        f"projects/{project_id}/secrets/{name}/versions/latest"
+                    )
+                    response = client.access_secret_version(
+                        request={"name": resource_name}
+                    )
+                    self._secrets[name.replace("-", "_")] = (
+                        response.payload.data.decode("UTF-8")
+                    )
                 except Exception:
-                    logger.warning("secret not found in GCP", extra={"secret_name": name})
+                    logger.warning(
+                        "secret not found in GCP", extra={"secret_name": name}
+                    )
 
             logger.info("loaded secrets from GCP Secret Manager")
         except Exception as exc:

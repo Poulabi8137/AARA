@@ -1,17 +1,13 @@
 from __future__ import annotations
 
-import time
 from datetime import datetime, timezone
 
 from app.core.logging import get_logger
 from app.knowledge_graph.config import get_knowledge_graph_settings
 from app.knowledge_graph.models import (
-    EdgeMetadata,
     GraphEdge,
     GraphNode,
     KnowledgeGraph,
-    NodeMetadata,
-    NodeType,
 )
 
 logger = get_logger("knowledge_graph.provenance")
@@ -27,15 +23,17 @@ class ProvenanceTracker:
         llm_involved: bool = False,
         processing_version: str = "1.0",
     ) -> GraphNode:
-        node.metadata.provenance = list(set(
-            node.metadata.provenance + [f"component:{component}"]
-        ))
+        node.metadata.provenance = list(
+            set(node.metadata.provenance + [f"component:{component}"])
+        )
         if source_ids:
-            node.metadata.provenance = list(set(
-                node.metadata.provenance + [f"source:{s}" for s in source_ids]
-            ))
+            node.metadata.provenance = list(
+                set(node.metadata.provenance + [f"source:{s}" for s in source_ids])
+            )
         node.metadata.properties["provenance_component"] = component
-        node.metadata.properties["provenance_timestamp"] = datetime.now(timezone.utc).isoformat()
+        node.metadata.properties["provenance_timestamp"] = datetime.now(
+            timezone.utc
+        ).isoformat()
         node.metadata.properties["llm_involved"] = llm_involved
         node.metadata.properties["processing_version"] = processing_version
         return node
@@ -48,15 +46,17 @@ class ProvenanceTracker:
         llm_involved: bool = False,
         processing_version: str = "1.0",
     ) -> GraphEdge:
-        edge.metadata.provenance = list(set(
-            edge.metadata.provenance + [f"component:{component}"]
-        ))
+        edge.metadata.provenance = list(
+            set(edge.metadata.provenance + [f"component:{component}"])
+        )
         if source_ids:
-            edge.metadata.provenance = list(set(
-                edge.metadata.provenance + [f"source:{s}" for s in source_ids]
-            ))
+            edge.metadata.provenance = list(
+                set(edge.metadata.provenance + [f"source:{s}" for s in source_ids])
+            )
         edge.metadata.properties["provenance_component"] = component
-        edge.metadata.properties["provenance_timestamp"] = datetime.now(timezone.utc).isoformat()
+        edge.metadata.properties["provenance_timestamp"] = datetime.now(
+            timezone.utc
+        ).isoformat()
         edge.metadata.properties["llm_involved"] = llm_involved
         edge.metadata.properties["processing_version"] = processing_version
         return edge
@@ -78,9 +78,13 @@ class ProvenanceTracker:
             "source_type": node.metadata.source_type,
             "source_id": node.metadata.source_id,
             "confidence": node.metadata.confidence,
-            "origin_component": node.metadata.properties.get("provenance_component", "unknown"),
+            "origin_component": node.metadata.properties.get(
+                "provenance_component", "unknown"
+            ),
             "llm_involved": node.metadata.properties.get("llm_involved", False),
-            "processing_version": node.metadata.properties.get("processing_version", "unknown"),
+            "processing_version": node.metadata.properties.get(
+                "processing_version", "unknown"
+            ),
             "created_at": node.metadata.created_at,
             "updated_at": node.metadata.updated_at,
             "version": node.metadata.version,
@@ -100,7 +104,9 @@ class ProvenanceTracker:
             "reason": edge.metadata.reason,
             "confidence": edge.metadata.confidence,
             "weight": edge.metadata.weight,
-            "origin_component": edge.metadata.properties.get("provenance_component", "unknown"),
+            "origin_component": edge.metadata.properties.get(
+                "provenance_component", "unknown"
+            ),
             "llm_involved": edge.metadata.properties.get("llm_involved", False),
             "timestamp": edge.metadata.timestamp,
         }

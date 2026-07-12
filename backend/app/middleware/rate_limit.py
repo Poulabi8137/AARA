@@ -31,10 +31,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     """
 
     RATE_LIMITS: dict[str, list[tuple[int, int]]] = {
-        "/auth/login": [(60, 5)],           # 5 req/min
-        "/auth/register": [(60, 3)],         # 3 req/min
-        "/documents/upload": [(3600, 20)],   # 20 req/hour
-        "/agents/run": [(3600, 10)],         # 10 req/hour
+        "/auth/login": [(60, 5)],  # 5 req/min
+        "/auth/register": [(60, 3)],  # 3 req/min
+        "/documents/upload": [(3600, 20)],  # 20 req/hour
+        "/agents/run": [(3600, 10)],  # 10 req/hour
     }
 
     DEFAULT_LIMITS = [(60, 30)]  # 30 req/min default
@@ -44,7 +44,13 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self._settings = get_settings()
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
-        if request.url.path in ("/health", "/docs", "/redoc", "/openapi.json", "/metrics"):
+        if request.url.path in (
+            "/health",
+            "/docs",
+            "/redoc",
+            "/openapi.json",
+            "/metrics",
+        ):
             return await call_next(request)
 
         limits = self._get_limits(request.url.path)

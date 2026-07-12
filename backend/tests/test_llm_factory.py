@@ -3,12 +3,17 @@ from __future__ import annotations
 import pytest
 from typing import Any
 
-from app.llm.factory import get_llm_provider, validate_provider_config, ProviderInitError
+from app.llm.factory import (
+    get_llm_provider,
+    validate_provider_config,
+    ProviderInitError,
+)
 from app.llm.provider import LLMProvider, ProviderConfig
 from app.core.config import Settings
 
 
 # ── Helpers ──────────────────────────────────────────────
+
 
 def _make_settings(**overrides: Any) -> Settings:
     defaults: dict[str, Any] = {
@@ -24,6 +29,7 @@ def _make_settings(**overrides: Any) -> Settings:
 
 
 # ── Factory Tests ────────────────────────────────────────
+
 
 class TestFactory:
     def test_get_mock_provider(self) -> None:
@@ -75,6 +81,7 @@ class TestFactory:
 
     def test_mock_provider_generates(self) -> None:
         import asyncio
+
         settings = _make_settings(llm_provider="mock")
         provider = get_llm_provider(settings)
         response = asyncio.run(provider.generate("test prompt"))
@@ -84,6 +91,7 @@ class TestFactory:
 
     def test_mock_provider_counts_tokens(self) -> None:
         import asyncio
+
         settings = _make_settings(llm_provider="mock")
         provider = get_llm_provider(settings)
         count = asyncio.run(provider.count_tokens("hello world"))
@@ -91,6 +99,7 @@ class TestFactory:
 
 
 # ── Startup Validation Tests ────────────────────────────
+
 
 class TestStartupValidation:
     def test_valid_mock_provider(self) -> None:
@@ -147,11 +156,13 @@ class TestStartupValidation:
 
 # ── Graph Node Integration Tests ─────────────────────────
 
+
 class TestGraphInjection:
     @pytest.mark.asyncio
     async def test_planner_node_uses_settings_provider(self) -> None:
         from app.graphs.nodes import planner_node
         from app.agents.state import make_initial_state
+
         state = make_initial_state(query="test")
         result = await planner_node(state)
         assert result["status"] == "planner_complete"
@@ -161,6 +172,7 @@ class TestGraphInjection:
     async def test_retrieval_node_uses_settings_provider(self) -> None:
         from app.graphs.nodes import retrieval_node
         from app.agents.state import make_initial_state
+
         state = make_initial_state(query="test")
         state["planner_output"] = '{"subtopics": ["s1"], "search_queries": ["q1"]}'
         result = await retrieval_node(state)
@@ -170,9 +182,16 @@ class TestGraphInjection:
     async def test_summarizer_node_uses_settings_provider(self) -> None:
         from app.graphs.nodes import summarizer_node
         from app.agents.state import make_initial_state
+
         state = make_initial_state(query="test")
         state["retrieved_documents"] = [
-            {"subtopic": "s1", "evidence": [{"content": "doc1", "chunk_id": "c1"}], "sources": ["src"], "confidence_score": 80.0, "coverage": True},
+            {
+                "subtopic": "s1",
+                "evidence": [{"content": "doc1", "chunk_id": "c1"}],
+                "sources": ["src"],
+                "confidence_score": 80.0,
+                "coverage": True,
+            },
         ]
         result = await summarizer_node(state)
         assert result["status"] == "summarizer_complete"
@@ -182,9 +201,26 @@ class TestGraphInjection:
     async def test_gap_detection_node_uses_settings_provider(self) -> None:
         from app.graphs.nodes import gap_detection_node
         from app.agents.state import make_initial_state
+
         state = make_initial_state(query="test")
-        state["planner_output"] = '{"subtopics": ["s1", "s2"], "research_questions": ["q1"], "search_queries": ["q1"], "priority_areas": ["p1"], "risk_areas": ["r1"]}'
-        state["summaries"] = [{"subtopic": "s1", "executive_summary": "summary", "key_findings": ["f1"], "citation_count": 0, "source_count": 0, "confidence_score": 50, "contradictions": [], "supporting_evidence": [], "important_statistics": [], "consensus_points": [], "citations": []}]
+        state["planner_output"] = (
+            '{"subtopics": ["s1", "s2"], "research_questions": ["q1"], "search_queries": ["q1"], "priority_areas": ["p1"], "risk_areas": ["r1"]}'
+        )
+        state["summaries"] = [
+            {
+                "subtopic": "s1",
+                "executive_summary": "summary",
+                "key_findings": ["f1"],
+                "citation_count": 0,
+                "source_count": 0,
+                "confidence_score": 50,
+                "contradictions": [],
+                "supporting_evidence": [],
+                "important_statistics": [],
+                "consensus_points": [],
+                "citations": [],
+            }
+        ]
         result = await gap_detection_node(state)
         assert result["status"] == "gap_detection_complete"
         assert len(result["research_gaps"]) > 0
@@ -193,10 +229,35 @@ class TestGraphInjection:
     async def test_report_generator_node_uses_settings_provider(self) -> None:
         from app.graphs.nodes import report_generator_node
         from app.agents.state import make_initial_state
+
         state = make_initial_state(query="test")
         state["planner_output"] = '{"subtopics": ["s1"]}'
-        state["summaries"] = [{"subtopic": "s1", "executive_summary": "summary text here", "key_findings": ["f1"], "citation_count": 1, "source_count": 1, "confidence_score": 75, "contradictions": [], "citations": [{"claim": "c1", "source": "arxiv", "supporting_chunk_ids": ["c1"]}], "supporting_evidence": ["evidence"], "important_statistics": ["73%"], "consensus_points": ["cp1"]}]
-        state["research_gaps"] = [{"gap_id": "g1", "gap_type": "LOW_EVIDENCE", "severity": "high", "description": "gap", "confidence": 75}]
+        state["summaries"] = [
+            {
+                "subtopic": "s1",
+                "executive_summary": "summary text here",
+                "key_findings": ["f1"],
+                "citation_count": 1,
+                "source_count": 1,
+                "confidence_score": 75,
+                "contradictions": [],
+                "citations": [
+                    {"claim": "c1", "source": "arxiv", "supporting_chunk_ids": ["c1"]}
+                ],
+                "supporting_evidence": ["evidence"],
+                "important_statistics": ["73%"],
+                "consensus_points": ["cp1"],
+            }
+        ]
+        state["research_gaps"] = [
+            {
+                "gap_id": "g1",
+                "gap_type": "LOW_EVIDENCE",
+                "severity": "high",
+                "description": "gap",
+                "confidence": 75,
+            }
+        ]
         result = await report_generator_node(state)
         assert result["status"] == "report_generation_complete"
         assert result["generated_report"] is not None
@@ -204,6 +265,7 @@ class TestGraphInjection:
 
 
 # ── ProviderInitError Tests ─────────────────────────────
+
 
 class TestProviderInitError:
     def test_is_runtime_error(self) -> None:
@@ -215,6 +277,7 @@ class TestProviderInitError:
 
 
 # ── ProviderConfig Tests ────────────────────────────────
+
 
 class TestProviderConfig:
     def test_defaults(self) -> None:

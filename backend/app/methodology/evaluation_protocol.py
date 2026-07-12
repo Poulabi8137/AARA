@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 import time
 
 from app.core.logging import get_logger
@@ -55,7 +54,11 @@ class EvaluationProtocolDesigner:
                 baselines=["random_baseline", "majority_class"],
                 comparison_methods=["paired_statistical_test"],
                 validation_strategy="cross_validation",
-                reproducibility_steps=["seed fixed", "code released", "hyperparameters documented"],
+                reproducibility_steps=[
+                    "seed fixed",
+                    "code released",
+                    "hyperparameters documented",
+                ],
             )
             logger.info("LLM disabled, using default protocol")
             return fallback
@@ -106,7 +109,6 @@ class EvaluationProtocolDesigner:
 
     def _parse_protocol(self, content: str) -> EvaluationProtocol:
         lines = content.split("\n")
-        current_section = None
         protocol: dict = {
             "metrics": [],
             "baselines": [],
@@ -121,15 +123,23 @@ class EvaluationProtocolDesigner:
                 continue
             low = line.lower()
             if low.startswith("metrics:"):
-                protocol["metrics"] = [m.strip() for m in line.split(":", 1)[1].split(",") if m.strip()]
+                protocol["metrics"] = [
+                    m.strip() for m in line.split(":", 1)[1].split(",") if m.strip()
+                ]
             elif low.startswith("baselines:"):
-                protocol["baselines"] = [b.strip() for b in line.split(":", 1)[1].split(",") if b.strip()]
+                protocol["baselines"] = [
+                    b.strip() for b in line.split(":", 1)[1].split(",") if b.strip()
+                ]
             elif low.startswith("comparison methods:"):
-                protocol["comparison_methods"] = [c.strip() for c in line.split(":", 1)[1].split(",") if c.strip()]
+                protocol["comparison_methods"] = [
+                    c.strip() for c in line.split(":", 1)[1].split(",") if c.strip()
+                ]
             elif low.startswith("validation strategy:"):
                 protocol["validation_strategy"] = line.split(":", 1)[1].strip()
             elif low.startswith("reproducibility steps:"):
-                steps = [s.strip() for s in line.split(":", 1)[1].split(",") if s.strip()]
+                steps = [
+                    s.strip() for s in line.split(":", 1)[1].split(",") if s.strip()
+                ]
                 protocol["reproducibility_steps"] = steps
 
         return EvaluationProtocol(

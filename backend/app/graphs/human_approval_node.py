@@ -26,7 +26,9 @@ async def human_approval_node(state: ResearchState) -> dict[str, Any]:
 
     execution_id = state.get("execution_id", state.get("project_id", ""))
     gaps = state.get("research_gaps", [])
-    critical_gaps = [g for g in gaps if isinstance(g, dict) and g.get("severity") == "critical"]
+    critical_gaps = [
+        g for g in gaps if isinstance(g, dict) and g.get("severity") == "critical"
+    ]
 
     logger.info(
         "human approval checkpoint",
@@ -47,7 +49,9 @@ async def human_approval_node(state: ResearchState) -> dict[str, Any]:
     try:
         from sqlalchemy import select as _select
 
-        exec_uuid = uuid.UUID(execution_id) if isinstance(execution_id, str) else execution_id
+        exec_uuid = (
+            uuid.UUID(execution_id) if isinstance(execution_id, str) else execution_id
+        )
 
         async with async_session_factory() as db_session:
             result = await db_session.execute(
@@ -64,7 +68,10 @@ async def human_approval_node(state: ResearchState) -> dict[str, Any]:
                 )
                 db_session.add(approval)
                 await db_session.flush()
-                logger.info("human approval record created", extra={"execution_id": execution_id})
+                logger.info(
+                    "human approval record created",
+                    extra={"execution_id": execution_id},
+                )
     except Exception as exc:
         logger.error("failed to persist human approval", extra={"error": str(exc)})
 
@@ -73,11 +80,23 @@ async def human_approval_node(state: ResearchState) -> dict[str, Any]:
         "gaps_summary": {
             "total": len(gaps),
             "critical": len(critical_gaps),
-            "high": len([g for g in gaps if isinstance(g, dict) and g.get("severity") == "high"]),
-            "medium": len([g for g in gaps if isinstance(g, dict) and g.get("severity") == "medium"]),
-            "low": len([g for g in gaps if isinstance(g, dict) and g.get("severity") == "low"]),
+            "high": len(
+                [g for g in gaps if isinstance(g, dict) and g.get("severity") == "high"]
+            ),
+            "medium": len(
+                [
+                    g
+                    for g in gaps
+                    if isinstance(g, dict) and g.get("severity") == "medium"
+                ]
+            ),
+            "low": len(
+                [g for g in gaps if isinstance(g, dict) and g.get("severity") == "low"]
+            ),
         },
     }
 
-    logger.info("workflow awaiting human approval", extra={"execution_id": execution_id})
+    logger.info(
+        "workflow awaiting human approval", extra={"execution_id": execution_id}
+    )
     return state

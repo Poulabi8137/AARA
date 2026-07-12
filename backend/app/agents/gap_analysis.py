@@ -66,16 +66,20 @@ def _detect_missing_subtopics(
 
     for sub in missing:
         sev = compute_severity(GapType.MISSING_SUBTOPIC, planner)
-        gaps.append(ResearchGap(
-            gap_id=f"missing_subtopic_{sub[:20].replace(' ', '_').lower()}",
-            gap_type=GapType.MISSING_SUBTOPIC,
-            description=f"Subtopics planned but not covered in any summary: '{sub}'",
-            severity=sev,
-            affected_subtopics=[sub],
-            supporting_evidence=f"Planner included '{sub}' but no summary addresses it",
-            remediation=generate_remediation(GapType.MISSING_SUBTOPIC, planner, summaries, bundles),
-            confidence=85.0,
-        ))
+        gaps.append(
+            ResearchGap(
+                gap_id=f"missing_subtopic_{sub[:20].replace(' ', '_').lower()}",
+                gap_type=GapType.MISSING_SUBTOPIC,
+                description=f"Subtopics planned but not covered in any summary: '{sub}'",
+                severity=sev,
+                affected_subtopics=[sub],
+                supporting_evidence=f"Planner included '{sub}' but no summary addresses it",
+                remediation=generate_remediation(
+                    GapType.MISSING_SUBTOPIC, planner, summaries, bundles
+                ),
+                confidence=85.0,
+            )
+        )
     return gaps
 
 
@@ -91,16 +95,20 @@ def _detect_low_evidence(
         conf = s.get("confidence_score", 50)
         if cites < 2 and conf < 50:
             sev = compute_severity(GapType.LOW_EVIDENCE, planner, s)
-            gaps.append(ResearchGap(
-                gap_id=f"low_evidence_{sub[:20].replace(' ', '_').lower()}",
-                gap_type=GapType.LOW_EVIDENCE,
-                description=f"Insufficient evidence for '{sub}': only {cites} citation(s) with confidence {conf}",
-                severity=sev,
-                affected_subtopics=[sub],
-                supporting_evidence=f"Citation count={cites}, confidence={conf}",
-                remediation=generate_remediation(GapType.LOW_EVIDENCE, planner, summaries, bundles),
-                confidence=70.0,
-            ))
+            gaps.append(
+                ResearchGap(
+                    gap_id=f"low_evidence_{sub[:20].replace(' ', '_').lower()}",
+                    gap_type=GapType.LOW_EVIDENCE,
+                    description=f"Insufficient evidence for '{sub}': only {cites} citation(s) with confidence {conf}",
+                    severity=sev,
+                    affected_subtopics=[sub],
+                    supporting_evidence=f"Citation count={cites}, confidence={conf}",
+                    remediation=generate_remediation(
+                        GapType.LOW_EVIDENCE, planner, summaries, bundles
+                    ),
+                    confidence=70.0,
+                )
+            )
     return gaps
 
 
@@ -116,16 +124,20 @@ def _detect_low_citation_coverage(
         srcs = s.get("source_count", 0)
         if cites == 0 and srcs == 0:
             sev = compute_severity(GapType.LOW_CITATION_COVERAGE, planner, s)
-            gaps.append(ResearchGap(
-                gap_id=f"low_citation_{sub[:20].replace(' ', '_').lower()}",
-                gap_type=GapType.LOW_CITATION_COVERAGE,
-                description=f"No citations for '{sub}': all claims are unsupported",
-                severity=sev,
-                affected_subtopics=[sub],
-                supporting_evidence=f"citation_count={cites}, source_count={srcs}",
-                remediation=generate_remediation(GapType.LOW_CITATION_COVERAGE, planner, summaries, bundles),
-                confidence=80.0,
-            ))
+            gaps.append(
+                ResearchGap(
+                    gap_id=f"low_citation_{sub[:20].replace(' ', '_').lower()}",
+                    gap_type=GapType.LOW_CITATION_COVERAGE,
+                    description=f"No citations for '{sub}': all claims are unsupported",
+                    severity=sev,
+                    affected_subtopics=[sub],
+                    supporting_evidence=f"citation_count={cites}, source_count={srcs}",
+                    remediation=generate_remediation(
+                        GapType.LOW_CITATION_COVERAGE, planner, summaries, bundles
+                    ),
+                    confidence=80.0,
+                )
+            )
     return gaps
 
 
@@ -146,16 +158,24 @@ def _detect_contradictions(
                 topic = c.get("topic", f"contradiction_{i}")
                 statements = c.get("statements", [])
                 sev = compute_severity(GapType.CONTRADICTION, planner, s)
-                gaps.append(ResearchGap(
-                    gap_id=f"contradiction_{sub[:15]}_{i}".replace(" ", "_").lower(),
-                    gap_type=GapType.CONTRADICTION,
-                    description=f"Unresolved contradiction in '{sub}': {topic}",
-                    severity=sev,
-                    affected_subtopics=[sub],
-                    supporting_evidence="; ".join(statements[:3]) if statements else "Contradictory statements detected",
-                    remediation=generate_remediation(GapType.CONTRADICTION, planner, summaries, bundles),
-                    confidence=75.0,
-                ))
+                gaps.append(
+                    ResearchGap(
+                        gap_id=f"contradiction_{sub[:15]}_{i}".replace(
+                            " ", "_"
+                        ).lower(),
+                        gap_type=GapType.CONTRADICTION,
+                        description=f"Unresolved contradiction in '{sub}': {topic}",
+                        severity=sev,
+                        affected_subtopics=[sub],
+                        supporting_evidence="; ".join(statements[:3])
+                        if statements
+                        else "Contradictory statements detected",
+                        remediation=generate_remediation(
+                            GapType.CONTRADICTION, planner, summaries, bundles
+                        ),
+                        confidence=75.0,
+                    )
+                )
     if not gaps:
         # Still flag if no contradictions were found in any summary (may indicate shallow analysis)
         pass
@@ -177,16 +197,20 @@ def _detect_outdated_information(
             sub = s.get("subtopic", "unknown")
             old_years = sorted(years_found, reverse=True)[:3]
             sev = compute_severity(GapType.OUTDATED_INFORMATION, planner, s)
-            gaps.append(ResearchGap(
-                gap_id=f"outdated_{sub[:20].replace(' ', '_').lower()}",
-                gap_type=GapType.OUTDATED_INFORMATION,
-                description=f"No recent sources in '{sub}': latest reference is from {old_years[0] if old_years else 'unknown'}",
-                severity=sev,
-                affected_subtopics=[sub],
-                supporting_evidence=f"Years referenced: {', '.join(old_years)}",
-                remediation=generate_remediation(GapType.OUTDATED_INFORMATION, planner, summaries, bundles),
-                confidence=65.0,
-            ))
+            gaps.append(
+                ResearchGap(
+                    gap_id=f"outdated_{sub[:20].replace(' ', '_').lower()}",
+                    gap_type=GapType.OUTDATED_INFORMATION,
+                    description=f"No recent sources in '{sub}': latest reference is from {old_years[0] if old_years else 'unknown'}",
+                    severity=sev,
+                    affected_subtopics=[sub],
+                    supporting_evidence=f"Years referenced: {', '.join(old_years)}",
+                    remediation=generate_remediation(
+                        GapType.OUTDATED_INFORMATION, planner, summaries, bundles
+                    ),
+                    confidence=65.0,
+                )
+            )
     return gaps
 
 
@@ -203,16 +227,20 @@ def _detect_missing_risk_analysis(
     for risk in risks:
         if risk.lower() not in covered:
             sev = compute_severity(GapType.MISSING_RISK_ANALYSIS, planner)
-            gaps.append(ResearchGap(
-                gap_id=f"missing_risk_{risk[:20].replace(' ', '_').lower()}",
-                gap_type=GapType.MISSING_RISK_ANALYSIS,
-                description=f"Risk area identified by planner but not analysed: '{risk}'",
-                severity=sev,
-                affected_subtopics=[risk],
-                supporting_evidence=f"Planner flagged '{risk}' as a risk area but no summary discusses it",
-                remediation=generate_remediation(GapType.MISSING_RISK_ANALYSIS, planner, summaries, bundles),
-                confidence=85.0,
-            ))
+            gaps.append(
+                ResearchGap(
+                    gap_id=f"missing_risk_{risk[:20].replace(' ', '_').lower()}",
+                    gap_type=GapType.MISSING_RISK_ANALYSIS,
+                    description=f"Risk area identified by planner but not analysed: '{risk}'",
+                    severity=sev,
+                    affected_subtopics=[risk],
+                    supporting_evidence=f"Planner flagged '{risk}' as a risk area but no summary discusses it",
+                    remediation=generate_remediation(
+                        GapType.MISSING_RISK_ANALYSIS, planner, summaries, bundles
+                    ),
+                    confidence=85.0,
+                )
+            )
     return gaps
 
 
@@ -229,16 +257,20 @@ def _detect_missing_priority_area(
     for p in priorities:
         if p.lower() not in covered:
             sev = compute_severity(GapType.MISSING_PRIORITY_AREA, planner)
-            gaps.append(ResearchGap(
-                gap_id=f"missing_priority_{p[:20].replace(' ', '_').lower()}",
-                gap_type=GapType.MISSING_PRIORITY_AREA,
-                description=f"Priority area identified by planner but not covered: '{p}'",
-                severity=sev,
-                affected_subtopics=[p],
-                supporting_evidence=f"Planner prioritised '{p}' but no summary addresses it",
-                remediation=generate_remediation(GapType.MISSING_PRIORITY_AREA, planner, summaries, bundles),
-                confidence=85.0,
-            ))
+            gaps.append(
+                ResearchGap(
+                    gap_id=f"missing_priority_{p[:20].replace(' ', '_').lower()}",
+                    gap_type=GapType.MISSING_PRIORITY_AREA,
+                    description=f"Priority area identified by planner but not covered: '{p}'",
+                    severity=sev,
+                    affected_subtopics=[p],
+                    supporting_evidence=f"Planner prioritised '{p}' but no summary addresses it",
+                    remediation=generate_remediation(
+                        GapType.MISSING_PRIORITY_AREA, planner, summaries, bundles
+                    ),
+                    confidence=85.0,
+                )
+            )
     return gaps
 
 
@@ -252,20 +284,25 @@ def _detect_missing_research_question(
     if not questions:
         return gaps
     from app.agents.gap_coverage import build_question_mapping
+
     mapping = build_question_mapping(questions, summaries)
     for q, status in mapping.items():
         if status == "uncovered":
             sev = compute_severity(GapType.MISSING_RESEARCH_QUESTION, planner)
-            gaps.append(ResearchGap(
-                gap_id=f"unanswered_q_{hash(q) % 10000:04d}",
-                gap_type=GapType.MISSING_RESEARCH_QUESTION,
-                description=f"Research question not answered by any summary: '{q[:120]}'",
-                severity=sev,
-                affected_subtopics=[],
-                supporting_evidence=f"Question: {q}",
-                remediation=generate_remediation(GapType.MISSING_RESEARCH_QUESTION, planner, summaries, bundles),
-                confidence=80.0,
-            ))
+            gaps.append(
+                ResearchGap(
+                    gap_id=f"unanswered_q_{hash(q) % 10000:04d}",
+                    gap_type=GapType.MISSING_RESEARCH_QUESTION,
+                    description=f"Research question not answered by any summary: '{q[:120]}'",
+                    severity=sev,
+                    affected_subtopics=[],
+                    supporting_evidence=f"Question: {q}",
+                    remediation=generate_remediation(
+                        GapType.MISSING_RESEARCH_QUESTION, planner, summaries, bundles
+                    ),
+                    confidence=80.0,
+                )
+            )
     return gaps
 
 
@@ -287,16 +324,20 @@ def _detect_insufficient_source_diversity(
     if len(all_sources) <= 1 and len(summaries) > 1:
         dominant = list(all_sources)[0] if all_sources else "unknown"
         sev = compute_severity(GapType.INSUFFICIENT_SOURCE_DIVERSITY, planner)
-        gaps.append(ResearchGap(
-            gap_id="low_source_diversity",
-            gap_type=GapType.INSUFFICIENT_SOURCE_DIVERSITY,
-            description=f"Single-source dominance: '{dominant}' is the only source type across all summaries",
-            severity=sev,
-            affected_subtopics=[s.get("subtopic", "") for s in summaries],
-            supporting_evidence=f"Unique sources: {len(all_sources)} across {len(summaries)} summaries",
-            remediation=generate_remediation(GapType.INSUFFICIENT_SOURCE_DIVERSITY, planner, summaries, bundles),
-            confidence=70.0,
-        ))
+        gaps.append(
+            ResearchGap(
+                gap_id="low_source_diversity",
+                gap_type=GapType.INSUFFICIENT_SOURCE_DIVERSITY,
+                description=f"Single-source dominance: '{dominant}' is the only source type across all summaries",
+                severity=sev,
+                affected_subtopics=[s.get("subtopic", "") for s in summaries],
+                supporting_evidence=f"Unique sources: {len(all_sources)} across {len(summaries)} summaries",
+                remediation=generate_remediation(
+                    GapType.INSUFFICIENT_SOURCE_DIVERSITY, planner, summaries, bundles
+                ),
+                confidence=70.0,
+            )
+        )
     return gaps
 
 
@@ -311,16 +352,20 @@ def _detect_low_confidence_summary(
         sub = s.get("subtopic", "unknown")
         if conf < 30:
             sev = compute_severity(GapType.LOW_CONFIDENCE_SUMMARY, planner, s)
-            gaps.append(ResearchGap(
-                gap_id=f"low_confidence_{sub[:20].replace(' ', '_').lower()}",
-                gap_type=GapType.LOW_CONFIDENCE_SUMMARY,
-                description=f"Summary for '{sub}' has low confidence: score={conf}",
-                severity=sev,
-                affected_subtopics=[sub],
-                supporting_evidence=f"confidence_score={conf}, citation_count={s.get('citation_count', 0)}",
-                remediation=generate_remediation(GapType.LOW_CONFIDENCE_SUMMARY, planner, summaries, bundles),
-                confidence=conf,
-            ))
+            gaps.append(
+                ResearchGap(
+                    gap_id=f"low_confidence_{sub[:20].replace(' ', '_').lower()}",
+                    gap_type=GapType.LOW_CONFIDENCE_SUMMARY,
+                    description=f"Summary for '{sub}' has low confidence: score={conf}",
+                    severity=sev,
+                    affected_subtopics=[sub],
+                    supporting_evidence=f"confidence_score={conf}, citation_count={s.get('citation_count', 0)}",
+                    remediation=generate_remediation(
+                        GapType.LOW_CONFIDENCE_SUMMARY, planner, summaries, bundles
+                    ),
+                    confidence=conf,
+                )
+            )
     return gaps
 
 
@@ -349,18 +394,24 @@ def _risk_covered_set(risks: list[str], summaries: list[dict[str, Any]]) -> set[
         text = _summary_text_flat(s).lower()
         for r in risks:
             tokens = set(re.findall(r"\b[a-zA-Z]{4,}\b", r.lower()))
-            if tokens and sum(1 for t in tokens if t in text) >= max(1, len(tokens) // 3):
+            if tokens and sum(1 for t in tokens if t in text) >= max(
+                1, len(tokens) // 3
+            ):
                 covered.add(r.lower())
     return covered
 
 
-def _priority_covered_set(priorities: list[str], summaries: list[dict[str, Any]]) -> set[str]:
+def _priority_covered_set(
+    priorities: list[str], summaries: list[dict[str, Any]]
+) -> set[str]:
     covered: set[str] = set()
     for s in summaries:
         text = _summary_text_flat(s).lower()
         for p in priorities:
             tokens = set(re.findall(r"\b[a-zA-Z]{4,}\b", p.lower()))
-            if tokens and sum(1 for t in tokens if t in text) >= max(1, len(tokens) // 3):
+            if tokens and sum(1 for t in tokens if t in text) >= max(
+                1, len(tokens) // 3
+            ):
                 covered.add(p.lower())
     return covered
 

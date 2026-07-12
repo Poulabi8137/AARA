@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-import uuid
 from typing import Any
 
 from app.analysis.models import AnalysisResult
@@ -57,7 +56,9 @@ class KnowledgeGraphEngine:
         self._relationship_builder = relationship_builder or RelationshipBuilder()
         self._graph_builder = graph_builder or GraphBuilder()
         self._query_engine = query_engine
-        self._relationship_discovery = relationship_discovery or RelationshipDiscovery(llm)
+        self._relationship_discovery = relationship_discovery or RelationshipDiscovery(
+            llm
+        )
         self._confidence = confidence_propagator or ConfidencePropagator()
         self._provenance = provenance_tracker or ProvenanceTracker()
         self._validator = validator or GraphValidator()
@@ -86,7 +87,6 @@ class KnowledgeGraphEngine:
         self._graph = graph
 
         all_nodes: list[GraphNode] = []
-        all_edges: list[GraphEdge] = []
 
         if memories:
             memory_nodes = self._node_builder.build_memory_nodes(memories)
@@ -131,78 +131,161 @@ class KnowledgeGraphEngine:
         if summary:
             summary_nodes_list = self._node_builder.build_summary_nodes(summary)
             summary_node = summary_nodes_list[0] if summary_nodes_list else None
-            finding_nodes = [n for n in summary_nodes_list if n.node_type == NodeType.FINDING]
+            finding_nodes = [
+                n for n in summary_nodes_list if n.node_type == NodeType.FINDING
+            ]
             gap_nodes = [n for n in summary_nodes_list if n.node_type == NodeType.GAP]
             evidence_nodes_list = graph.get_nodes_by_type(NodeType.EVIDENCE)
             if summary_node:
-                edges.extend(self._relationship_builder.build_summary_relationships(
-                    summary_node, finding_nodes, gap_nodes, evidence_nodes_list,
-                ))
+                edges.extend(
+                    self._relationship_builder.build_summary_relationships(
+                        summary_node,
+                        finding_nodes,
+                        gap_nodes,
+                        evidence_nodes_list,
+                    )
+                )
 
         if analysis:
             analysis_nodes_list = self._node_builder.build_analysis_nodes(analysis)
             analysis_node = analysis_nodes_list[0] if analysis_nodes_list else None
-            consensus_nodes = [n for n in analysis_nodes_list if n.node_type == NodeType.CONSENSUS]
-            contra_nodes = [n for n in analysis_nodes_list if n.node_type == NodeType.CONTRADICTION]
-            trend_nodes = [n for n in analysis_nodes_list if n.node_type == NodeType.TREND]
-            limitation_nodes = [n for n in analysis_nodes_list if n.node_type == NodeType.LIMITATION]
-            recommendation_nodes = [n for n in analysis_nodes_list if n.node_type == NodeType.RECOMMENDATION]
+            consensus_nodes = [
+                n for n in analysis_nodes_list if n.node_type == NodeType.CONSENSUS
+            ]
+            contra_nodes = [
+                n for n in analysis_nodes_list if n.node_type == NodeType.CONTRADICTION
+            ]
+            trend_nodes = [
+                n for n in analysis_nodes_list if n.node_type == NodeType.TREND
+            ]
+            limitation_nodes = [
+                n for n in analysis_nodes_list if n.node_type == NodeType.LIMITATION
+            ]
+            recommendation_nodes = [
+                n for n in analysis_nodes_list if n.node_type == NodeType.RECOMMENDATION
+            ]
             all_finding_nodes = graph.get_nodes_by_type(NodeType.FINDING)
             if analysis_node:
-                edges.extend(self._relationship_builder.build_analysis_relationships(
-                    analysis_node, consensus_nodes, contra_nodes,
-                    trend_nodes, limitation_nodes, recommendation_nodes,
-                    all_finding_nodes,
-                ))
+                edges.extend(
+                    self._relationship_builder.build_analysis_relationships(
+                        analysis_node,
+                        consensus_nodes,
+                        contra_nodes,
+                        trend_nodes,
+                        limitation_nodes,
+                        recommendation_nodes,
+                        all_finding_nodes,
+                    )
+                )
 
         if methodology:
-            methodology_nodes_list = self._node_builder.build_methodology_nodes(methodology)
-            methodology_node = methodology_nodes_list[0] if methodology_nodes_list else None
-            method_nodes = [n for n in methodology_nodes_list if n.node_type == NodeType.METHOD]
-            dataset_nodes = [n for n in methodology_nodes_list if n.node_type == NodeType.DATASET]
-            benchmark_nodes = [n for n in methodology_nodes_list if n.node_type == NodeType.BENCHMARK]
-            risk_nodes = [n for n in methodology_nodes_list if n.node_type == NodeType.RISK]
-            practice_nodes = [n for n in methodology_nodes_list if n.node_type == NodeType.BEST_PRACTICE]
+            methodology_nodes_list = self._node_builder.build_methodology_nodes(
+                methodology
+            )
+            methodology_node = (
+                methodology_nodes_list[0] if methodology_nodes_list else None
+            )
+            method_nodes = [
+                n for n in methodology_nodes_list if n.node_type == NodeType.METHOD
+            ]
+            dataset_nodes = [
+                n for n in methodology_nodes_list if n.node_type == NodeType.DATASET
+            ]
+            benchmark_nodes = [
+                n for n in methodology_nodes_list if n.node_type == NodeType.BENCHMARK
+            ]
+            risk_nodes = [
+                n for n in methodology_nodes_list if n.node_type == NodeType.RISK
+            ]
+            practice_nodes = [
+                n
+                for n in methodology_nodes_list
+                if n.node_type == NodeType.BEST_PRACTICE
+            ]
             if methodology_node:
-                edges.extend(self._relationship_builder.build_methodology_relationships(
-                    methodology_node, method_nodes, dataset_nodes,
-                    benchmark_nodes, risk_nodes, practice_nodes,
-                ))
+                edges.extend(
+                    self._relationship_builder.build_methodology_relationships(
+                        methodology_node,
+                        method_nodes,
+                        dataset_nodes,
+                        benchmark_nodes,
+                        risk_nodes,
+                        practice_nodes,
+                    )
+                )
 
         if experiment:
-            experiment_nodes_list = self._node_builder.build_experiment_nodes(experiment)
-            experiment_node = experiment_nodes_list[0] if experiment_nodes_list else None
-            hypothesis_nodes = [n for n in experiment_nodes_list if n.node_type == NodeType.HYPOTHESIS]
-            variable_nodes = [n for n in experiment_nodes_list if n.node_type == NodeType.VARIABLE]
-            baseline_nodes = [n for n in experiment_nodes_list if n.node_type == NodeType.BASELINE]
-            risk_nodes_e = [n for n in experiment_nodes_list if n.node_type == NodeType.RISK]
-            phase_nodes = [n for n in experiment_nodes_list if n.node_type == NodeType.PHASE]
-            step_nodes = [n for n in experiment_nodes_list if n.node_type == NodeType.STEP]
-            objective_nodes = [n for n in experiment_nodes_list if n.node_type == NodeType.OBJECTIVE]
-            outcome_nodes = [n for n in experiment_nodes_list if n.node_type == NodeType.OUTCOME]
+            experiment_nodes_list = self._node_builder.build_experiment_nodes(
+                experiment
+            )
+            experiment_node = (
+                experiment_nodes_list[0] if experiment_nodes_list else None
+            )
+            hypothesis_nodes = [
+                n for n in experiment_nodes_list if n.node_type == NodeType.HYPOTHESIS
+            ]
+            variable_nodes = [
+                n for n in experiment_nodes_list if n.node_type == NodeType.VARIABLE
+            ]
+            baseline_nodes = [
+                n for n in experiment_nodes_list if n.node_type == NodeType.BASELINE
+            ]
+            risk_nodes_e = [
+                n for n in experiment_nodes_list if n.node_type == NodeType.RISK
+            ]
+            phase_nodes = [
+                n for n in experiment_nodes_list if n.node_type == NodeType.PHASE
+            ]
+            step_nodes = [
+                n for n in experiment_nodes_list if n.node_type == NodeType.STEP
+            ]
+            objective_nodes = [
+                n for n in experiment_nodes_list if n.node_type == NodeType.OBJECTIVE
+            ]
+            outcome_nodes = [
+                n for n in experiment_nodes_list if n.node_type == NodeType.OUTCOME
+            ]
             all_method_nodes = graph.get_nodes_by_type(NodeType.METHOD)
             all_dataset_nodes = graph.get_nodes_by_type(NodeType.DATASET)
             if experiment_node:
-                edges.extend(self._relationship_builder.build_experiment_relationships(
-                    experiment_node, hypothesis_nodes, variable_nodes,
-                    baseline_nodes, risk_nodes_e, phase_nodes, step_nodes,
-                    objective_nodes, outcome_nodes, all_method_nodes, all_dataset_nodes,
-                ))
+                edges.extend(
+                    self._relationship_builder.build_experiment_relationships(
+                        experiment_node,
+                        hypothesis_nodes,
+                        variable_nodes,
+                        baseline_nodes,
+                        risk_nodes_e,
+                        phase_nodes,
+                        step_nodes,
+                        objective_nodes,
+                        outcome_nodes,
+                        all_method_nodes,
+                        all_dataset_nodes,
+                    )
+                )
 
         if domain and graph.get_nodes_by_type(NodeType.DATASET):
             domain_nodes = graph.get_nodes_by_type(NodeType.DOMAIN)
             dataset_nodes_all = graph.get_nodes_by_type(NodeType.DATASET)
             method_nodes_all = graph.get_nodes_by_type(NodeType.METHOD)
             if domain_nodes:
-                edges.extend(self._relationship_builder.build_domain_relationships(
-                    domain_nodes[0], dataset_nodes_all, method_nodes_all, [],
-                ))
+                edges.extend(
+                    self._relationship_builder.build_domain_relationships(
+                        domain_nodes[0],
+                        dataset_nodes_all,
+                        method_nodes_all,
+                        [],
+                    )
+                )
 
         self._graph_builder.add_edges_batch(graph, edges, merge=True)
 
         if settings.graph_enable_inference:
             discovered = await self._relationship_discovery.discover(
-                graph, analysis, methodology, experiment,
+                graph,
+                analysis,
+                methodology,
+                experiment,
             )
             self._graph_builder.add_edges_batch(graph, discovered, merge=True)
 
@@ -317,7 +400,9 @@ class KnowledgeGraphEngine:
         if not self._graph:
             return Subgraph()
         engine = self._get_query_engine()
-        return engine.extract_subgraph(root_id, max_depth, settings.graph_max_subgraph_size)
+        return engine.extract_subgraph(
+            root_id, max_depth, settings.graph_max_subgraph_size
+        )
 
     def traverse(
         self,

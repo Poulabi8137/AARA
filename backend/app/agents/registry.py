@@ -24,7 +24,9 @@ class AgentRegistry:
         if not name:
             raise ValueError(f"agent_name not set on {agent_cls.__name__}")
         cls._agents[name] = agent_cls
-        logger.info("agent registered", extra={"agent_name": name, "class": agent_cls.__name__})
+        logger.info(
+            "agent registered", extra={"agent_name": name, "class": agent_cls.__name__}
+        )
         return agent_cls
 
     @classmethod
@@ -37,7 +39,9 @@ class AgentRegistry:
             {
                 "name": name,
                 "description": getattr(agent_cls, "description", ""),
-                "requires_human_approval": getattr(agent_cls, "requires_human_approval", False),
+                "requires_human_approval": getattr(
+                    agent_cls, "requires_human_approval", False
+                ),
             }
             for name, agent_cls in cls._agents.items()
         ]
@@ -65,4 +69,6 @@ class AgentRegistry:
             try:
                 __import__(mod)
             except ImportError:
-                logger.warning("agent module not found, skipping", extra={"agent_module": mod})
+                logger.warning(
+                    "agent module not found, skipping", extra={"agent_module": mod}
+                )

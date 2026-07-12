@@ -92,6 +92,7 @@ def require_role(*roles: UserRole):
                 detail="Insufficient permissions",
             )
         return current_user
+
     return role_checker
 
 
@@ -111,12 +112,16 @@ class AuthService:
                 detail=f"Password must not exceed {settings.password_max_length} characters",
             )
 
-    async def register(self, name: str, email: str, password: str) -> tuple[User, str, str]:
+    async def register(
+        self, name: str, email: str, password: str
+    ) -> tuple[User, str, str]:
         self._validate_password_complexity(password)
 
         result = await self.db.execute(select(User).where(User.email == email))
         if result.scalar_one_or_none():
-            logger.warning("registration attempt with existing email", extra={"email": email})
+            logger.warning(
+                "registration attempt with existing email", extra={"email": email}
+            )
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="A user with this email already exists",
@@ -177,7 +182,9 @@ class AuthService:
             )
 
         user_id = payload.get("sub")
-        result = await self.db.execute(select(User).where(User.id == uuid.UUID(user_id)))
+        result = await self.db.execute(
+            select(User).where(User.id == uuid.UUID(user_id))
+        )
         user = result.scalar_one_or_none()
         if user is None:
             raise HTTPException(
@@ -193,7 +200,9 @@ class AuthService:
         result = await self.db.execute(select(User).where(User.email == email))
         user = result.scalar_one_or_none()
         if user is None:
-            logger.info("password reset requested for unknown email", extra={"email": email})
+            logger.info(
+                "password reset requested for unknown email", extra={"email": email}
+            )
             return ""
         token = create_password_reset_token(str(user.id))
         logger.info("password reset token generated", extra={"user_id": str(user.id)})
@@ -214,7 +223,9 @@ class AuthService:
                 detail="Invalid password reset token",
             )
 
-        result = await self.db.execute(select(User).where(User.id == uuid.UUID(user_id)))
+        result = await self.db.execute(
+            select(User).where(User.id == uuid.UUID(user_id))
+        )
         user = result.scalar_one_or_none()
         if user is None:
             raise HTTPException(

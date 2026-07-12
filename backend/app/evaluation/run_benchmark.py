@@ -12,16 +12,13 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
-import sys
 import time
 from datetime import datetime, timezone
 from typing import Any
 
 from app.core.logging import get_logger
 from app.evaluation.benchmark_scenarios import evaluate_report
-from app.evaluation.metrics import METRIC_REGISTRY, METRIC_WEIGHTS
 from app.evaluation.scorecard import generate_scorecard
-from app.evaluation.report import build_evaluation_report
 
 try:
     from app.evaluation.benchmark_20_questions import (
@@ -30,8 +27,10 @@ try:
     )
 except ImportError:
     BENCHMARK_20_QUESTIONS = []
+
     def get_questions_by_category():
         return {}
+
 
 logger = get_logger("evaluation.run_benchmark")
 
@@ -41,26 +40,30 @@ def _collect_state_from_report(report: dict[str, Any], query: str) -> dict[str, 
     sections = report.get("sections", [])
     summaries = []
     for sec in sections:
-        summaries.append({
-            "subtopic": sec.get("title", "General"),
-            "executive_summary": sec.get("summary", ""),
-            "key_findings": sec.get("key_findings", []),
-            "citations": sec.get("citations", []),
-            "sources": [c.get("source", "") for c in sec.get("citations", [])],
-            "supporting_evidence": sec.get("evidence_highlights", []),
-            "coverage_score": 50.0,
-            "citation_strength": 50.0,
-            "consistency_score": 50.0,
-            "summary_score": 50.0,
-            "evidence_density": 50.0,
-        })
+        summaries.append(
+            {
+                "subtopic": sec.get("title", "General"),
+                "executive_summary": sec.get("summary", ""),
+                "key_findings": sec.get("key_findings", []),
+                "citations": sec.get("citations", []),
+                "sources": [c.get("source", "") for c in sec.get("citations", [])],
+                "supporting_evidence": sec.get("evidence_highlights", []),
+                "coverage_score": 50.0,
+                "citation_strength": 50.0,
+                "consistency_score": 50.0,
+                "summary_score": 50.0,
+                "evidence_density": 50.0,
+            }
+        )
     return {
         "query": query,
-        "planner_output": json.dumps({
-            "research_questions": [f"Research question about {query}"],
-            "subtopics": [s.get("title", "") for s in sections],
-            "methodology": "literature review",
-        }),
+        "planner_output": json.dumps(
+            {
+                "research_questions": [f"Research question about {query}"],
+                "subtopics": [s.get("title", "") for s in sections],
+                "methodology": "literature review",
+            }
+        ),
         "summaries": summaries,
         "research_gaps": report.get("research_gaps", []),
         "generated_report": report,
@@ -175,24 +178,28 @@ def build_benchmark_report(
     lines.append(f"| **Average Score** | {avg:.1f}/100 ({grade} — {label}) |")
     lines.append(f"| **Questions Passed** | {passed}/{len(all_scores)} |")
     lines.append(f"| **Questions Failed** | {failed} |")
-    lines.append(f"| **Pass Rate** | {(passed/max(len(all_scores), 1))*100:.0f}% |")
+    lines.append(f"| **Pass Rate** | {(passed / max(len(all_scores), 1)) * 100:.0f}% |")
     lines.append("")
 
     for cat_name, cat_results in sorted(category_results.items()):
         cat_scores = [score_single_question(r) for r in cat_results]
         cat_avg = round(sum(cat_scores) / max(len(cat_scores), 1), 1)
         cat_grade, cat_label = grade_score(cat_avg)
-        lines.append(f"| **{cat_name}** | {cat_avg:.1f}/100 ({cat_grade} — {cat_label}) |")
+        lines.append(
+            f"| **{cat_name}** | {cat_avg:.1f}/100 ({cat_grade} — {cat_label}) |"
+        )
     lines.append("")
 
-    lines.extend([
-        "---",
-        "",
-        "## Per-Question Results",
-        "",
-        "| ID | Category | Difficulty | Score | Grade | Errors | Warnings |",
-        "|---|---|---|---|---|---|---|",
-    ])
+    lines.extend(
+        [
+            "---",
+            "",
+            "## Per-Question Results",
+            "",
+            "| ID | Category | Difficulty | Score | Grade | Errors | Warnings |",
+            "|---|---|---|---|---|---|---|",
+        ]
+    )
 
     for i, r in enumerate(results):
         qid = r["question_id"]
@@ -203,29 +210,41 @@ def build_benchmark_report(
         se = r["scenario_evaluation"]
         n_err = len(se.get("errors", []))
         n_warn = len(se.get("warnings", []))
-        lines.append(f"| {qid} | {cat} | {diff} | {score:.1f} | {grade} | {n_err} | {n_warn} |")
+        lines.append(
+            f"| {qid} | {cat} | {diff} | {score:.1f} | {grade} | {n_err} | {n_warn} |"
+        )
 
     lines.append("")
 
     for i, r in enumerate(results):
-        lines.extend([
-            "---",
-            "",
-            f"## {r['question_id']}: {r['query']}",
-            "",
-            f"**Category:** {r['category']} | **Difficulty:** {r['difficulty']}",
-            "",
-            f"**Objective:** {r['objective']}",
-            "",
-            f"**Score:** {all_scores[i]:.1f}/100 ({grade_score(all_scores[i])[0]} — {grade_score(all_scores[i])[1]})",
-            "",
-            "### Scenario Evaluation",
-            "",
-        ])
+        lines.extend(
+            [
+                "---",
+                "",
+                f"## {r['question_id']}: {r['query']}",
+                "",
+                f"**Category:** {r['category']} | **Difficulty:** {r['difficulty']}",
+                "",
+                f"**Objective:** {r['objective']}",
+                "",
+                f"**Score:** {all_scores[i]:.1f}/100 ({grade_score(all_scores[i])[0]} — {grade_score(all_scores[i])[1]})",
+                "",
+                "### Scenario Evaluation",
+                "",
+            ]
+        )
         se = r["scenario_evaluation"]
-        for key in ["completeness_score", "confidence", "section_count",
-                     "reference_count", "citation_count", "has_introduction",
-                     "has_conclusion", "has_executive_summary", "has_methodology"]:
+        for key in [
+            "completeness_score",
+            "confidence",
+            "section_count",
+            "reference_count",
+            "citation_count",
+            "has_introduction",
+            "has_conclusion",
+            "has_executive_summary",
+            "has_methodology",
+        ]:
             val = se.get(key)
             if isinstance(val, bool):
                 val = "✓" if val else "✗"
@@ -243,7 +262,9 @@ def build_benchmark_report(
                     continue
                 bar_len = int(score_val / 5)
                 bar = "█" * bar_len + "░" * (20 - bar_len)
-                lines.append(f"- **{name.replace('_', ' ').title()}:** {score_val:.1f}/100 {bar}")
+                lines.append(
+                    f"- **{name.replace('_', ' ').title()}:** {score_val:.1f}/100 {bar}"
+                )
 
         lines.append("")
 
@@ -282,12 +303,16 @@ async def run_benchmark_suite(
         return []
 
     if category_filter:
-        questions = [q for q in questions if q.category.lower() == category_filter.lower()]
+        questions = [
+            q for q in questions if q.category.lower() == category_filter.lower()
+        ]
     if question_filter:
         questions = [q for q in questions if q.id.upper() == question_filter.upper()]
 
     if not questions:
-        logger.error(f"No questions match filter: category={category_filter}, question={question_filter}")
+        logger.error(
+            f"No questions match filter: category={category_filter}, question={question_filter}"
+        )
         return []
 
     logger.info(f"Running benchmark suite: {len(questions)} questions")
@@ -301,28 +326,34 @@ async def run_benchmark_suite(
             results.append(result)
         except Exception as e:
             logger.error(f"  [{q.id}] Failed: {e}")
-            results.append({
-                "question_id": q.id,
-                "category": q.category,
-                "difficulty": q.difficulty,
-                "query": q.query,
-                "objective": q.objective,
-                "scenario_evaluation": {
-                    "completeness_score": 0.0,
-                    "confidence": 0.0,
-                    "section_count": 0,
-                    "reference_count": 0,
-                    "citation_count": 0,
-                    "has_introduction": False,
-                    "has_conclusion": False,
-                    "has_executive_summary": False,
-                    "has_methodology": False,
-                    "errors": [str(e)],
-                    "warnings": [],
-                },
-                "scorecard": {"scores": {}, "composite": 0, "summary": {"tier": "error", "passed": False}},
-                "evaluation_latency": 0.0,
-            })
+            results.append(
+                {
+                    "question_id": q.id,
+                    "category": q.category,
+                    "difficulty": q.difficulty,
+                    "query": q.query,
+                    "objective": q.objective,
+                    "scenario_evaluation": {
+                        "completeness_score": 0.0,
+                        "confidence": 0.0,
+                        "section_count": 0,
+                        "reference_count": 0,
+                        "citation_count": 0,
+                        "has_introduction": False,
+                        "has_conclusion": False,
+                        "has_executive_summary": False,
+                        "has_methodology": False,
+                        "errors": [str(e)],
+                        "warnings": [],
+                    },
+                    "scorecard": {
+                        "scores": {},
+                        "composite": 0,
+                        "summary": {"tier": "error", "passed": False},
+                    },
+                    "evaluation_latency": 0.0,
+                }
+            )
 
     duration = time.monotonic() - start
 
@@ -350,11 +381,13 @@ def main():
     parser.add_argument("--json", action="store_true", help="Output raw JSON results")
     args = parser.parse_args()
 
-    results = asyncio.run(run_benchmark_suite(
-        category_filter=args.category,
-        question_filter=args.question,
-        output_file=args.output if not args.json else None,
-    ))
+    results = asyncio.run(
+        run_benchmark_suite(
+            category_filter=args.category,
+            question_filter=args.question,
+            output_file=args.output if not args.json else None,
+        )
+    )
 
     if args.json:
         print(json.dumps(results, indent=2, default=str))

@@ -31,8 +31,8 @@ export default function SignupPage() {
     try {
       await signup(formData.email, formData.password, formData.name)
       router.push('/dashboard')
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Signup failed')
+    } catch (err: unknown) {
+      setError((err as { response?: { data?: { detail?: string } } })?.response?.data?.detail || (err instanceof Error ? err.message : 'Signup failed'))
     } finally {
       setIsLoading(false)
     }

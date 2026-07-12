@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import time
 import uuid
-from datetime import datetime, timezone
 from typing import Any
 
 from app.core.logging import get_logger
@@ -16,7 +15,6 @@ from app.planner.models import (
     PlanningContext,
     PlanningMetadata,
     PlanningResult,
-    ResearchGoal,
     ResearchStrategyType,
     ResearchTask,
     TaskDependency,
@@ -25,7 +23,6 @@ from app.planner.retrieval_planner import RetrievalPlanner
 from app.planner.strategies import StrategySelector
 from app.planner.task_decomposer import TaskDecomposer
 from app.planner.validator import PlanValidator
-from app.rag.models import SearchIntent
 from app.rag.query_processor import QueryProcessor
 from app.services.research_memory.manager import ResearchMemoryManager
 

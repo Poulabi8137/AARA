@@ -27,12 +27,14 @@ _PLATFORM_COLLECTION_MAP: dict[SourceType, CollectionName] = {
     SourceType.CHROMA_KNOWLEDGE: CollectionName.KNOWLEDGE_BASE,
 }
 
-_MEMORY_SOURCE_TYPES = frozenset({
-    SourceType.MEMORY_SESSION,
-    SourceType.MEMORY_LONG_TERM,
-    SourceType.MEMORY_PAPER,
-    SourceType.MEMORY_PROJECT,
-})
+_MEMORY_SOURCE_TYPES = frozenset(
+    {
+        SourceType.MEMORY_SESSION,
+        SourceType.MEMORY_LONG_TERM,
+        SourceType.MEMORY_PAPER,
+        SourceType.MEMORY_PROJECT,
+    }
+)
 
 
 class RetrievalEngine:
@@ -194,7 +196,9 @@ class RetrievalEngine:
                     RetrievedEvidence(
                         content=doc.page_content,
                         source_type=src_type,
-                        source_id=doc.metadata.get("id", "") or doc.id or str(hash(doc.page_content[:100])),
+                        source_id=doc.metadata.get("id", "")
+                        or doc.id
+                        or str(hash(doc.page_content[:100])),
                         score=score,
                         metadata=doc.metadata,
                         provenance=f"chroma:{coll_name.value}",
@@ -231,7 +235,9 @@ class RetrievalEngine:
 
         if route_collections:
             memory_types = [c for c in route_collections if c in _MEMORY_SOURCE_TYPES]
-            platform_types = [c for c in route_collections if c not in _MEMORY_SOURCE_TYPES]
+            platform_types = [
+                c for c in route_collections if c not in _MEMORY_SOURCE_TYPES
+            ]
         else:
             memory_types = list(_MEMORY_SOURCE_TYPES)
             platform_types = list(_PLATFORM_COLLECTION_MAP.keys())
@@ -247,7 +253,9 @@ class RetrievalEngine:
                         all_evidence.extend(await self.retrieve_keyword(query))
 
         if platform_types:
-            platform_hits, platform_analytics = await self.retrieve_platform(query, platform_types)
+            platform_hits, platform_analytics = await self.retrieve_platform(
+                query, platform_types
+            )
             all_evidence.extend(platform_hits)
             all_analytics.extend(platform_analytics)
 

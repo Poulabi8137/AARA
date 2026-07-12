@@ -78,7 +78,7 @@ class BenchmarkRecommender:
 
         for section in ar.sections:
             matches = re.findall(
-                r'\b([A-Z][A-Za-z0-9-]+(?:Bench|Benchmark|Score|Eval))\b',
+                r"\b([A-Z][A-Za-z0-9-]+(?:Bench|Benchmark|Score|Eval))\b",
                 section.content,
             )
             for name in matches:
@@ -95,7 +95,10 @@ class BenchmarkRecommender:
                     )
 
         for trend in ar.trends:
-            if "benchmark" in trend.trend.lower() or "evaluation" in trend.trend.lower():
+            if (
+                "benchmark" in trend.trend.lower()
+                or "evaluation" in trend.trend.lower()
+            ):
                 benchmarks.append(
                     BenchmarkRecommendation(
                         benchmark_name=trend.trend[:60],
@@ -125,20 +128,24 @@ class BenchmarkRecommender:
             )
             return self._parse_benchmarks(content)
         except Exception as exc:
-            logger.warning("LLM benchmark recommendation failed", extra={"error": str(exc)})
+            logger.warning(
+                "LLM benchmark recommendation failed", extra={"error": str(exc)}
+            )
             return []
 
     def _summarize_analysis(self, ar: AnalysisResult) -> str:
         parts = [
             f"Consensus: {len(ar.consensus)} findings",
             f"Trends: {len(ar.trends)}",
-            f"Confidence: {ar.confidence.overall:.2f}" if hasattr(ar.confidence, "overall") else "",
+            f"Confidence: {ar.confidence.overall:.2f}"
+            if hasattr(ar.confidence, "overall")
+            else "",
         ]
         return "\n".join(p for p in parts if p)
 
     def _parse_benchmarks(self, content: str) -> list[BenchmarkRecommendation]:
         results: list[BenchmarkRecommendation] = []
-        blocks = re.split(r'\n\s*\n', content)
+        blocks = re.split(r"\n\s*\n", content)
         current: dict = {}
         for block in blocks:
             block = block.strip()

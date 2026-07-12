@@ -8,7 +8,8 @@ from pydantic import BaseModel
 
 from app.agents.state import make_initial_state
 from app.agents.retrieval_agent import RetrievalAgent
-from app.llm.mock_provider import MockProvider
+from app.llm.factory import get_llm_provider
+from app.core.config import get_settings
 from app.models.user import User
 from app.core.logging import get_logger
 from app.services.auth_service import require_role
@@ -37,7 +38,7 @@ async def debug_retrieval(
     current_user: User = Depends(require_role(UserRole.ADMIN)),
 ) -> DebugRetrievalResponse:
     """Run the full retrieval pipeline and return debug telemetry."""
-    provider = MockProvider()
+    provider = get_llm_provider(get_settings())
     agent = RetrievalAgent(llm_provider=provider)
 
     query = body.query or "test debug query"

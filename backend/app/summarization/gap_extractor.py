@@ -72,14 +72,18 @@ class GapExtractor:
             header = f"Group {i}: {group.label}"
             texts: list[str] = []
             for j, ev in enumerate(group.evidence):
-                key = group.citation_keys[j] if j < len(group.citation_keys) else f"[{j + 1}]"
+                key = (
+                    group.citation_keys[j]
+                    if j < len(group.citation_keys)
+                    else f"[{j + 1}]"
+                )
                 texts.append(f"{key} {ev.content[:400]}")
             parts.append(f"{header}\n" + "\n".join(texts))
         return "\n\n".join(parts)
 
     def _parse_gaps(self, content: str) -> list[ResearchGap]:
         gaps: list[ResearchGap] = []
-        blocks = re.split(r'\n\s*\n', content)
+        blocks = re.split(r"\n\s*\n", content)
         current: dict = {}
 
         for block in blocks:
@@ -93,7 +97,7 @@ class GapExtractor:
             elif block.lower().startswith("type:"):
                 current["type"] = block.split(":", 1)[1].strip()
             elif block.lower().startswith("evidence:"):
-                current["evidence"] = re.findall(r'\[\d+\]', block)
+                current["evidence"] = re.findall(r"\[\d+\]", block)
 
         if current.get("gap"):
             gaps.append(self._build_gap(current))

@@ -62,7 +62,9 @@ def create_refresh_token(subject: str) -> str:
 def decode_token(token: str) -> dict[str, Any]:
     try:
         payload = jwt.decode(
-            token, settings.secret_key, algorithms=[settings.algorithm],
+            token,
+            settings.secret_key,
+            algorithms=[settings.algorithm],
             options={"verify_exp": True},
         )
         return payload
@@ -86,7 +88,9 @@ def create_password_reset_token(user_id: str) -> str:
 def verify_password_reset_token(token: str) -> str:
     try:
         payload = jwt.decode(
-            token, settings.secret_key, algorithms=[settings.algorithm],
+            token,
+            settings.secret_key,
+            algorithms=[settings.algorithm],
         )
         if payload.get("type") != "password_reset":
             raise TokenInvalidError("Invalid token type")

@@ -20,51 +20,61 @@ from app.llm.mock_provider import MockProvider
 
 # ── Helpers ───────────────────────────────────────────────
 
-_VALID_PLANNER_JSON = json.dumps({
-    "research_goal": "Build a comprehensive security framework for agentic AI systems.",
-    "research_questions": [
-        "What are the unique security vulnerabilities of agentic AI systems?",
-        "What mitigation frameworks exist for autonomous agent threats?",
-        "How do emergent behaviors in multi-agent systems create new attack surfaces?",
-        "What regulatory frameworks apply to agentic AI security?",
-    ],
-    "keywords": ["agentic AI", "AI security", "autonomous agents", "threat modeling"],
-    "search_queries": [
-        "agentic AI security vulnerabilities 2025",
-        "autonomous agent threat modeling framework",
-        "multi-agent system attack surfaces",
-        "AI agent governance and compliance",
-        "emerging threats in agentic systems",
-    ],
-    "subtopics": [
-        "Agent architecture security",
-        "Threat models for autonomous systems",
-        "Governance and compliance frameworks",
-    ],
-    "methodology": "Systematic literature review and threat analysis",
-    "expected_deliverables": [
-        "Security framework document",
-        "Threat taxonomy for agentic AI",
-        "Mitigation strategy recommendations",
-    ],
-    "priority_areas": [
-        "Architecture-level vulnerabilities",
-        "Runtime behavior monitoring",
-        "Cross-agent communication security",
-    ],
-    "risk_areas": [
-        "Rapidly evolving threat landscape",
-        "Limited empirical security data",
-    ],
-    "estimated_steps": 7,
-})
+_VALID_PLANNER_JSON = json.dumps(
+    {
+        "research_goal": "Build a comprehensive security framework for agentic AI systems.",
+        "research_questions": [
+            "What are the unique security vulnerabilities of agentic AI systems?",
+            "What mitigation frameworks exist for autonomous agent threats?",
+            "How do emergent behaviors in multi-agent systems create new attack surfaces?",
+            "What regulatory frameworks apply to agentic AI security?",
+        ],
+        "keywords": [
+            "agentic AI",
+            "AI security",
+            "autonomous agents",
+            "threat modeling",
+        ],
+        "search_queries": [
+            "agentic AI security vulnerabilities 2025",
+            "autonomous agent threat modeling framework",
+            "multi-agent system attack surfaces",
+            "AI agent governance and compliance",
+            "emerging threats in agentic systems",
+        ],
+        "subtopics": [
+            "Agent architecture security",
+            "Threat models for autonomous systems",
+            "Governance and compliance frameworks",
+        ],
+        "methodology": "Systematic literature review and threat analysis",
+        "expected_deliverables": [
+            "Security framework document",
+            "Threat taxonomy for agentic AI",
+            "Mitigation strategy recommendations",
+        ],
+        "priority_areas": [
+            "Architecture-level vulnerabilities",
+            "Runtime behavior monitoring",
+            "Cross-agent communication security",
+        ],
+        "risk_areas": [
+            "Rapidly evolving threat landscape",
+            "Limited empirical security data",
+        ],
+        "estimated_steps": 7,
+    }
+)
 
 
 class JSONReturningMockProvider(MockProvider):
     """Mock provider that returns valid PlannerOutput JSON."""
+
     response_json: str = _VALID_PLANNER_JSON
 
-    async def generate(self, prompt: str, system_prompt: str | None = None) -> LLMResponse:
+    async def generate(
+        self, prompt: str, system_prompt: str | None = None
+    ) -> LLMResponse:
         return LLMResponse(
             content=self.response_json,
             model="mock-json",
@@ -75,7 +85,10 @@ class JSONReturningMockProvider(MockProvider):
 
 class InvalidJSONMockProvider(MockProvider):
     """Mock provider that returns non-JSON garbage."""
-    async def generate(self, prompt: str, system_prompt: str | None = None) -> LLMResponse:
+
+    async def generate(
+        self, prompt: str, system_prompt: str | None = None
+    ) -> LLMResponse:
         return LLMResponse(
             content="This is not valid JSON at all. Sorry!",
             model="mock-bad",
@@ -86,7 +99,10 @@ class InvalidJSONMockProvider(MockProvider):
 
 class PartiallyBrokenJSONProvider(MockProvider):
     """Mock provider that returns JSON with common LLM errors."""
-    async def generate(self, prompt: str, system_prompt: str | None = None) -> LLMResponse:
+
+    async def generate(
+        self, prompt: str, system_prompt: str | None = None
+    ) -> LLMResponse:
         topic = "agentic AI"
         return LLMResponse(
             content=f"""Here is the plan you requested:
@@ -111,6 +127,7 @@ class PartiallyBrokenJSONProvider(MockProvider):
 
 # ── PlannerOutput Schema Tests ───────────────────────────
 
+
 class TestPlannerOutputSchema:
     def test_valid_plan(self) -> None:
         data = json.loads(_VALID_PLANNER_JSON)
@@ -134,7 +151,11 @@ class TestPlannerOutputSchema:
     def test_duplicate_queries_rejected(self) -> None:
         data = json.loads(_VALID_PLANNER_JSON)
         data["search_queries"] = [
-            "same query", "same query", "same query", "same query", "same query"
+            "same query",
+            "same query",
+            "same query",
+            "same query",
+            "same query",
         ]
         with pytest.raises(ValueError, match="unique"):
             PlannerOutput(**data)
@@ -175,6 +196,7 @@ class TestPlannerOutputSchema:
 
 # ── JSON Parse / Repair Tests ────────────────────────────
 
+
 class TestParseLLMResponse:
     def test_direct_json(self) -> None:
         result = parse_llm_response('{"key": "value"}')
@@ -196,12 +218,12 @@ class TestParseLLMResponse:
         assert result["key"] == "value"
 
     def test_json_embedded_in_text(self) -> None:
-        result = parse_llm_response("Here is the plan:\n{\"key\": \"value\"}\nEnd.")
+        result = parse_llm_response('Here is the plan:\n{"key": "value"}\nEnd.')
         assert result is not None
         assert result["key"] == "value"
 
     def test_unquoted_keys(self) -> None:
-        result = parse_llm_response("{key: \"value\"}")
+        result = parse_llm_response('{key: "value"}')
         assert result is not None
         assert result["key"] == "value"
 
@@ -229,6 +251,7 @@ class TestParseLLMResponse:
         """Test that the JSON from PartiallyBrokenJSONProvider gets repaired."""
         provider = PartiallyBrokenJSONProvider()
         import asyncio
+
         response = asyncio.run(provider.generate("test"))
         result = parse_llm_response(response.content)
         assert result is not None
@@ -237,11 +260,13 @@ class TestParseLLMResponse:
 
 # ── Repair Helper Tests ──────────────────────────────────
 
+
 class TestRepairJSON:
     def test_fix_trailing_comma_in_list(self) -> None:
         result = _repair_json('{"a": [1, 2,]}')
         assert result is not None
         import json
+
         parsed = json.loads(result)
         assert parsed["a"] == [1, 2]
 
@@ -249,6 +274,7 @@ class TestRepairJSON:
         result = _repair_json('{"a": 1, "b": 2,}')
         assert result is not None
         import json
+
         parsed = json.loads(result)
         assert parsed["a"] == 1
 
@@ -258,7 +284,7 @@ class TestRepairJSON:
         assert '"key": "value"' in result
 
     def test_fix_single_quotes(self) -> None:
-        result = _repair_json('{"a": \'value\'}')
+        result = _repair_json("{\"a\": 'value'}")
         assert result is not None
         assert '"a": "value"' in result
 
@@ -268,6 +294,7 @@ class TestRepairJSON:
 
 
 # ── Quality Scoring Tests ────────────────────────────────
+
 
 class TestPlanningScore:
     def test_score_calculation(self) -> None:
@@ -303,6 +330,7 @@ class TestPlanningScore:
 
 # ── Validation Warning Tests ─────────────────────────────
 
+
 class TestValidatePlan:
     def test_valid_plan_no_warnings(self) -> None:
         data = json.loads(_VALID_PLANNER_JSON)
@@ -313,7 +341,12 @@ class TestValidatePlan:
     def test_questions_without_question_mark(self) -> None:
         plan = PlannerOutput(
             research_goal="Study agentic AI security comprehensively.",
-            research_questions=["Question one", "Question two.", "Question three?", "Question four?"],
+            research_questions=[
+                "Question one",
+                "Question two.",
+                "Question three?",
+                "Question four?",
+            ],
             keywords=["kw1", "kw2", "kw3"],
             search_queries=["sq1", "sq2", "sq3", "sq4", "sq5"],
             subtopics=["st1", "st2", "st3"],
@@ -344,6 +377,7 @@ class TestValidatePlan:
 
 
 # ── PlannerAgent Tests ───────────────────────────────────
+
 
 class TestPlannerAgent:
     @pytest.mark.asyncio
@@ -459,6 +493,7 @@ class TestPlannerAgent:
 
 # ── Fallback Template Tests ──────────────────────────────
 
+
 class TestFallbackTemplate:
     def test_template_structure(self) -> None:
         assert "research_goal" in PLANNER_FALLBACK_TEMPLATE
@@ -474,31 +509,42 @@ class TestFallbackTemplate:
     def test_template_formatting(self) -> None:
         goal = PLANNER_FALLBACK_TEMPLATE["research_goal"].format(query="AI")
         assert "AI" in goal
-        questions = [q.format(query="AI") for q in PLANNER_FALLBACK_TEMPLATE["research_questions"]]
+        questions = [
+            q.format(query="AI")
+            for q in PLANNER_FALLBACK_TEMPLATE["research_questions"]
+        ]
         assert all("AI" in q for q in questions)
 
     def test_fallback_creates_valid_output(self) -> None:
         query = "quantum machine learning"
         data = dict(PLANNER_FALLBACK_TEMPLATE)
         data["research_goal"] = data["research_goal"].format(query=query)
-        data["research_questions"] = [q.format(query=query) for q in data["research_questions"]]
+        data["research_questions"] = [
+            q.format(query=query) for q in data["research_questions"]
+        ]
         data["keywords"] = [k.format(query=query) for k in data["keywords"]]
-        data["search_queries"] = [sq.format(query=query) for sq in data["search_queries"]]
+        data["search_queries"] = [
+            sq.format(query=query) for sq in data["search_queries"]
+        ]
         data["subtopics"] = [st.format(query=query) for st in data["subtopics"]]
-        data["expected_deliverables"] = [d.format(query=query) for d in data["expected_deliverables"]]
+        data["expected_deliverables"] = [
+            d.format(query=query) for d in data["expected_deliverables"]
+        ]
         data["priority_areas"] = [p.format(query=query) for p in data["priority_areas"]]
         data["risk_areas"] = [r.format(query=query) for r in data["risk_areas"]]
 
         # Pad lists to meet PlannerOutput minimums
         while len(data["keywords"]) < 3:
-            data["keywords"].append(f"keyword_{len(data['keywords'])+1}")
+            data["keywords"].append(f"keyword_{len(data['keywords']) + 1}")
         while len(data["search_queries"]) < 5:
-            data["search_queries"].append(f"additional query {len(data['search_queries'])+1}")
+            data["search_queries"].append(
+                f"additional query {len(data['search_queries']) + 1}"
+            )
         while len(data["subtopics"]) < 3:
-            data["subtopics"].append(f"subtopic_{len(data['subtopics'])+1}")
+            data["subtopics"].append(f"subtopic_{len(data['subtopics']) + 1}")
         rq = [q for q in data["research_questions"] if q.strip().endswith("?")]
         while len(rq) < 3:
-            rq.append(f"What is subtopic {len(rq)+1}?")
+            rq.append(f"What is subtopic {len(rq) + 1}?")
         data["research_questions"] = rq
 
         plan = PlannerOutput(**data)

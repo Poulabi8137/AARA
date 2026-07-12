@@ -81,7 +81,9 @@ class ProcessedQuery:
     intent: SearchIntent = SearchIntent.FACTUAL
     keywords: list[str] = field(default_factory=list)
     metadata_filters: dict[str, Any] = field(default_factory=dict)
-    search_strategies: list[RetrievalStrategy] = field(default_factory=lambda: [RetrievalStrategy.HYBRID])
+    search_strategies: list[RetrievalStrategy] = field(
+        default_factory=lambda: [RetrievalStrategy.HYBRID]
+    )
     user_id: uuid.UUID | None = None
     project_id: uuid.UUID | None = None
     confidence_threshold: float = 0.0
@@ -146,4 +148,6 @@ class RAGResponse:
     query: ProcessedQuery
     retrieval_stats: dict[str, Any] = field(default_factory=dict)
     processing_metadata: dict[str, Any] = field(default_factory=dict)
-    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    timestamp: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )

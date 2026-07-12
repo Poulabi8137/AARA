@@ -51,14 +51,20 @@ class PaperConsolidationStrategy:
         for p in papers:
             if str(p.id) in already_ids:
                 continue
-            key = str(p.project_id) if hasattr(p, "project_id") and p.project_id else "default"
-            grouped.setdefault(key, []).append({
-                "id": p.id,
-                "content": p.content,
-                "title": getattr(p, "title", ""),
-                "user_id": getattr(p, "user_id", user_id),
-                "confidence": p.confidence,
-            })
+            key = (
+                str(p.project_id)
+                if hasattr(p, "project_id") and p.project_id
+                else "default"
+            )
+            grouped.setdefault(key, []).append(
+                {
+                    "id": p.id,
+                    "content": p.content,
+                    "title": getattr(p, "title", ""),
+                    "user_id": getattr(p, "user_id", user_id),
+                    "confidence": p.confidence,
+                }
+            )
 
         if not grouped:
             logger.info("all paper memories already consolidated")
@@ -66,7 +72,15 @@ class PaperConsolidationStrategy:
 
         for project_key, memories in grouped.items():
             try:
-                await self._consolidate_group(manager, uuid.UUID(project_key) if project_key != "default" else config.project_id, memories, config, result)
+                await self._consolidate_group(
+                    manager,
+                    uuid.UUID(project_key)
+                    if project_key != "default"
+                    else config.project_id,
+                    memories,
+                    config,
+                    result,
+                )
             except Exception as exc:
                 result.errors.append(f"paper group {project_key}: {exc}")
 
@@ -97,31 +111,33 @@ class PaperConsolidationStrategy:
         config: ConsolidationConfig,
         result: ConsolidationResult,
     ) -> None:
-        content = "\n\n".join(
-            f"[{m['title']}] {m['content']}" for m in memories
-        )
+        content = "\n\n".join(f"[{m['title']}] {m['content']}" for m in memories)
         source_ids = [str(m["id"]) for m in memories]
         max_conf = max(m["confidence"] for m in memories)
-        effective_user_id = next((m["user_id"] for m in memories if m.get("user_id")), config.user_id)
+        effective_user_id = next(
+            (m["user_id"] for m in memories if m.get("user_id")), config.user_id
+        )
 
         if config.dry_run:
             result.skipped_count += 1
             return
 
-        await manager.store_long_term_memory(LongTermMemoryCreate(
-            user_id=effective_user_id,
-            category=LongTermMemoryCategory.REUSABLE_FINDING,
-            content=content,
-            summary=f"Paper consolidation ({len(memories)} papers from project {project_id})",
-            source_session_ids=source_ids,
-            importance=MemoryImportance.HIGH,
-            confidence=max_conf,
-            memory_metadata={
-                "consolidated_source_ids": source_ids,
-                "project_id": str(project_id),
-                "consolidated_at": datetime.now(timezone.utc).isoformat(),
-                "source_count": len(memories),
-                "strategy": self.name,
-            },
-        ))
+        await manager.store_long_term_memory(
+            LongTermMemoryCreate(
+                user_id=effective_user_id,
+                category=LongTermMemoryCategory.REUSABLE_FINDING,
+                content=content,
+                summary=f"Paper consolidation ({len(memories)} papers from project {project_id})",
+                source_session_ids=source_ids,
+                importance=MemoryImportance.HIGH,
+                confidence=max_conf,
+                memory_metadata={
+                    "consolidated_source_ids": source_ids,
+                    "project_id": str(project_id),
+                    "consolidated_at": datetime.now(timezone.utc).isoformat(),
+                    "source_count": len(memories),
+                    "strategy": self.name,
+                },
+            )
+        )
         result.created_count += 1

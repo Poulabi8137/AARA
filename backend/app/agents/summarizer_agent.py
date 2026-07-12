@@ -64,7 +64,9 @@ class SummarizerAgent(BaseAgent):
                 sources = bundle.get("sources", [])
 
                 if not evidence:
-                    logger.warning("empty evidence bundle", extra={"subtopic": subtopic})
+                    logger.warning(
+                        "empty evidence bundle", extra={"subtopic": subtopic}
+                    )
                     summary = self._fallback_summary(query, subtopic)
                     section_summaries.append(summary)
                     continue
@@ -124,7 +126,10 @@ class SummarizerAgent(BaseAgent):
 
                 # 10. Executive summary (extractive baseline)
                 exec_summary = self._generate_executive_summary(
-                    subtopic, key_findings, consensus, stats,
+                    subtopic,
+                    key_findings,
+                    consensus,
+                    stats,
                 )
 
                 # 11. LLM enhancement: abstractive summarization
@@ -169,21 +174,27 @@ class SummarizerAgent(BaseAgent):
             1 for s in section_summaries if getattr(s, "_llm_enhanced", False)
         )
 
-        compression = compute_compression_ratio(total_original_chars, total_summary_chars)
+        compression = compute_compression_ratio(
+            total_original_chars, total_summary_chars
+        )
         if total_chunks > 0:
             sum(len(s.citations) for s in section_summaries)
             util = compute_evidence_utilization(0, [], total_chunks)
         else:
             util = 0.0
 
-        avg_score = (
-            round(sum(s.summary_score for s in section_summaries) / max(len(section_summaries), 1), 2)
+        avg_score = round(
+            sum(s.summary_score for s in section_summaries)
+            / max(len(section_summaries), 1),
+            2,
         )
 
         metrics.bundles_processed = len(section_summaries)
         metrics.total_evidence_chunks = total_chunks
         metrics.total_citations = sum(s.citation_count for s in section_summaries)
-        metrics.total_contradictions = sum(len(s.contradictions) for s in section_summaries)
+        metrics.total_contradictions = sum(
+            len(s.contradictions) for s in section_summaries
+        )
         metrics.compression_ratio = compression
         metrics.evidence_utilization = util
         metrics.average_summary_score = avg_score
@@ -194,14 +205,17 @@ class SummarizerAgent(BaseAgent):
         state["status"] = "summarizer_complete"
         state["agent_metrics"]["summarizer"] = metrics.model_dump()
 
-        logger.info("summarizer complete", extra={
-            "bundles": len(section_summaries),
-            "citations": metrics.total_citations,
-            "contradictions": metrics.total_contradictions,
-            "avg_score": avg_score,
-            "compression": compression,
-            "latency": metrics.latency_seconds,
-        })
+        logger.info(
+            "summarizer complete",
+            extra={
+                "bundles": len(section_summaries),
+                "citations": metrics.total_citations,
+                "contradictions": metrics.total_contradictions,
+                "avg_score": avg_score,
+                "compression": compression,
+                "latency": metrics.latency_seconds,
+            },
+        )
 
         return state
 
@@ -216,7 +230,9 @@ class SummarizerAgent(BaseAgent):
         return relevant[:3]
 
     def _find_consensus(
-        self, evidence: list[dict[str, Any]], top_phrases: list[str],
+        self,
+        evidence: list[dict[str, Any]],
+        top_phrases: list[str],
     ) -> list[str]:
         """Find themes that appear across multiple evidence chunks."""
         phrase_chunk_count: dict[str, int] = {}
@@ -228,10 +244,14 @@ class SummarizerAgent(BaseAgent):
             if count >= 2:
                 phrase_chunk_count[phrase] = count
         sorted_phrases = sorted(phrase_chunk_count.items(), key=lambda x: -x[1])
-        return [f"Multiple sources confirm the importance of '{p}'" for p, _ in sorted_phrases[:4]]
+        return [
+            f"Multiple sources confirm the importance of '{p}'"
+            for p, _ in sorted_phrases[:4]
+        ]
 
     def _detect_contradictions(
-        self, evidence: list[dict[str, Any]],
+        self,
+        evidence: list[dict[str, Any]],
     ) -> list[Contradiction]:
         """Detect intra-bundle contradictions."""
         contradictions: list[Contradiction] = []
@@ -247,28 +267,39 @@ class SummarizerAgent(BaseAgent):
                     if sig.lower() in e.get("content", "").lower():
                         contra_chunks.append(cid)
                         break
-            contradictions.append(Contradiction(
-                topic="conflicting viewpoints",
-                statements=[f"Language suggesting contradiction detected: '{s}'" for s in signals[:3]],
-                source_chunk_ids=contra_chunks[:5],
-                severity="medium" if len(signals) <= 3 else "high",
-            ))
+            contradictions.append(
+                Contradiction(
+                    topic="conflicting viewpoints",
+                    statements=[
+                        f"Language suggesting contradiction detected: '{s}'"
+                        for s in signals[:3]
+                    ],
+                    source_chunk_ids=contra_chunks[:5],
+                    severity="medium" if len(signals) <= 3 else "high",
+                )
+            )
 
         # Check for numerical contradictions
         numbers_a = set(re.findall(r"\b(\d+)[%]\b", texts[0])) if texts else set()
         if len(texts) > 1:
             numbers_b = set(re.findall(r"\b(\d+)[%]\b", texts[1]))
             if numbers_a and numbers_b and numbers_a != numbers_b:
-                contradictions.append(Contradiction(
-                    topic="conflicting statistics",
-                    statements=[f"Different numerical claims: {numbers_a} vs {numbers_b}"],
-                    severity="medium",
-                ))
+                contradictions.append(
+                    Contradiction(
+                        topic="conflicting statistics",
+                        statements=[
+                            f"Different numerical claims: {numbers_a} vs {numbers_b}"
+                        ],
+                        severity="medium",
+                    )
+                )
 
         return contradictions
 
     def _build_citations(
-        self, findings: list[str], evidence: list[dict[str, Any]],
+        self,
+        findings: list[str],
+        evidence: list[dict[str, Any]],
     ) -> list[CitationRecord]:
         citations: list[CitationRecord] = []
         for finding in findings:
@@ -284,15 +315,21 @@ class SummarizerAgent(BaseAgent):
                     if not source:
                         source = e.get("source", "")
             if chunk_ids:
-                citations.append(CitationRecord(
-                    claim=finding[:120],
-                    supporting_chunk_ids=chunk_ids[:3],
-                    source=source,
-                ))
+                citations.append(
+                    CitationRecord(
+                        claim=finding[:120],
+                        supporting_chunk_ids=chunk_ids[:3],
+                        source=source,
+                    )
+                )
         return citations
 
     def _generate_executive_summary(
-        self, subtopic: str, findings: list[str], consensus: list[str], stats: list[str],
+        self,
+        subtopic: str,
+        findings: list[str],
+        consensus: list[str],
+        stats: list[str],
     ) -> str:
         parts = [f"Analysis of {subtopic} reveals"]
         if findings:
@@ -321,11 +358,18 @@ class SummarizerAgent(BaseAgent):
             return None
 
         combined_evidence = "\n\n".join(
-            f"[{i+1}] {t[:500]}" for i, t in enumerate(evidence_texts[:5])
+            f"[{i + 1}] {t[:500]}" for i, t in enumerate(evidence_texts[:5])
         )
-        contradictions_text = json.dumps(
-            [c.model_dump() if hasattr(c, "model_dump") else c for c in contradictions]
-        ) if contradictions else "None"
+        contradictions_text = (
+            json.dumps(
+                [
+                    c.model_dump() if hasattr(c, "model_dump") else c
+                    for c in contradictions
+                ]
+            )
+            if contradictions
+            else "None"
+        )
 
         prompt = SUMMARIZER_USER_PROMPT_TEMPLATE.format(
             subtopic=subtopic,
@@ -357,7 +401,9 @@ class SummarizerAgent(BaseAgent):
             )
             return None
 
-    def _fallback_summary(self, query: str, subtopic: str = "general") -> SectionSummary:
+    def _fallback_summary(
+        self, query: str, subtopic: str = "general"
+    ) -> SectionSummary:
         return SectionSummary(
             subtopic=subtopic,
             executive_summary=f"Insufficient evidence to generate a detailed summary for {subtopic}.",

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import uuid
-from typing import Any
 
 from app.core.config import get_settings
 from app.core.logging import get_logger
@@ -29,15 +27,23 @@ class RAGLLMProvider:
             original_config = self._provider.config
             override = ProviderConfig(
                 model=original_config.model,
-                temperature=temperature if temperature is not None else original_config.temperature,
-                max_tokens=max_tokens if max_tokens is not None else original_config.max_tokens,
+                temperature=temperature
+                if temperature is not None
+                else original_config.temperature,
+                max_tokens=max_tokens
+                if max_tokens is not None
+                else original_config.max_tokens,
                 top_p=original_config.top_p,
                 timeout_seconds=original_config.timeout_seconds,
             )
             provider_override = self._clone_with_config(override)
-            response = await provider_override.generate(prompt, system_prompt=system_prompt)
+            response = await provider_override.generate(
+                prompt, system_prompt=system_prompt
+            )
         else:
-            response = await self._provider.generate(prompt, system_prompt=system_prompt)
+            response = await self._provider.generate(
+                prompt, system_prompt=system_prompt
+            )
 
         content = response.content.strip()
         logger.info(
@@ -68,9 +74,12 @@ class RAGLLMProvider:
         provider_name = settings.llm_provider
         if provider_name == "openai":
             from app.llm.openai_provider import OpenAIProvider
+
             return OpenAIProvider(config=config)
         if provider_name == "gemini":
             from app.llm.gemini_provider import GeminiProvider
+
             return GeminiProvider(config=config, api_key=settings.gemini_api_key)
         from app.llm.mock_provider import MockProvider
+
         return MockProvider(config=config)

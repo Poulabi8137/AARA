@@ -42,7 +42,8 @@ PLANNER_FALLBACK_TEMPLATE = {
         "What are the key challenges in {query}?",
         "What best practices exist for {query}?",
     ],
-    "keywords": [w.strip() for w in "{query}".split() if len(w.strip()) > 3] or ["research", "analysis", "review"],
+    "keywords": [w.strip() for w in "{query}".split() if len(w.strip()) > 3]
+    or ["research", "analysis", "review"],
     "search_queries": [
         "{query} overview",
         "{query} challenges",

@@ -2,17 +2,14 @@ from __future__ import annotations
 
 import time
 import uuid
-from typing import Any
 
 from app.core.logging import get_logger
 from app.rag.config import get_rag_settings
 from app.rag.context_builder import ContextBuilder
 from app.rag.llm import RAGLLMProvider
 from app.rag.models import (
-    ProcessedQuery,
     RAGContext,
     RAGResponse,
-    RetrievedEvidence,
     SearchIntent,
 )
 from app.rag.prompt_builder import PromptBuilder
@@ -35,7 +32,9 @@ class ResponseGenerator:
         prompt_builder: PromptBuilder | None = None,
     ):
         self._query_processor = query_processor or QueryProcessor()
-        self._retrieval_pipeline = retrieval_pipeline or RetrievalPipeline(retrieval_engine)
+        self._retrieval_pipeline = retrieval_pipeline or RetrievalPipeline(
+            retrieval_engine
+        )
         self._context_builder = context_builder or ContextBuilder()
         self._prompt_builder = prompt_builder or PromptBuilder()
         self._llm = llm_provider or RAGLLMProvider()
@@ -132,5 +131,7 @@ class ResponseGenerator:
         if not retrieval_output.evidence:
             return 0.0
         retrieval_conf = retrieval_output.confidence
-        coverage = min(1.0, len(context.chunks) / max(1, retrieval_output.total_candidates))
+        coverage = min(
+            1.0, len(context.chunks) / max(1, retrieval_output.total_candidates)
+        )
         return round(0.7 * retrieval_conf + 0.3 * coverage, 4)

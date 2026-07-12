@@ -18,7 +18,9 @@ class ConsolidationConfig:
     min_confidence: float = 0.3
     max_memories_per_group: int = 50
     similarity_threshold: float = 0.85
-    target_category: LongTermMemoryCategory = LongTermMemoryCategory.CROSS_SESSION_INSIGHT
+    target_category: LongTermMemoryCategory = (
+        LongTermMemoryCategory.CROSS_SESSION_INSIGHT
+    )
     importance: MemoryImportance = MemoryImportance.MEDIUM
     batch_size: int = 100
     dry_run: bool = False
@@ -55,5 +57,4 @@ class ConsolidationStrategy(Protocol):
         self,
         manager: object,
         config: ConsolidationConfig,
-    ) -> ConsolidationResult:
-        ...
+    ) -> ConsolidationResult: ...

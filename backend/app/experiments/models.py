@@ -177,7 +177,9 @@ class ExperimentValidationReport:
 
 @dataclass
 class ExperimentMetadata:
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     duration_ms: float = 0.0
     model: str = ""
     complexity: str = "moderate"

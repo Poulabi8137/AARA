@@ -108,30 +108,44 @@ class MethodSelector:
         methods: list[ResearchMethod] = []
         ql = query.lower()
 
-        if ar.consensus and any(
-            c.category in ("comparison", "comparative") for c in ar.consensus
-        ) or "compare" in ql or "vs" in ql:
+        if (
+            ar.consensus
+            and any(c.category in ("comparison", "comparative") for c in ar.consensus)
+            or "compare" in ql
+            or "vs" in ql
+        ):
             methods.append(
-                ResearchMethod(method="comparative_study", confidence=0.7,
-                               rationale="Query involves comparison of approaches",
-                               supporting_evidence=[], requirements=["Multiple approaches to compare"],
-                               limitations=["Requires controlled conditions"])
+                ResearchMethod(
+                    method="comparative_study",
+                    confidence=0.7,
+                    rationale="Query involves comparison of approaches",
+                    supporting_evidence=[],
+                    requirements=["Multiple approaches to compare"],
+                    limitations=["Requires controlled conditions"],
+                )
             )
 
         if ar.benchmarks or ar.trends:
             methods.append(
-                ResearchMethod(method="benchmark_evaluation", confidence=0.6,
-                               rationale="Relevant benchmarks or evaluation trends identified",
-                               supporting_evidence=[], requirements=["Standard benchmark datasets"],
-                               limitations=["May not cover all aspects"])
+                ResearchMethod(
+                    method="benchmark_evaluation",
+                    confidence=0.6,
+                    rationale="Relevant benchmarks or evaluation trends identified",
+                    supporting_evidence=[],
+                    requirements=["Standard benchmark datasets"],
+                    limitations=["May not cover all aspects"],
+                )
             )
 
         if not methods:
             methods.append(
-                ResearchMethod(method="literature_review", confidence=0.5,
-                               rationale="General research query suitable for literature review",
-                               requirements=["Access to relevant literature"],
-                               limitations=["May not provide novel empirical insights"])
+                ResearchMethod(
+                    method="literature_review",
+                    confidence=0.5,
+                    rationale="General research query suitable for literature review",
+                    requirements=["Access to relevant literature"],
+                    limitations=["May not provide novel empirical insights"],
+                )
             )
 
         return methods
@@ -168,13 +182,15 @@ class MethodSelector:
             f"Trends: {len(ar.trends)} identified",
             f"Limitations: {len(ar.limitations)} identified",
             f"Recommendations: {len(ar.recommendations)}",
-            f"Confidence: {ar.confidence.overall:.2f}" if hasattr(ar.confidence, "overall") else "",
+            f"Confidence: {ar.confidence.overall:.2f}"
+            if hasattr(ar.confidence, "overall")
+            else "",
         ]
         return "\n".join(p for p in parts if p)
 
     def _parse_methods(self, content: str) -> list[ResearchMethod]:
         results: list[ResearchMethod] = []
-        blocks = re.split(r'\n\s*\n', content)
+        blocks = re.split(r"\n\s*\n", content)
         current: dict = {}
         for block in blocks:
             block = block.strip()
@@ -191,9 +207,13 @@ class MethodSelector:
             elif low.startswith("rationale:"):
                 current["rationale"] = block.split(":", 1)[1].strip()
             elif low.startswith("requirements:"):
-                current["requirements"] = [r.strip() for r in block.split(":", 1)[1].split(",")]
+                current["requirements"] = [
+                    r.strip() for r in block.split(":", 1)[1].split(",")
+                ]
             elif low.startswith("limitations:"):
-                current["limitations"] = [l.strip() for l in block.split(":", 1)[1].split(",")]
+                current["limitations"] = [
+                    x.strip() for x in block.split(":", 1)[1].split(",")
+                ]
         if current.get("method"):
             results.append(self._build_method(current))
         return results

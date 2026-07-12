@@ -92,8 +92,12 @@ class GraphOperation(str, Enum):
 class NodeMetadata:
     source_type: str = ""
     source_id: str = ""
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
-    updated_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
+    updated_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     confidence: float = 1.0
     provenance: list[str] = field(default_factory=list)
     tags: list[str] = field(default_factory=list)
@@ -108,7 +112,9 @@ class NodeMetadata:
 class EdgeMetadata:
     confidence: float = 1.0
     weight: float = 1.0
-    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    timestamp: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     provenance: list[str] = field(default_factory=list)
     source: str = ""
     reason: str = ""
@@ -286,8 +292,12 @@ class GraphValidationReport:
 
 @dataclass
 class GraphMetadata:
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
-    updated_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
+    updated_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     version: str = "1.0"
     node_count: int = 0
     edge_count: int = 0
@@ -338,11 +348,13 @@ class KnowledgeGraph:
         for edge in self.adjacency.get(node_id, []):
             target_node = self.nodes.get(edge.target_id)
             if target_node:
-                results.append(GraphRelationship(
-                    source_node=source_node,
-                    target_node=target_node,
-                    edge=edge,
-                ))
+                results.append(
+                    GraphRelationship(
+                        source_node=source_node,
+                        target_node=target_node,
+                        edge=edge,
+                    )
+                )
         return results
 
     def get_nodes_by_type(self, node_type: NodeType) -> list[GraphNode]:

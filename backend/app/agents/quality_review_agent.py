@@ -40,17 +40,22 @@ class QualityReviewAgent(BaseAgent):
         }
 
         history = state.get("execution_history", [])
-        history.append({
-            "node": "quality_review_agent",
-            "timestamp": state.get("timestamp"),
-            "status": "review_complete",
-            "composite_score": review.get("composite_score", 0),
-        })
+        history.append(
+            {
+                "node": "quality_review_agent",
+                "timestamp": state.get("timestamp"),
+                "status": "review_complete",
+                "composite_score": review.get("composite_score", 0),
+            }
+        )
         state["execution_history"] = history
 
-        logger.info("quality review complete", extra={
-            "composite_score": review.get("composite_score", 0),
-        })
+        logger.info(
+            "quality review complete",
+            extra={
+                "composite_score": review.get("composite_score", 0),
+            },
+        )
         return state
 
     async def _review_paper(self, paper: dict[str, Any]) -> dict[str, Any]:
@@ -60,10 +65,14 @@ class QualityReviewAgent(BaseAgent):
             for s in sections
         )
         refs = paper.get("references", [])
-        refs_text = "\n".join(
-            f"{r.get('citation_key', '')} {r.get('authors', '')} - {r.get('title', '')}"
-            for r in refs
-        ) if refs else "No references."
+        refs_text = (
+            "\n".join(
+                f"{r.get('citation_key', '')} {r.get('authors', '')} - {r.get('title', '')}"
+                for r in refs
+            )
+            if refs
+            else "No references."
+        )
 
         prompt = QUALITY_REVIEW_USER_PROMPT.format(
             title=paper.get("title", ""),
@@ -82,7 +91,9 @@ class QualityReviewAgent(BaseAgent):
                 raw = raw.rsplit("\n```", 1)[0]
             return json.loads(raw)
         except Exception as exc:
-            logger.warning("LLM review failed, using template", extra={"error": str(exc)})
+            logger.warning(
+                "LLM review failed, using template", extra={"error": str(exc)}
+            )
             return self._template_review(paper)
 
     def _template_review(self, paper: dict[str, Any]) -> dict[str, Any]:
@@ -99,7 +110,9 @@ class QualityReviewAgent(BaseAgent):
             "logical_consistency": 60.0,
             "academic_tone": 55.0,
             "section_completeness": completeness,
-            "composite_score": round((50 + 50 + 40 + 55 + writing + 60 + 55 + completeness) / 8, 1),
+            "composite_score": round(
+                (50 + 50 + 40 + 55 + writing + 60 + 55 + completeness) / 8, 1
+            ),
             "suggestions": [
                 "Add more specific technical details to the methodology section",
                 "Include additional references to support claims",

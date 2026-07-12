@@ -32,7 +32,9 @@ from app.services.research_memory.long_term_memory_service import LongTermMemory
 from app.services.research_memory.paper_memory_service import PaperMemoryService
 from app.services.research_memory.project_memory_service import ProjectMemoryService
 from app.services.research_memory.user_profile_service import UserResearchProfileService
-from app.services.research_memory.semantic_index_service import SemanticMemoryIndexService
+from app.services.research_memory.semantic_index_service import (
+    SemanticMemoryIndexService,
+)
 from app.vectorstore.embeddings import EmbeddingProvider
 from app.vectorstore.memory_indexer import MemoryIndexer
 from app.vectorstore.memory_search import MemorySearch, MemorySearchResult
@@ -95,9 +97,7 @@ class ResearchMemoryManager:
     # Session Memory
     # ==================================================================
 
-    async def create_session_memory(
-        self, data: SessionMemoryCreate
-    ) -> SessionMemory:
+    async def create_session_memory(self, data: SessionMemoryCreate) -> SessionMemory:
         return await self._session_service.create_memory(data)
 
     async def get_session_memory(self, memory_id: uuid.UUID) -> SessionMemory:
@@ -192,9 +192,7 @@ class ResearchMemoryManager:
     # Project Memory
     # ==================================================================
 
-    async def create_project_memory(
-        self, data: ProjectMemoryCreate
-    ) -> ProjectMemory:
+    async def create_project_memory(self, data: ProjectMemoryCreate) -> ProjectMemory:
         return await self._project_service.create_memory(data)
 
     async def get_project_memory(self, memory_id: uuid.UUID) -> ProjectMemory:
@@ -333,7 +331,8 @@ class ResearchMemoryManager:
                     stmt = (
                         select(SessionMemory)
                         .where(SessionMemory.content.ilike(pattern))
-                        .offset(skip).limit(limit)
+                        .offset(skip)
+                        .limit(limit)
                     )
                     if user_id:
                         stmt = stmt.where(SessionMemory.user_id == user_id)
@@ -344,7 +343,8 @@ class ResearchMemoryManager:
                     stmt = (
                         select(LongTermMemory)
                         .where(LongTermMemory.content.ilike(pattern))
-                        .offset(skip).limit(limit)
+                        .offset(skip)
+                        .limit(limit)
                     )
                     if user_id:
                         stmt = stmt.where(LongTermMemory.user_id == user_id)
@@ -361,7 +361,8 @@ class ResearchMemoryManager:
                                 PaperMemory.source_paper_title.ilike(pattern),
                             )
                         )
-                        .offset(skip).limit(limit)
+                        .offset(skip)
+                        .limit(limit)
                     )
                     if user_id:
                         stmt = stmt.where(PaperMemory.user_id == user_id)
@@ -377,7 +378,8 @@ class ResearchMemoryManager:
                                 ProjectMemory.summary.ilike(pattern),
                             )
                         )
-                        .offset(skip).limit(limit)
+                        .offset(skip)
+                        .limit(limit)
                     )
                     if user_id:
                         stmt = stmt.where(ProjectMemory.user_id == user_id)
@@ -465,9 +467,7 @@ class ResearchMemoryManager:
                         count += 1
 
                 elif mem_type == "paper_memory":
-                    result = await self._paper_service.db.execute(
-                        select(PaperMemory)
-                    )
+                    result = await self._paper_service.db.execute(select(PaperMemory))
                     for mem in result.scalars().all():
                         await self._indexer.index_paper_memory(mem)
                         count += 1

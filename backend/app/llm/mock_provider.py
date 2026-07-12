@@ -15,15 +15,22 @@ class MockProvider:
     config: ProviderConfig = field(default_factory=lambda: ProviderConfig(model="mock"))
     response_delay_seconds: float = 0.05
 
-    async def generate(self, prompt: str, system_prompt: str | None = None) -> LLMResponse:
+    async def generate(
+        self, prompt: str, system_prompt: str | None = None
+    ) -> LLMResponse:
         if self.response_delay_seconds > 0:
             import asyncio
+
             await asyncio.sleep(self.response_delay_seconds)
 
         return LLMResponse(
             content=f"[mock] Generated response for query (length={len(prompt)})",
             model="mock",
-            usage={"prompt_tokens": len(prompt.split()), "completion_tokens": 50, "total_tokens": len(prompt.split()) + 50},
+            usage={
+                "prompt_tokens": len(prompt.split()),
+                "completion_tokens": 50,
+                "total_tokens": len(prompt.split()) + 50,
+            },
             finish_reason="stop",
         )
 

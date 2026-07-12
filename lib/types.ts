@@ -163,3 +163,83 @@ export interface ResearchState {
   isLoading: boolean;
   error: string | null;
 }
+
+// ── Paper Authoring Types ──────────────────────────────────────────────
+
+export interface Proposal {
+  id: string;
+  project_id: string;
+  gap_id?: string;
+  proposed_title: string;
+  problem_statement: string;
+  motivation: string;
+  research_questions: string[];
+  hypothesis: string;
+  objectives: string[];
+  expected_contributions: string[];
+  proposed_methodology: string;
+  evaluation_strategy: string;
+  future_scope: string;
+  keywords: string[];
+  domain?: string;
+  base_paper_analysis?: any;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PaperSection {
+  id: string;
+  paper_id: string;
+  section_number: number;
+  section_title: string;
+  content: string;
+  word_count: number;
+  status: 'draft' | 'reviewed' | 'approved' | 'needs_revision';
+  evidence_classifications?: any;
+}
+
+export interface PaperCitation {
+  id: string;
+  paper_id: string;
+  citation_key: string;
+  authors?: string;
+  title?: string;
+  year?: number;
+  journal?: string;
+  doi?: string;
+  url?: string;
+  ieee_format?: string;
+  verified: boolean;
+  verification_errors?: string[];
+}
+
+export interface PaperMetrics {
+  id: string;
+  paper_id: string;
+  novelty_score: number;
+  citation_coverage: number;
+  evidence_strength: number;
+  methodology_quality: number;
+  writing_quality: number;
+  logical_consistency: number;
+  academic_tone: number;
+  section_completeness: number;
+  composite_score: number;
+  suggestions?: string[];
+}
+
+export interface AcademicPaper {
+  id: string;
+  project_id: string;
+  proposal_id?: string;
+  title: string;
+  abstract: string;
+  keywords: string[];
+  authors: string;
+  status: 'draft' | 'proposal' | 'generated' | 'editing' | 'reviewing' | 'complete';
+  sections: PaperSection[];
+  citations: PaperCitation[];
+  metrics?: PaperMetrics;
+  created_at: string;
+  updated_at: string;
+}

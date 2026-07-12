@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
 
 from app.core.logging import get_logger
 from app.rag.models import RAGContext, SearchIntent

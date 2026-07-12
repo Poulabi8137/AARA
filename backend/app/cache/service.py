@@ -84,4 +84,5 @@ class CacheService:
     @staticmethod
     def _is_async(fn: Callable) -> bool:
         import asyncio
+
         return asyncio.iscoroutinefunction(fn)

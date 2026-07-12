@@ -20,31 +20,33 @@ from app.schemas.retrieval import RetrievalBundle, RetrievedChunkSchema
 
 # ── Fixtures ──────────────────────────────────────────────
 
-_SAMPLE_PLANNER_OUTPUT = json.dumps({
-    "research_goal": "Study agentic AI security.",
-    "research_questions": [
-        "What are agentic AI vulnerabilities?",
-        "What mitigation frameworks exist?",
-    ],
-    "keywords": ["agentic AI", "security"],
-    "search_queries": [
-        "agentic AI security vulnerabilities 2025",
-        "autonomous agent threat modeling",
-        "multi-agent system attack surfaces",
-        "AI agent governance compliance",
-        "emerging threats agentic systems",
-    ],
-    "subtopics": [
-        "Architecture security",
-        "Threat models",
-        "Governance compliance",
-    ],
-    "methodology": "literature review",
-    "expected_deliverables": ["security report"],
-    "priority_areas": ["architecture", "threats"],
-    "risk_areas": ["limited data"],
-    "estimated_steps": 5,
-})
+_SAMPLE_PLANNER_OUTPUT = json.dumps(
+    {
+        "research_goal": "Study agentic AI security.",
+        "research_questions": [
+            "What are agentic AI vulnerabilities?",
+            "What mitigation frameworks exist?",
+        ],
+        "keywords": ["agentic AI", "security"],
+        "search_queries": [
+            "agentic AI security vulnerabilities 2025",
+            "autonomous agent threat modeling",
+            "multi-agent system attack surfaces",
+            "AI agent governance compliance",
+            "emerging threats agentic systems",
+        ],
+        "subtopics": [
+            "Architecture security",
+            "Threat models",
+            "Governance compliance",
+        ],
+        "methodology": "literature review",
+        "expected_deliverables": ["security report"],
+        "priority_areas": ["architecture", "threats"],
+        "risk_areas": ["limited data"],
+        "estimated_steps": 5,
+    }
+)
 
 
 def _state_with_planner(query: str = "agentic AI security") -> Any:
@@ -55,9 +57,12 @@ def _state_with_planner(query: str = "agentic AI security") -> Any:
 
 # ── Ranking Tests ─────────────────────────────────────────
 
+
 class TestRanking:
     def test_keyword_overlap_full(self) -> None:
-        score = _keyword_overlap("AI security threats in agentic systems", "AI security threats")
+        score = _keyword_overlap(
+            "AI security threats in agentic systems", "AI security threats"
+        )
         assert score > 0.5
 
     def test_keyword_overlap_none(self) -> None:
@@ -69,13 +74,19 @@ class TestRanking:
         assert score == 0.0
 
     def test_relevance_score_range(self) -> None:
-        score = compute_relevance_score("content about AI", "AI query", semantic_score=0.8)
+        score = compute_relevance_score(
+            "content about AI", "AI query", semantic_score=0.8
+        )
         assert 0.0 <= score <= 100.0
         assert score > 20.0
 
     def test_relevance_semantic_boost(self) -> None:
-        low = compute_relevance_score("content", "AI", semantic_score=0.2, source_quality=10.0)
-        high = compute_relevance_score("content", "AI", semantic_score=0.9, source_quality=10.0)
+        low = compute_relevance_score(
+            "content", "AI", semantic_score=0.2, source_quality=10.0
+        )
+        high = compute_relevance_score(
+            "content", "AI", semantic_score=0.9, source_quality=10.0
+        )
         assert high > low
 
     def test_source_quality_basic(self) -> None:
@@ -87,13 +98,15 @@ class TestRanking:
         assert score == 50.0
 
     def test_source_quality_rich_metadata(self) -> None:
-        score = compute_source_quality({
-            "source": "arxiv",
-            "author": "Smith",
-            "page_number": 5,
-            "filename": "paper.pdf",
-            "content": "x" * 600,
-        })
+        score = compute_source_quality(
+            {
+                "source": "arxiv",
+                "author": "Smith",
+                "page_number": 5,
+                "filename": "paper.pdf",
+                "content": "x" * 600,
+            }
+        )
         assert score > 70.0
 
     def test_content_hash_consistency(self) -> None:
@@ -122,28 +135,64 @@ class TestRanking:
 
 # ── Dedup Tests ───────────────────────────────────────────
 
+
 class TestDedup:
     def test_no_duplicates(self) -> None:
         chunks = [
-            {"content": "doc A", "chunk_id": "a", "source": "src1", "relevance_score": 50.0},
-            {"content": "doc B", "chunk_id": "b", "source": "src2", "relevance_score": 40.0},
-            {"content": "doc C", "chunk_id": "c", "source": "src3", "relevance_score": 30.0},
+            {
+                "content": "doc A",
+                "chunk_id": "a",
+                "source": "src1",
+                "relevance_score": 50.0,
+            },
+            {
+                "content": "doc B",
+                "chunk_id": "b",
+                "source": "src2",
+                "relevance_score": 40.0,
+            },
+            {
+                "content": "doc C",
+                "chunk_id": "c",
+                "source": "src3",
+                "relevance_score": 30.0,
+            },
         ]
         result = list(deduplicate_chunks(chunks))
         assert len(result) == 3
 
     def test_identical_chunks_removed(self) -> None:
         chunks = [
-            {"content": "same content", "chunk_id": "a", "source": "src1", "relevance_score": 50.0},
-            {"content": "same content", "chunk_id": "b", "source": "src2", "relevance_score": 40.0},
+            {
+                "content": "same content",
+                "chunk_id": "a",
+                "source": "src1",
+                "relevance_score": 50.0,
+            },
+            {
+                "content": "same content",
+                "chunk_id": "b",
+                "source": "src2",
+                "relevance_score": 40.0,
+            },
         ]
         result = list(deduplicate_chunks(chunks))
         assert len(result) == 1
 
     def test_same_chunk_id_removed(self) -> None:
         chunks = [
-            {"content": "doc A", "chunk_id": "dup", "source": "src1", "relevance_score": 50.0},
-            {"content": "doc B", "chunk_id": "dup", "source": "src2", "relevance_score": 40.0},
+            {
+                "content": "doc A",
+                "chunk_id": "dup",
+                "source": "src1",
+                "relevance_score": 50.0,
+            },
+            {
+                "content": "doc B",
+                "chunk_id": "dup",
+                "source": "src2",
+                "relevance_score": 40.0,
+            },
         ]
         result = list(deduplicate_chunks(chunks))
         assert len(result) == 1
@@ -161,6 +210,7 @@ class TestDedup:
 
 # ── RetrievalBundle Schema Tests ──────────────────────────
 
+
 class TestRetrievalBundle:
     def test_minimal_bundle(self) -> None:
         bundle = RetrievalBundle(subtopic="AI", title="test")
@@ -172,7 +222,13 @@ class TestRetrievalBundle:
 
     def test_bundle_with_evidence(self) -> None:
         evidence = [
-            RetrievedChunkSchema(query="q", source="s", content="c", collection="col", relevance_score=80.0),
+            RetrievedChunkSchema(
+                query="q",
+                source="s",
+                content="c",
+                collection="col",
+                relevance_score=80.0,
+            ),
         ]
         bundle = RetrievalBundle(
             subtopic="security",
@@ -188,6 +244,7 @@ class TestRetrievalBundle:
 
 
 # ── RetrievalAgent Tests ──────────────────────────────────
+
 
 class TestRetrievalAgent:
     @pytest.mark.asyncio
@@ -293,9 +350,13 @@ class TestRetrievalAgent:
 
 # ── Debug Endpoint Schema Test ────────────────────────────
 
+
 class TestDebugEndpoint:
     def test_debug_request_model(self) -> None:
         from app.api.retrieval_debug import DebugRetrievalRequest
-        req = DebugRetrievalRequest(query="AI security", planner_output_json=_SAMPLE_PLANNER_OUTPUT)
+
+        req = DebugRetrievalRequest(
+            query="AI security", planner_output_json=_SAMPLE_PLANNER_OUTPUT
+        )
         assert req.query == "AI security"
         assert req.planner_output_json == _SAMPLE_PLANNER_OUTPUT

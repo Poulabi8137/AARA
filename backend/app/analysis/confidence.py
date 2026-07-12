@@ -100,9 +100,7 @@ class ConfidenceAssessor:
             return 0.0
         return cited / total
 
-    def _score_agreement(
-        self, consensus_count: int, contradiction_count: int
-    ) -> float:
+    def _score_agreement(self, consensus_count: int, contradiction_count: int) -> float:
         total = consensus_count + contradiction_count
         if total == 0:
             return 0.5

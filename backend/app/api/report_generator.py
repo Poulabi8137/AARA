@@ -12,7 +12,11 @@ from app.schemas.report_generator import (
     ReportGenerateRequest,
     ReportExportRequest,
 )
-from app.agents.report_builder import build_report_from_state, build_markdown, build_json
+from app.agents.report_builder import (
+    build_report_from_state,
+    build_markdown,
+    build_json,
+)
 from app.agents.report_validation import validate_report_data, validate_export_request
 from app.core.logging import get_logger
 from app.services.auth_service import get_current_user
@@ -59,7 +63,10 @@ async def generate_report(
     )
 
     if validation.errors:
-        logger.warning("report generated with validation errors", extra={"errors": validation.errors})
+        logger.warning(
+            "report generated with validation errors",
+            extra={"errors": validation.errors},
+        )
 
     return report
 

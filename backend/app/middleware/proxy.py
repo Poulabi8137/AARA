@@ -19,16 +19,19 @@ class ProxyHeadersMiddleware(BaseHTTPMiddleware):
         # Set forwarded host for host validation
         forwarded_host = request.headers.get("X-Forwarded-Host")
         if forwarded_host:
-            request.scope["server"] = (forwarded_host, 443 if forwarded_proto == "https" else 80)
+            request.scope["server"] = (
+                forwarded_host,
+                443 if forwarded_proto == "https" else 80,
+            )
 
         response = await call_next(request)
-        
+
         # Add security headers
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        
+
         return response
 
 
@@ -41,7 +44,7 @@ class TrustedHostMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         host = request.headers.get("host") or request.url.hostname
-        
+
         # In production, validate against trusted hosts
         if host and self.trusted_hosts:
             # Extract hostname without port
@@ -50,28 +53,23 @@ class TrustedHostMiddleware(BaseHTTPMiddleware):
                 return Response(
                     status_code=403,
                     content={"detail": "Invalid host header"},
-                    media_type="application/json"
+                    media_type="application/json",
                 )
-        
+
         return await call_next(request)
 
 
 def setup_proxy_middleware(app):
     """Setup proxy headers and trusted host middleware."""
     settings = get_settings()
-    
+
     # Add proxy headers middleware for reverse proxy support
-    app.add_middleware(
-        ProxyHeadersMiddleware
-    )
-    
+    app.add_middleware(ProxyHeadersMiddleware)
+
     # Add trusted host middleware for HTTPS security
-    trusted_hosts = getattr(settings, 'trusted_hosts', None)
+    trusted_hosts = getattr(settings, "trusted_hosts", None)
     if trusted_hosts:
-        app.add_middleware(
-            TrustedHostMiddleware,
-            trusted_hosts=trusted_hosts
-        )
+        app.add_middleware(TrustedHostMiddleware, trusted_hosts=trusted_hosts)
 
 
 # Legacy proxy middleware for backward compatibility
@@ -79,13 +77,9 @@ class LegacyProxyMiddleware(BaseHTTPMiddleware):
     """Legacy proxy middleware for backward compatibility."""
 
     async def dispatch(self, request: Request, call_next):
-        # Maintain original request for compatibility
         original_scheme = request.scope.get("scheme", "http")
-        original_host = request.scope.get("server", (None, None))[-packcontent ]
 
-        # Process request
         response = await call_next(request)
-        
-        # Restore original scheme in response
+
         response.headers["X-Original-Scheme"] = original_scheme
         return response

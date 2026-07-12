@@ -92,6 +92,7 @@ def invalidate_cache(key_prefix: str = "cache") -> Callable:
         async def update_data(...):
             ...
     """
+
     def decorator(func: Callable) -> Callable:
         is_async = asyncio.iscoroutinefunction(func)
 
@@ -116,7 +117,9 @@ def invalidate_cache(key_prefix: str = "cache") -> Callable:
                 keys = loop.run_until_complete(redis._redis.keys(key_pattern))
                 if keys:
                     loop.run_until_complete(redis._redis.delete(*keys))
-                    logger.debug("Invalidated %d keys matching %s", len(keys), key_pattern)
+                    logger.debug(
+                        "Invalidated %d keys matching %s", len(keys), key_pattern
+                    )
                 return result
             finally:
                 loop.close()

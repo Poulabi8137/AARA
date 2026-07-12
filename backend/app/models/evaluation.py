@@ -3,9 +3,8 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import String, Text, DateTime, ForeignKey, Float, JSON
+from sqlalchemy import String, Text, DateTime, ForeignKey, Float, JSON, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID
 
 from app.db.session import Base
 
@@ -37,7 +36,9 @@ class EvaluationRun(Base):
     )
 
     execution = relationship("AgentExecution", backref="evaluations")
-    metrics = relationship("EvaluationMetric", back_populates="run", cascade="all, delete-orphan")
+    metrics = relationship(
+        "EvaluationMetric", back_populates="run", cascade="all, delete-orphan"
+    )
 
     def __repr__(self) -> str:
         return f"<EvaluationRun id={self.id} query={self.query[:50]}>"

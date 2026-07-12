@@ -64,7 +64,7 @@ export default function NewResearchPage() {
         </div>
       </div>
 
-      <GlassCard depth="medium" className="p-6 space-y-6">
+        <GlassCard depth="raised" className="p-6 space-y-6">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
             <label className="text-sm font-medium">Research Topic</label>

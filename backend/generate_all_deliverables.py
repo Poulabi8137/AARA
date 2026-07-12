@@ -77,9 +77,9 @@ def phase1():
     lines.append("- Quality scores are low due to mock data; real LLM provider will improve significantly.")
     lines.append("")
     path = os.path.join(DOCS_DIR, "benchmark_results.md")
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
-    print(f"  ✓ {path}")
+    print(f"  OK {path}")
 
 # ── Phase 2: showcase_results.md ───────────────────────────────────
 def phase2():
@@ -131,9 +131,9 @@ def phase2():
         "",
     ])
     path = os.path.join(DOCS_DIR, "showcase_results.md")
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
-    print(f"  ✓ {path}")
+    print(f"  OK {path}")
 
 # ── Phase 3: failure_analysis.md ───────────────────────────────────
 def phase3():
@@ -202,9 +202,9 @@ def phase3():
     ])
 
     path = os.path.join(DOCS_DIR, "failure_analysis.md")
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
-    print(f"  ✓ {path}")
+    print(f"  OK {path}")
 
 # ── Phase 4: quality_metrics.md ────────────────────────────────────
 def phase4():
@@ -287,9 +287,9 @@ def phase4():
     lines.append("")
 
     path = os.path.join(DOCS_DIR, "quality_metrics.md")
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
-    print(f"  ✓ {path}")
+    print(f"  OK {path}")
 
 # ── Phase 5: screenshots_verified.md ───────────────────────────────
 def phase5():
@@ -345,9 +345,9 @@ def phase5():
         "",
     ])
     path = os.path.join(DOCS_DIR, "screenshots_verified.md")
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
-    print(f"  ✓ {path}")
+    print(f"  OK {path}")
 
 # ── Phase 6: demo_video_script.md ──────────────────────────────────
 def phase6():
@@ -436,11 +436,11 @@ def phase6():
         "",
         '9:45 — **Resources** "Full documentation at opencode/docs/, architecture diagrams in docs/architecture/, deployment guide in deployment/."',
         "",
-    ])
+    ]
     path = os.path.join(DOCS_DIR, "demo_video_script.md")
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
-    print(f"  ✓ {path}")
+    print(f"  OK {path}")
 
 # ── Phase 7: deployment_verification.md ────────────────────────────
 def phase7():
@@ -531,9 +531,9 @@ def phase7():
         "",
     ]
     path = os.path.join(DOCS_DIR, "deployment_verification.md")
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
-    print(f"  ✓ {path}")
+    print(f"  OK {path}")
 
 # ── Phase 8: resume_evidence.md ────────────────────────────────────
 def phase8():
@@ -608,9 +608,9 @@ def phase8():
         "",
     ]
     path = os.path.join(DOCS_DIR, "resume_evidence.md")
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
-    print(f"  ✓ {path}")
+    print(f"  OK {path}")
 
 # ── Phase 9: recruiter_simulation.md ────────────────────────────────
 def phase9():
@@ -686,9 +686,9 @@ def phase9():
         "",
     ]
     path = os.path.join(DOCS_DIR, "recruiter_simulation.md")
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
-    print(f"  ✓ {path}")
+    print(f"  OK {path}")
 
 # ── Phase 10: release_candidate_report.md ──────────────────────────
 def phase10():
@@ -857,9 +857,9 @@ def phase10():
     lines.append("")
 
     path = os.path.join(DOCS_DIR, "release_candidate_report.md")
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
-    print(f"  ✓ {path}")
+    print(f"  OK {path}")
 
 # ── Run all ────────────────────────────────────────────────────────
 def main():

@@ -16,7 +16,9 @@ class OpenAIProvider:
     Uses the AsyncOpenAI client under the hood.
     """
 
-    config: ProviderConfig = field(default_factory=lambda: ProviderConfig(model="gpt-4o"))
+    config: ProviderConfig = field(
+        default_factory=lambda: ProviderConfig(model="gpt-4o")
+    )
 
     def __post_init__(self) -> None:
         self._client: Any = None
@@ -24,10 +26,13 @@ class OpenAIProvider:
     def _get_client(self):
         if self._client is None:
             from openai import AsyncOpenAI
+
             self._client = AsyncOpenAI()
         return self._client
 
-    async def generate(self, prompt: str, system_prompt: str | None = None) -> LLMResponse:
+    async def generate(
+        self, prompt: str, system_prompt: str | None = None
+    ) -> LLMResponse:
         messages: list[dict[str, str]] = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
@@ -63,10 +68,13 @@ class OpenAIProvider:
                 "total_tokens": response.usage.total_tokens,
             }
 
-        logger.info("openai generation complete", extra={
-            "model": self.config.model,
-            "usage": usage_data,
-        })
+        logger.info(
+            "openai generation complete",
+            extra={
+                "model": self.config.model,
+                "usage": usage_data,
+            },
+        )
 
         return LLMResponse(
             content=choice.message.content or "",
@@ -77,5 +85,6 @@ class OpenAIProvider:
 
     async def count_tokens(self, text: str) -> int:
         import tiktoken
+
         encoding = tiktoken.encoding_for_model(self.config.model)
         return len(encoding.encode(text))

@@ -50,7 +50,8 @@ def _low_evidence_remediation(
             if sub:
                 queries.append(f"additional evidence for {sub}")
     return RemediationSuggestion(
-        recommended_queries=queries[:5] or ["broader search terms for low-evidence topics"],
+        recommended_queries=queries[:5]
+        or ["broader search terms for low-evidence topics"],
         recommended_sources=["google scholar", "semantic scholar", "pubmed"],
         recommended_actions=[
             "Broaden search queries for low-evidence topics",
@@ -88,7 +89,11 @@ def _contradiction_remediation(
     queries = [f"resolve conflicting findings about {t}" for t in topics if t]
     return RemediationSuggestion(
         recommended_queries=queries[:5],
-        recommended_sources=["meta-analyses", "systematic reviews", "expert interviews"],
+        recommended_sources=[
+            "meta-analyses",
+            "systematic reviews",
+            "expert interviews",
+        ],
         recommended_actions=[
             "Consult meta-analyses to resolve contradictions",
             "Flag contradictions for human expert review",
@@ -171,8 +176,11 @@ def _source_diversity_remediation(
     return RemediationSuggestion(
         recommended_queries=["diverse perspectives", "alternative viewpoints"],
         recommended_sources=[
-            "industry reports", "government publications", "conference proceedings",
-            "dissertations", "patent filings",
+            "industry reports",
+            "government publications",
+            "conference proceedings",
+            "dissertations",
+            "patent filings",
         ],
         recommended_actions=[
             "Expand collection strategy to include non-academic sources",
@@ -188,7 +196,10 @@ def _low_confidence_remediation(
     bundles: list[dict[str, Any]],
 ) -> RemediationSuggestion:
     return RemediationSuggestion(
-        recommended_queries=["high-quality authoritative sources", "peer-reviewed surveys"],
+        recommended_queries=[
+            "high-quality authoritative sources",
+            "peer-reviewed surveys",
+        ],
         recommended_sources=["peer-reviewed journals", "authoritative textbooks"],
         recommended_actions=[
             "Prioritize authoritative and peer-reviewed sources",

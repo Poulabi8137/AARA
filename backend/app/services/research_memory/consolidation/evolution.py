@@ -95,8 +95,12 @@ class KnowledgeEvolution:
         await manager.update_long_term_memory(
             memory_id=ltm.id,
             data=LongTermMemoryUpdate(
-                importance=new_importance if new_importance != current_importance else None,
-                confidence=new_confidence if new_confidence != current_confidence else None,
+                importance=new_importance
+                if new_importance != current_importance
+                else None,
+                confidence=new_confidence
+                if new_confidence != current_confidence
+                else None,
                 memory_metadata={
                     **meta,
                     "last_evolved_at": datetime.now(timezone.utc).isoformat(),

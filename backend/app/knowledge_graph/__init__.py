@@ -1,5 +1,8 @@
 from app.knowledge_graph.confidence import ConfidencePropagator
-from app.knowledge_graph.config import KnowledgeGraphSettings, get_knowledge_graph_settings
+from app.knowledge_graph.config import (
+    KnowledgeGraphSettings,
+    get_knowledge_graph_settings,
+)
 from app.knowledge_graph.engine import KnowledgeGraphEngine
 from app.knowledge_graph.graph_builder import GraphBuilder
 from app.knowledge_graph.models import (

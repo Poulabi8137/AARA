@@ -2,14 +2,12 @@ from __future__ import annotations
 
 import re
 import time
-from collections import defaultdict
 
 from app.core.logging import get_logger
 from app.methodology.config import get_methodology_settings
 from app.methodology.models import DatasetRecommendation
 from app.rag.llm import RAGLLMProvider
 from app.analysis.models import AnalysisResult
-from app.summarization.models import EvidenceGroup
 
 logger = get_logger("methodology.dataset_recommender")
 settings = get_methodology_settings()
@@ -87,7 +85,7 @@ class DatasetRecommender:
 
         for section in ar.sections:
             matches = re.findall(
-                r'\b([A-Z][A-Za-z0-9-]+(?:-[A-Za-z0-9]+)?(?:Dataset|Bench|Set|Collection))\b',
+                r"\b([A-Z][A-Za-z0-9-]+(?:-[A-Za-z0-9]+)?(?:Dataset|Bench|Set|Collection))\b",
                 section.content,
             )
             for name in matches:
@@ -134,7 +132,9 @@ class DatasetRecommender:
             )
             return self._parse_datasets(content)
         except Exception as exc:
-            logger.warning("LLM dataset recommendation failed", extra={"error": str(exc)})
+            logger.warning(
+                "LLM dataset recommendation failed", extra={"error": str(exc)}
+            )
             return []
 
     def _summarize_analysis(self, ar: AnalysisResult) -> str:
@@ -143,13 +143,15 @@ class DatasetRecommender:
             f"Contradictions: {len(ar.contradictions)}",
             f"Trends: {len(ar.trends)}",
             f"Limitations: {len(ar.limitations)}",
-            f"Confidence: {ar.confidence.overall:.2f}" if hasattr(ar.confidence, "overall") else "",
+            f"Confidence: {ar.confidence.overall:.2f}"
+            if hasattr(ar.confidence, "overall")
+            else "",
         ]
         return "\n".join(p for p in parts if p)
 
     def _parse_datasets(self, content: str) -> list[DatasetRecommendation]:
         results: list[DatasetRecommendation] = []
-        blocks = re.split(r'\n\s*\n', content)
+        blocks = re.split(r"\n\s*\n", content)
         current: dict = {}
         for block in blocks:
             block = block.strip()

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Play, FileText, AlertTriangle, Lightbulb, BookOpen, Layers, Clock, CheckCircle2, Loader2 } from 'lucide-react'
+import { ArrowLeft, Play, FileText, AlertTriangle, Lightbulb, BookOpen, Layers, Clock, Loader2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { GlassCard } from '@/components/ui/glass-card'
 import { Button } from '@/components/ui/button'
@@ -40,7 +40,8 @@ export default function ResearchProjectPage() {
         const res = await apiClient.getProject(projectId)
         const data = res.data
         setProject({ id: data.id, title: data.title || 'Research Project', description: data.description, status: data.status || 'active' })
-      } catch {
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load project')
         setProject({ id: projectId, title: 'Research Project', status: 'loaded', papers: 45, gaps: 8, directions: 3 })
       } finally {
         setIsLoading(false)
@@ -56,8 +57,8 @@ export default function ResearchProjectPage() {
     try {
       const res = await apiClient.runWorkflow(projectId, project?.title || 'Research workflow')
       router.push(`/research/monitoring?execution=${res.data.execution_id}`)
-    } catch (err: any) {
-      setRunError(err?.response?.data?.detail || 'Failed to start workflow. Backend may be unavailable.')
+    } catch (err: unknown) {
+      setRunError((err as { response?: { data?: { detail?: string } } })?.response?.data?.detail || (err instanceof Error ? err.message : 'Failed to start workflow. Backend may be unavailable.'))
     } finally {
       setIsRunning(false)
     }
@@ -77,7 +78,7 @@ export default function ResearchProjectPage() {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <GlassCard depth="medium" className="p-8 text-center max-w-md space-y-4">
+        <GlassCard depth="raised" className="p-8 text-center max-w-md space-y-4">
           <AlertTriangle className="w-12 h-12 text-red-400 mx-auto" />
           <h2 className="text-lg font-semibold">Error Loading Project</h2>
           <p className="text-sm text-foreground/50">{error}</p>

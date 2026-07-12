@@ -54,8 +54,14 @@ BENCHMARK_SCENARIOS = [
             "healthcare",
         ],
         expected_keywords=[
-            "XAI", "explainable", "transparency", "ethics", "GDPR",
-            "fairness", "accountability", "interpretability",
+            "XAI",
+            "explainable",
+            "transparency",
+            "ethics",
+            "GDPR",
+            "fairness",
+            "accountability",
+            "interpretability",
         ],
         known_contradictions=[
             "Accuracy vs interpretability trade-off",
@@ -80,8 +86,14 @@ BENCHMARK_SCENARIOS = [
             "hardware limitations",
         ],
         expected_keywords=[
-            "quantum", "variational", "VQE", "QAOA", "NISQ",
-            "superposition", "entanglement", "error correction",
+            "quantum",
+            "variational",
+            "VQE",
+            "QAOA",
+            "NISQ",
+            "superposition",
+            "entanglement",
+            "error correction",
         ],
         min_expected_sections=3,
         expected_references=4,
@@ -98,8 +110,13 @@ BENCHMARK_SCENARIOS = [
             "secure aggregation",
         ],
         expected_keywords=[
-            "federated", "privacy", "differential", "secure aggregation",
-            "communication efficiency", "non-iid", "gradient leakage",
+            "federated",
+            "privacy",
+            "differential",
+            "secure aggregation",
+            "communication efficiency",
+            "non-iid",
+            "gradient leakage",
         ],
         known_contradictions=[
             "Privacy guarantees vs model accuracy",
@@ -121,8 +138,13 @@ BENCHMARK_SCENARIOS = [
             "policy frameworks",
         ],
         expected_keywords=[
-            "DAC", "carbon capture", "CO2 removal", "negative emissions",
-            "sorbent", "thermodynamic", "levelized cost",
+            "DAC",
+            "carbon capture",
+            "CO2 removal",
+            "negative emissions",
+            "sorbent",
+            "thermodynamic",
+            "levelized cost",
         ],
         min_expected_sections=3,
         expected_references=4,
@@ -140,9 +162,14 @@ BENCHMARK_SCENARIOS = [
             "evaluation",
         ],
         expected_keywords=[
-            "low-resource", "transfer learning", "cross-lingual",
-            "multilingual BERT", "data augmentation", "zero-shot",
-            "few-shot", "unsupervised",
+            "low-resource",
+            "transfer learning",
+            "cross-lingual",
+            "multilingual BERT",
+            "data augmentation",
+            "zero-shot",
+            "few-shot",
+            "unsupervised",
         ],
         min_expected_sections=4,
         expected_references=5,
@@ -150,7 +177,9 @@ BENCHMARK_SCENARIOS = [
 ]
 
 
-def evaluate_report(scenario: BenchmarkScenario, report: dict[str, Any]) -> EvaluationResult:
+def evaluate_report(
+    scenario: BenchmarkScenario, report: dict[str, Any]
+) -> EvaluationResult:
     """Evaluate a generated report against a benchmark scenario."""
     result = EvaluationResult(
         scenario=scenario.name,
@@ -207,15 +236,19 @@ def evaluate_report(scenario: BenchmarkScenario, report: dict[str, Any]) -> Eval
 
     missing_subtopics = set(scenario.expected_subtopics) - covered
     if missing_subtopics:
-        result.warnings.append(f"Missing subtopics: {', '.join(sorted(missing_subtopics))}")
+        result.warnings.append(
+            f"Missing subtopics: {', '.join(sorted(missing_subtopics))}"
+        )
 
     # Keyword presence
-    all_text = " ".join([
-        report.get("executive_summary", ""),
-        report.get("introduction", ""),
-        report.get("conclusion", ""),
-        " ".join(s.get("summary", "") for s in sections),
-    ]).lower()
+    all_text = " ".join(
+        [
+            report.get("executive_summary", ""),
+            report.get("introduction", ""),
+            report.get("conclusion", ""),
+            " ".join(s.get("summary", "") for s in sections),
+        ]
+    ).lower()
 
     for kw in scenario.expected_keywords:
         if kw.lower() not in all_text:
@@ -230,15 +263,26 @@ def evaluate_report(scenario: BenchmarkScenario, report: dict[str, Any]) -> Eval
 
     # Compute scores
     structural_score = (
-        sum([result.has_introduction, result.has_conclusion,
-             result.has_executive_summary, result.has_methodology]) / 4.0
+        sum(
+            [
+                result.has_introduction,
+                result.has_conclusion,
+                result.has_executive_summary,
+                result.has_methodology,
+            ]
+        )
+        / 4.0
     ) * 40
 
-    content_score = min(30, (result.section_count / max(scenario.min_expected_sections, 1)) * 30)
+    content_score = min(
+        30, (result.section_count / max(scenario.min_expected_sections, 1)) * 30
+    )
     citation_score = min(15, result.citation_count * 3)
     coverage_score = max(0, 15 - len(missing_subtopics) * 3)
 
-    result.completeness_score = round(structural_score + content_score + citation_score + coverage_score, 1)
+    result.completeness_score = round(
+        structural_score + content_score + citation_score + coverage_score, 1
+    )
     result.confidence = round(
         (result.completeness_score / 100.0) * (1.0 - len(result.errors) * 0.1),
         2,

@@ -31,7 +31,15 @@ def build_markdown(report: ResearchReport) -> str:
 
     # Quality badge
     q = report.metrics.research_quality_score
-    badge = "🟢 Excellent" if q >= 80 else "🟡 Good" if q >= 60 else "🟠 Fair" if q >= 40 else "🔴 Needs Improvement"
+    badge = (
+        "🟢 Excellent"
+        if q >= 80
+        else "🟡 Good"
+        if q >= 60
+        else "🟠 Fair"
+        if q >= 40
+        else "🔴 Needs Improvement"
+    )
     lines.append(f"> **Quality Assessment**: {badge} ({q:.1f}/100)")
     lines.append("")
 
@@ -134,15 +142,19 @@ def build_markdown(report: ResearchReport) -> str:
             if ref.claims:
                 claims_text = "; ".join(ref.claims[:2])
                 lines.append(f"    → {claims_text}")
-            lines.append(f"    *Cited in: {', '.join(ref.subtopics)} | Occurrences: {ref.occurrence_count}*")
+            lines.append(
+                f"    *Cited in: {', '.join(ref.subtopics)} | Occurrences: {ref.occurrence_count}*"
+            )
             lines.append("")
 
     # Metrics summary
     lines.append("---")
-    lines.append(f"*Report metrics: {report.metrics.section_count} sections, "
-                 f"{report.metrics.reference_count} references, "
-                 f"{report.metrics.citation_count} citations, "
-                 f"{report.metrics.report_length} characters*")
+    lines.append(
+        f"*Report metrics: {report.metrics.section_count} sections, "
+        f"{report.metrics.reference_count} references, "
+        f"{report.metrics.citation_count} citations, "
+        f"{report.metrics.report_length} characters*"
+    )
 
     return "\n".join(lines)
 
@@ -253,8 +265,10 @@ def _render_section(lines: list[str], sec: ReportSection, index: int) -> None:
     lines.append("")
     conf = sec.confidence_score
     badge = "High" if conf >= 70 else "Medium" if conf >= 40 else "Low"
-    lines.append(f"*Confidence: {badge} ({conf:.1f}/100) | "
-                 f"Citations: {sec.citation_count} | Sources: {sec.source_count}*")
+    lines.append(
+        f"*Confidence: {badge} ({conf:.1f}/100) | "
+        f"Citations: {sec.citation_count} | Sources: {sec.source_count}*"
+    )
     lines.append("")
     lines.append(sec.summary)
     lines.append("")
@@ -340,7 +354,8 @@ def _build_report_sections(summaries: list[dict[str, Any]]) -> list[ReportSectio
                 subtopic=sub,
                 severity=c.get("severity", "medium"),
             )
-            for c in raw_contra if isinstance(c, dict)
+            for c in raw_contra
+            if isinstance(c, dict)
         ]
 
         citations = [
@@ -350,21 +365,25 @@ def _build_report_sections(summaries: list[dict[str, Any]]) -> list[ReportSectio
                 supporting_chunk_ids=c.get("supporting_chunk_ids", []),
                 subtopic=sub,
             )
-            for c in raw_cites if isinstance(c, dict)
+            for c in raw_cites
+            if isinstance(c, dict)
         ]
 
-        sections.append(ReportSection(
-            title=sub,
-            summary=s.get("executive_summary", f"Analysis of {sub}."),
-            key_findings=kf if isinstance(kf, list) else [],
-            evidence_highlights=ev if isinstance(ev, list) else [],
-            statistics=stats if isinstance(stats, list) else [],
-            contradictions=contradictions,
-            citations=citations,
-            confidence_score=s.get("confidence_score", 0) or s.get("summary_score", 0),
-            citation_count=s.get("citation_count", 0),
-            source_count=s.get("source_count", 0),
-        ))
+        sections.append(
+            ReportSection(
+                title=sub,
+                summary=s.get("executive_summary", f"Analysis of {sub}."),
+                key_findings=kf if isinstance(kf, list) else [],
+                evidence_highlights=ev if isinstance(ev, list) else [],
+                statistics=stats if isinstance(stats, list) else [],
+                contradictions=contradictions,
+                citations=citations,
+                confidence_score=s.get("confidence_score", 0)
+                or s.get("summary_score", 0),
+                citation_count=s.get("citation_count", 0),
+                source_count=s.get("source_count", 0),
+            )
+        )
 
     return sections
 
@@ -380,26 +399,36 @@ def _aggregate_key_findings(summaries: list[dict[str, Any]]) -> list[str]:
     return findings
 
 
-def _build_introduction(query: str, research_goal: str, planner: dict[str, Any] | None) -> str:
+def _build_introduction(
+    query: str, research_goal: str, planner: dict[str, Any] | None
+) -> str:
     parts = [f"This report presents a comprehensive investigation into: {query}."]
     if research_goal:
         parts.append(f"\n\nThe primary research goal is: {research_goal}")
     if planner:
         subs = planner.get("subtopics", [])
         if subs:
-            parts.append(f"\n\nThe analysis covers {len(subs)} key subtopics: "
-                         f"{'; '.join(subs[:5])}.")
+            parts.append(
+                f"\n\nThe analysis covers {len(subs)} key subtopics: "
+                f"{'; '.join(subs[:5])}."
+            )
         keywords = planner.get("keywords", [])
         if keywords:
             parts.append(f"\n\nCore research keywords: {', '.join(keywords[:8])}.")
-    parts.append("\n\nThis report synthesises findings from multiple sources, "
-                 "evaluates evidence quality, identifies research gaps, "
-                 "and provides actionable recommendations.")
+    parts.append(
+        "\n\nThis report synthesises findings from multiple sources, "
+        "evaluates evidence quality, identifies research gaps, "
+        "and provides actionable recommendations."
+    )
     return "".join(parts)
 
 
 def _build_methodology(planner: dict[str, Any] | None) -> str:
-    method = planner.get("methodology", "literature review") if planner else "literature review"
+    method = (
+        planner.get("methodology", "literature review")
+        if planner
+        else "literature review"
+    )
     parts = [
         f"This research was conducted using a {method} approach.",
         "\n\nThe methodology consisted of:",
@@ -412,10 +441,14 @@ def _build_methodology(planner: dict[str, Any] | None) -> str:
     if planner:
         queries = planner.get("search_queries", [])
         if queries:
-            parts.append(f"\n\nSearch strategy included {len(queries)} targeted queries "
-                         f"across multiple collections.")
-    parts.append("\n\nConfidence scores reflect the strength of supporting evidence, "
-                 "citation volume, source diversity, and consistency of findings.")
+            parts.append(
+                f"\n\nSearch strategy included {len(queries)} targeted queries "
+                f"across multiple collections."
+            )
+    parts.append(
+        "\n\nConfidence scores reflect the strength of supporting evidence, "
+        "citation volume, source diversity, and consistency of findings."
+    )
     return "".join(parts)
 
 
@@ -432,7 +465,11 @@ def _build_executive_summary(
     if n_findings == 0 and n_sections == 0:
         return f"Insufficient data to generate an executive summary for '{query}'."
 
-    avg_conf = round(sum(s.confidence_score for s in sections) / max(n_sections, 1), 1) if sections else 0
+    avg_conf = (
+        round(sum(s.confidence_score for s in sections) / max(n_sections, 1), 1)
+        if sections
+        else 0
+    )
 
     parts = [
         f"This report investigates '{query}' across {n_sections} subtopics "
@@ -444,49 +481,61 @@ def _build_executive_summary(
 
     if sections:
         highest = max(sections, key=lambda s: s.confidence_score)
-        parts.append(f"\n\nThe strongest evidence is in '{highest.title}' "
-                     f"(confidence: {highest.confidence_score:.1f}/100).")
+        parts.append(
+            f"\n\nThe strongest evidence is in '{highest.title}' "
+            f"(confidence: {highest.confidence_score:.1f}/100)."
+        )
 
     if n_gaps > 0:
         critical = sum(1 for g in gaps if g.get("severity", "") == "critical")
         high = sum(1 for g in gaps if g.get("severity", "") == "high")
         if critical or high:
-            parts.append(f"\n\nThe analysis identified {n_gaps} research gaps "
-                         f"({critical} critical, {high} high severity) "
-                         f"that limit the strength of conclusions.")
+            parts.append(
+                f"\n\nThe analysis identified {n_gaps} research gaps "
+                f"({critical} critical, {high} high severity) "
+                f"that limit the strength of conclusions."
+            )
         else:
             parts.append(f"\n\nThe analysis identified {n_gaps} research gaps.")
 
     return "".join(parts)
 
 
-def _build_conclusion(query: str, sections: list[ReportSection], gaps: list[dict[str, Any]]) -> str:
+def _build_conclusion(
+    query: str, sections: list[ReportSection], gaps: list[dict[str, Any]]
+) -> str:
     n_sections = len(sections)
     n_gaps = len(gaps)
     covered_subs = [s.title for s in sections]
 
-    parts = [
-        f"This research has examined '{query}' through {n_sections} subtopics."
-    ]
+    parts = [f"This research has examined '{query}' through {n_sections} subtopics."]
 
     if covered_subs:
         parts.append(f"\n\nThe analysis covered: {'; '.join(covered_subs[:6])}.")
 
     if n_gaps == 0:
-        parts.append("\n\nNo significant research gaps were identified, "
-                     "indicating good coverage of the topic.")
+        parts.append(
+            "\n\nNo significant research gaps were identified, "
+            "indicating good coverage of the topic."
+        )
     else:
-        parts.append(f"\n\nThe identification of {n_gaps} research gaps suggests "
-                     "that further investigation is warranted in specific areas.")
+        parts.append(
+            f"\n\nThe identification of {n_gaps} research gaps suggests "
+            "that further investigation is warranted in specific areas."
+        )
 
     total_cites = sum(s.citation_count for s in sections)
     if total_cites > 0:
-        parts.append(f"\n\nFindings are supported by {total_cites} citations across "
-                     f"{len(covered_subs)} subtopics.")
+        parts.append(
+            f"\n\nFindings are supported by {total_cites} citations across "
+            f"{len(covered_subs)} subtopics."
+        )
 
-    parts.append("\n\nThe methodology employed provides a structured and reproducible "
-                 "approach to evidence synthesis. Results should be interpreted "
-                 "considering the limitations and gaps documented in this report.")
+    parts.append(
+        "\n\nThe methodology employed provides a structured and reproducible "
+        "approach to evidence synthesis. Results should be interpreted "
+        "considering the limitations and gaps documented in this report."
+    )
 
     return "".join(parts)
 
@@ -517,7 +566,9 @@ def _extract_limitations(gaps: list[dict[str, Any]]) -> list[str]:
             limitations.append(text)
 
     if not limitations:
-        limitations.append("No significant limitations identified beyond those documented in research gaps.")
+        limitations.append(
+            "No significant limitations identified beyond those documented in research gaps."
+        )
 
     return limitations[:8]
 

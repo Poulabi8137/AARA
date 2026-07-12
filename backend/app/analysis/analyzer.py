@@ -19,12 +19,11 @@ from app.analysis.models import (
     AnalysisSection,
     AnalysisSectionType,
     AnalysisStatistics,
-    AnalysisValidationReport,
     ConfidenceAssessment,
 )
 from app.core.logging import get_logger
 from app.rag.llm import RAGLLMProvider
-from app.summarization.models import EvidenceGroup, SummaryResult
+from app.summarization.models import EvidenceGroup
 
 logger = get_logger("analysis.orchestrator")
 settings = get_analysis_settings()
@@ -69,33 +68,55 @@ class Analyzer:
 
         if AnalysisSectionType.CONSENSUS in section_types or not section_types:
             consensus = await self._consensus.detect(request.query, groups)
-            sections.append(self._build_section(
-                AnalysisSectionType.CONSENSUS, "Consensus Analysis", consensus,
-            ))
+            sections.append(
+                self._build_section(
+                    AnalysisSectionType.CONSENSUS,
+                    "Consensus Analysis",
+                    consensus,
+                )
+            )
 
         if AnalysisSectionType.CONTRADICTION in section_types or not section_types:
             contradictions = await self._contradiction.detect(request.query, groups)
-            sections.append(self._build_section(
-                AnalysisSectionType.CONTRADICTION, "Contradiction Analysis", contradictions,
-            ))
+            sections.append(
+                self._build_section(
+                    AnalysisSectionType.CONTRADICTION,
+                    "Contradiction Analysis",
+                    contradictions,
+                )
+            )
 
         if AnalysisSectionType.TRENDS in section_types or not section_types:
             trends = await self._trends.analyze(request.query, groups)
-            sections.append(self._build_section(
-                AnalysisSectionType.TRENDS, "Trend Analysis", trends,
-            ))
+            sections.append(
+                self._build_section(
+                    AnalysisSectionType.TRENDS,
+                    "Trend Analysis",
+                    trends,
+                )
+            )
 
         if AnalysisSectionType.LIMITATIONS in section_types or not section_types:
             limitations = await self._limitations.analyze(request.query, groups)
-            sections.append(self._build_section(
-                AnalysisSectionType.LIMITATIONS, "Limitation Analysis", limitations,
-            ))
+            sections.append(
+                self._build_section(
+                    AnalysisSectionType.LIMITATIONS,
+                    "Limitation Analysis",
+                    limitations,
+                )
+            )
 
         if AnalysisSectionType.RECOMMENDATIONS in section_types or not section_types:
-            recommendations = await self._recommendations.generate(request.query, groups)
-            sections.append(self._build_section(
-                AnalysisSectionType.RECOMMENDATIONS, "Recommendations", recommendations,
-            ))
+            recommendations = await self._recommendations.generate(
+                request.query, groups
+            )
+            sections.append(
+                self._build_section(
+                    AnalysisSectionType.RECOMMENDATIONS,
+                    "Recommendations",
+                    recommendations,
+                )
+            )
 
         confidence = self._confidence.assess(
             groups,
@@ -106,13 +127,22 @@ class Analyzer:
 
         if AnalysisSectionType.RELATIONSHIPS in section_types or not section_types:
             relationships = self._relationships.build(groups)
-            sections.append(self._build_section(
-                AnalysisSectionType.RELATIONSHIPS, "Evidence Relationships", relationships,
-            ))
+            sections.append(
+                self._build_section(
+                    AnalysisSectionType.RELATIONSHIPS,
+                    "Evidence Relationships",
+                    relationships,
+                )
+            )
 
         stats = self._build_statistics(
-            consensus, contradictions, trends, limitations, recommendations,
-            relationships, confidence,
+            consensus,
+            contradictions,
+            trends,
+            limitations,
+            recommendations,
+            relationships,
+            confidence,
         )
 
         result = AnalysisResult(
@@ -163,6 +193,7 @@ class Analyzer:
             return sr.groups
         if hasattr(sr, "evidence") and sr.evidence:
             from app.summarization.evidence_grouping import EvidenceGrouper
+
             grouper = EvidenceGrouper()
             return grouper.group(sr.evidence)
         return []
@@ -185,14 +216,18 @@ class Analyzer:
             elif hasattr(item, "recommendation"):
                 label = item.recommendation
             elif hasattr(item, "source_id") and hasattr(item, "target_id"):
-                label = f"{item.source_id} -> {item.target_id} ({item.relationship_type})"
+                label = (
+                    f"{item.source_id} -> {item.target_id} ({item.relationship_type})"
+                )
             if label:
-                insights.append(AnalysisInsight(
-                    insight=str(label)[:200],
-                    evidence=[],
-                    confidence=getattr(item, "confidence", 0.5),
-                    category=getattr(item, "category", "general"),
-                ))
+                insights.append(
+                    AnalysisInsight(
+                        insight=str(label)[:200],
+                        evidence=[],
+                        confidence=getattr(item, "confidence", 0.5),
+                        category=getattr(item, "category", "general"),
+                    )
+                )
 
         content = "\n".join(i.insight for i in insights)
         return AnalysisSection(

@@ -90,12 +90,18 @@ class MultiDocumentSummarizer:
         start = time.monotonic()
 
         groups_text = self._format_groups(groups)
-        level = request.level.value if isinstance(request.level, SummaryLevel) else request.level
+        level = (
+            request.level.value
+            if isinstance(request.level, SummaryLevel)
+            else request.level
+        )
 
         if request.sections and len(request.sections) > 1:
             sections = await self._build_by_section(request, groups_text, groups)
         else:
-            sections = await self._build_single_summary(request, groups_text, groups, level)
+            sections = await self._build_single_summary(
+                request, groups_text, groups, level
+            )
 
         logger.info(
             "multi-document summarization complete",
@@ -115,7 +121,9 @@ class MultiDocumentSummarizer:
         groups: list[EvidenceGroup],
         level: str,
     ) -> list[SummarySection]:
-        system_prompt = _LEVEL_SYSTEM_PROMPTS.get(level, _LEVEL_SYSTEM_PROMPTS["standard"])
+        system_prompt = _LEVEL_SYSTEM_PROMPTS.get(
+            level, _LEVEL_SYSTEM_PROMPTS["standard"]
+        )
         user_prompt = (
             f"Research Topic: {request.query}\n\n"
             f"Evidence Groups:\n{groups_text}\n\n"
@@ -180,7 +188,11 @@ class MultiDocumentSummarizer:
             header = f"Group {i}: {group.label}"
             evidence_texts: list[str] = []
             for j, ev in enumerate(group.evidence):
-                citation = group.citation_keys[j] if j < len(group.citation_keys) else f"[{j + 1}]"
+                citation = (
+                    group.citation_keys[j]
+                    if j < len(group.citation_keys)
+                    else f"[{j + 1}]"
+                )
                 text = f"{citation} {ev.content[:500]}"
                 evidence_texts.append(text)
             parts.append(f"{header}\n" + "\n".join(evidence_texts))
@@ -188,9 +200,8 @@ class MultiDocumentSummarizer:
 
     def _extract_citations(self, text: str) -> list[str]:
         import re
-        return re.findall(r'\[\d+\]', text)
+
+        return re.findall(r"\[\d+\]", text)
 
     def _merge_sections(self, sections: list[SummarySection]) -> str:
-        return "\n\n".join(
-            f"## {s.title}\n{s.content}" for s in sections
-        )
+        return "\n\n".join(f"## {s.title}\n{s.content}" for s in sections)

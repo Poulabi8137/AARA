@@ -21,9 +21,13 @@ class ProjectService:
         skip: int = 0,
         limit: int = 50,
     ) -> tuple[list[ResearchProject], int]:
-        query = select(ResearchProject).where(
-            ResearchProject.created_by == user.id
-        ).order_by(ResearchProject.created_at.desc()).offset(skip).limit(limit)
+        query = (
+            select(ResearchProject)
+            .where(ResearchProject.created_by == user.id)
+            .order_by(ResearchProject.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+        )
 
         count_query = select(func.count(ResearchProject.id)).where(
             ResearchProject.created_by == user.id
@@ -52,9 +56,7 @@ class ProjectService:
             )
         return project
 
-    async def create_project(
-        self, data: ProjectCreate, user: User
-    ) -> ResearchProject:
+    async def create_project(self, data: ProjectCreate, user: User) -> ResearchProject:
         project = ResearchProject(
             title=data.title,
             description=data.description,

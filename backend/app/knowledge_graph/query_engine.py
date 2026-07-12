@@ -37,7 +37,8 @@ class GraphQueryEngine:
     def find_nodes_by_label(self, query: str) -> list[GraphNode]:
         q = query.lower()
         return [
-            n for n in self._graph.nodes.values()
+            n
+            for n in self._graph.nodes.values()
             if q in n.label.lower() or q in n.description.lower()
         ]
 
@@ -63,7 +64,9 @@ class GraphQueryEngine:
                     continue
                 if rel_types and edge.relationship_type not in rel_types:
                     continue
-                neighbor = edge.target_id if edge.source_id == current else edge.source_id
+                neighbor = (
+                    edge.target_id if edge.source_id == current else edge.source_id
+                )
                 if neighbor not in visited:
                     visited.add(neighbor)
                     neighbor_node = self._graph.nodes.get(neighbor)
@@ -90,7 +93,9 @@ class GraphQueryEngine:
                 return self._reconstruct_path(source_id, target_id, visited)
 
             for edge in self._graph.adjacency.get(current, []):
-                neighbor = edge.target_id if edge.source_id == current else edge.source_id
+                neighbor = (
+                    edge.target_id if edge.source_id == current else edge.source_id
+                )
                 if neighbor not in visited:
                     visited[neighbor] = (current, edge.edge_id)
                     if len(visited) <= max_length:
@@ -145,7 +150,9 @@ class GraphQueryEngine:
             return []
 
         neighbors = self.find_neighbors(
-            node_id, max_depth=2, rel_types=rel_types,
+            node_id,
+            max_depth=2,
+            rel_types=rel_types,
         )
         scored: list[tuple[GraphNode, float]] = []
         for neighbor in neighbors:
@@ -203,7 +210,9 @@ class GraphQueryEngine:
                 continue
 
             for edge in self._graph.adjacency.get(current, []):
-                neighbor = edge.target_id if edge.source_id == current else edge.source_id
+                neighbor = (
+                    edge.target_id if edge.source_id == current else edge.source_id
+                )
                 if neighbor not in visited and neighbor in self._graph.nodes:
                     visited.add(neighbor)
                     visited_edges.append(edge)
@@ -244,7 +253,9 @@ class GraphQueryEngine:
                 continue
 
             for edge in reversed(self._graph.adjacency.get(current, [])):
-                neighbor = edge.target_id if edge.source_id == current else edge.source_id
+                neighbor = (
+                    edge.target_id if edge.source_id == current else edge.source_id
+                )
                 if neighbor not in visited and neighbor in self._graph.nodes:
                     visited_edges.append(edge)
                     stack.append((neighbor, depth + 1))
@@ -263,6 +274,7 @@ class GraphQueryEngine:
         node_filter: Any,
     ) -> TraversalResult:
         import random
+
         visited_nodes: list[GraphNode] = []
         visited_edges: list[GraphEdge] = []
         traversal_path: list[str] = []
@@ -284,7 +296,9 @@ class GraphQueryEngine:
                 break
             chosen = random.choice(neighbors)
             visited_edges.append(chosen)
-            current = chosen.target_id if chosen.source_id == current else chosen.source_id
+            current = (
+                chosen.target_id if chosen.source_id == current else chosen.source_id
+            )
             depth_reached += 1
 
         return TraversalResult(
@@ -316,7 +330,9 @@ class GraphQueryEngine:
                 continue
 
             for edge in self._graph.adjacency.get(current, []):
-                neighbor = edge.target_id if edge.source_id == current else edge.source_id
+                neighbor = (
+                    edge.target_id if edge.source_id == current else edge.source_id
+                )
                 if neighbor not in visited:
                     visited.add(neighbor)
                     subgraph_edges[edge.edge_id] = edge
@@ -359,7 +375,9 @@ class GraphQueryEngine:
                     if not node_type or node.node_type == node_type:
                         component.append(node)
                 for edge in self._graph.adjacency.get(current, []):
-                    neighbor = edge.target_id if edge.source_id == current else edge.source_id
+                    neighbor = (
+                        edge.target_id if edge.source_id == current else edge.source_id
+                    )
                     if neighbor not in visited:
                         stack.append(neighbor)
 
@@ -400,7 +418,9 @@ class GraphQueryEngine:
                 candidates = self.find_nodes_by_type(NodeType(target_type))
                 if candidates:
                     target_id = candidates[0].node_id
-                    path = self.find_shortest_path(sid, target_id, graph_query.max_depth)
+                    path = self.find_shortest_path(
+                        sid, target_id, graph_query.max_depth
+                    )
                     if path:
                         result.nodes = path.nodes
                         result.edges = path.edges
@@ -443,7 +463,11 @@ class GraphQueryEngine:
         return self.find_neighbors(
             node_id,
             max_depth=3,
-            rel_types=[RelationshipType.VALIDATES, RelationshipType.USES, RelationshipType.EVALUATES],
+            rel_types=[
+                RelationshipType.VALIDATES,
+                RelationshipType.USES,
+                RelationshipType.EVALUATES,
+            ],
         )
 
     def find_methods(self, node_id: str) -> list[GraphNode]:

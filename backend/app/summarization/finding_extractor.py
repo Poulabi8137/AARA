@@ -73,14 +73,18 @@ class FindingExtractor:
             header = f"Group {i}: {group.label}"
             texts: list[str] = []
             for j, ev in enumerate(group.evidence):
-                key = group.citation_keys[j] if j < len(group.citation_keys) else f"[{j + 1}]"
+                key = (
+                    group.citation_keys[j]
+                    if j < len(group.citation_keys)
+                    else f"[{j + 1}]"
+                )
                 texts.append(f"{key} {ev.content[:400]}")
             parts.append(f"{header}\n" + "\n".join(texts))
         return "\n\n".join(parts)
 
     def _parse_findings(self, content: str) -> list[ExtractedFinding]:
         findings: list[ExtractedFinding] = []
-        blocks = re.split(r'\n\s*\n', content)
+        blocks = re.split(r"\n\s*\n", content)
         current: dict = {}
 
         for block in blocks:
@@ -92,11 +96,15 @@ class FindingExtractor:
                     findings.append(self._build_finding(current))
                 current = {"finding": block.split(":", 1)[1].strip()}
             elif block.lower().startswith("citations:"):
-                citations = re.findall(r'\[\d+\]', block)
+                citations = re.findall(r"\[\d+\]", block)
                 current["citations"] = citations
             elif block.lower().startswith("confidence:"):
                 conf_str = block.split(":", 1)[1].strip().lower()
-                current["confidence"] = 0.9 if conf_str == "high" else (0.5 if conf_str == "medium" else 0.2)
+                current["confidence"] = (
+                    0.9
+                    if conf_str == "high"
+                    else (0.5 if conf_str == "medium" else 0.2)
+                )
             elif block.lower().startswith("category:"):
                 current["category"] = block.split(":", 1)[1].strip()
 

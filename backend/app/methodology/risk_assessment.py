@@ -71,7 +71,10 @@ class RiskAssessor:
                 seen.add(key)
                 merged.append(r)
 
-        merged.sort(key=lambda x: {"high": 3, "medium": 2, "low": 1}.get(x.severity, 0), reverse=True)
+        merged.sort(
+            key=lambda x: {"high": 3, "medium": 2, "low": 1}.get(x.severity, 0),
+            reverse=True,
+        )
 
         logger.info(
             "risk assessment complete",
@@ -153,13 +156,15 @@ class RiskAssessor:
             f"Contradictions: {len(ar.contradictions)}",
             f"Limitations: {len(ar.limitations)}",
             f"Recommendations: {len(ar.recommendations)}",
-            f"Confidence: {ar.confidence.overall:.2f}" if hasattr(ar.confidence, "overall") else "",
+            f"Confidence: {ar.confidence.overall:.2f}"
+            if hasattr(ar.confidence, "overall")
+            else "",
         ]
         return "\n".join(p for p in parts if p)
 
     def _parse_risks(self, content: str) -> list[RiskAssessment]:
         results: list[RiskAssessment] = []
-        blocks = re.split(r'\n\s*\n', content)
+        blocks = re.split(r"\n\s*\n", content)
         current: dict = {}
         for block in blocks:
             block = block.strip()
@@ -172,7 +177,9 @@ class RiskAssessor:
                 current["category"] = block.split(":", 1)[1].strip().lower()
             elif low.startswith("severity:"):
                 sev = block.split(":", 1)[1].strip().lower()
-                current["severity"] = sev if sev in ("high", "medium", "low") else "medium"
+                current["severity"] = (
+                    sev if sev in ("high", "medium", "low") else "medium"
+                )
             elif low.startswith("mitigation:"):
                 current["mitigation"] = block.split(":", 1)[1].strip()
             elif low.startswith("confidence:"):

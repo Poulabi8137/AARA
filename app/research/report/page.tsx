@@ -1,9 +1,8 @@
 'use client'
 
 import { Suspense, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { FileText, Download, Eye, Edit2, Check, AlertCircle, Loader2 } from 'lucide-react'
+import { FileText, Download, Check, AlertCircle, Loader2 } from 'lucide-react'
 import { GlassCard } from '@/components/ui/glass-card'
 import { PageTransition, childVariants } from '@/components/page-transition'
 import { apiClient } from '@/lib/api-client'
@@ -15,9 +14,6 @@ const templates = [
 ]
 
 function ReportGenerationPageInner() {
-  const searchParams = useSearchParams()
-  const projectId = searchParams.get('id')
-
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
   const [selectedSections, setSelectedSections] = useState<string[]>([])
   const [reportName, setReportName] = useState('')

@@ -59,7 +59,9 @@ class MemoryAgingEngine:
         now = datetime.now(timezone.utc)
 
         for ltm in ltms:
-            meta = (ltm.memory_metadata or {}) if hasattr(ltm, "memory_metadata") else {}
+            meta = (
+                (ltm.memory_metadata or {}) if hasattr(ltm, "memory_metadata") else {}
+            )
             if meta.get("archived"):
                 continue
 
@@ -68,7 +70,11 @@ class MemoryAgingEngine:
             importance = getattr(ltm, "importance", MemoryImportance.MEDIUM)
             current_confidence = getattr(ltm, "confidence", 0.0)
 
-            ttl = self._active_ttl if importance != MemoryImportance.LOW else self._low_importance_ttl
+            ttl = (
+                self._active_ttl
+                if importance != MemoryImportance.LOW
+                else self._low_importance_ttl
+            )
             if age < ttl:
                 continue
 

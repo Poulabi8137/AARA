@@ -107,7 +107,8 @@ class ExperimentDesigner:
                         objective=h.hypothesis[:150],
                         category="primary",
                         priority=i + 2,
-                        success_criteria=h.validation_criteria or "Statistical validation at p<0.05",
+                        success_criteria=h.validation_criteria
+                        or "Statistical validation at p<0.05",
                         rationale=h.rationale or "Derived from primary hypothesis",
                     )
                 )
@@ -138,15 +139,21 @@ class ExperimentDesigner:
         hypotheses: list[ExperimentHypothesis],
     ) -> list[ExperimentPhase]:
         try:
-            hypo_text = "; ".join(
-                f"[{h.category}] {h.hypothesis[:80]}" for h in hypotheses[:5]
-            ) if hypotheses else "none"
-            methods_text = ", ".join(
-                m.method for m in methodology_result.methods[:5]
-            ) if methodology_result.methods else "none"
-            datasets_text = ", ".join(
-                d.dataset_name for d in methodology_result.datasets[:5]
-            ) if methodology_result.datasets else "none"
+            hypo_text = (
+                "; ".join(f"[{h.category}] {h.hypothesis[:80]}" for h in hypotheses[:5])
+                if hypotheses
+                else "none"
+            )
+            methods_text = (
+                ", ".join(m.method for m in methodology_result.methods[:5])
+                if methodology_result.methods
+                else "none"
+            )
+            datasets_text = (
+                ", ".join(d.dataset_name for d in methodology_result.datasets[:5])
+                if methodology_result.datasets
+                else "none"
+            )
 
             content = await self._llm.generate(
                 prompt=_DESIGN_USER.format(
@@ -178,15 +185,27 @@ class ExperimentDesigner:
                 phase_type="preparation",
                 order=1,
                 steps=[
-                    ExecutionStep(step_id="s1_1", name="Dataset Acquisition",
-                                  description="Download and verify datasets", step_type="data",
-                                  estimated_minutes=120),
-                    ExecutionStep(step_id="s1_2", name="Preprocessing",
-                                  description="Clean and preprocess data", step_type="data",
-                                  estimated_minutes=180),
-                    ExecutionStep(step_id="s1_3", name="Data Splitting",
-                                  description="Split into train/val/test sets", step_type="data",
-                                  estimated_minutes=30),
+                    ExecutionStep(
+                        step_id="s1_1",
+                        name="Dataset Acquisition",
+                        description="Download and verify datasets",
+                        step_type="data",
+                        estimated_minutes=120,
+                    ),
+                    ExecutionStep(
+                        step_id="s1_2",
+                        name="Preprocessing",
+                        description="Clean and preprocess data",
+                        step_type="data",
+                        estimated_minutes=180,
+                    ),
+                    ExecutionStep(
+                        step_id="s1_3",
+                        name="Data Splitting",
+                        description="Split into train/val/test sets",
+                        step_type="data",
+                        estimated_minutes=30,
+                    ),
                 ],
                 estimated_duration_minutes=330,
             ),
@@ -197,12 +216,20 @@ class ExperimentDesigner:
                 phase_type="implementation",
                 order=2,
                 steps=[
-                    ExecutionStep(step_id="s2_1", name="Model Implementation",
-                                  description="Implement the proposed model architecture",
-                                  step_type="implementation", estimated_minutes=480),
-                    ExecutionStep(step_id="s2_2", name="Baseline Implementation",
-                                  description="Implement baseline models for comparison",
-                                  step_type="implementation", estimated_minutes=240),
+                    ExecutionStep(
+                        step_id="s2_1",
+                        name="Model Implementation",
+                        description="Implement the proposed model architecture",
+                        step_type="implementation",
+                        estimated_minutes=480,
+                    ),
+                    ExecutionStep(
+                        step_id="s2_2",
+                        name="Baseline Implementation",
+                        description="Implement baseline models for comparison",
+                        step_type="implementation",
+                        estimated_minutes=240,
+                    ),
                 ],
                 estimated_duration_minutes=720,
             ),
@@ -213,12 +240,20 @@ class ExperimentDesigner:
                 phase_type="training",
                 order=3,
                 steps=[
-                    ExecutionStep(step_id="s3_1", name="Model Training",
-                                  description="Train the model on training data",
-                                  step_type="training", estimated_minutes=600),
-                    ExecutionStep(step_id="s3_2", name="Validation",
-                                  description="Validate on validation set",
-                                  step_type="validation", estimated_minutes=120),
+                    ExecutionStep(
+                        step_id="s3_1",
+                        name="Model Training",
+                        description="Train the model on training data",
+                        step_type="training",
+                        estimated_minutes=600,
+                    ),
+                    ExecutionStep(
+                        step_id="s3_2",
+                        name="Validation",
+                        description="Validate on validation set",
+                        step_type="validation",
+                        estimated_minutes=120,
+                    ),
                 ],
                 estimated_duration_minutes=720,
             ),
@@ -229,19 +264,26 @@ class ExperimentDesigner:
                 phase_type="evaluation",
                 order=4,
                 steps=[
-                    ExecutionStep(step_id="s4_1", name="Test Evaluation",
-                                  description="Evaluate on held-out test set",
-                                  step_type="evaluation", estimated_minutes=120),
-                    ExecutionStep(step_id="s4_2", name="Ablation Study",
-                                  description="Run ablation experiments",
-                                  step_type="analysis", estimated_minutes=300),
+                    ExecutionStep(
+                        step_id="s4_1",
+                        name="Test Evaluation",
+                        description="Evaluate on held-out test set",
+                        step_type="evaluation",
+                        estimated_minutes=120,
+                    ),
+                    ExecutionStep(
+                        step_id="s4_2",
+                        name="Ablation Study",
+                        description="Run ablation experiments",
+                        step_type="analysis",
+                        estimated_minutes=300,
+                    ),
                 ],
                 estimated_duration_minutes=420,
             ),
         ]
 
     def _parse_phases(self, content: str) -> list[ExperimentPhase]:
-        import re
         phases: list[ExperimentPhase] = []
         blocks = content.strip().split("\n\n")
         current_phase: dict[str, Any] = {}
@@ -261,7 +303,10 @@ class ExperimentDesigner:
                 phase_count += 1
                 if phase_count > settings.max_experiment_phases:
                     break
-                current_phase = {"name": block.split(":", 1)[1].strip(), "order": phase_count}
+                current_phase = {
+                    "name": block.split(":", 1)[1].strip(),
+                    "order": phase_count,
+                }
                 current_steps = []
                 step_count = 0
             elif low.startswith("description:"):

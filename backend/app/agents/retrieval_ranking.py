@@ -19,7 +19,13 @@ def compute_relevance_score(
     metadata_weighted = (metadata_match / 100.0) * 10.0
     freshness_weighted = _freshness_score(freshness_days) * 5.0
 
-    raw = keyword_score + semantic_weighted + quality_weighted + metadata_weighted + freshness_weighted
+    raw = (
+        keyword_score
+        + semantic_weighted
+        + quality_weighted
+        + metadata_weighted
+        + freshness_weighted
+    )
     return round(min(100.0, max(0.0, raw)), 2)
 
 
@@ -76,9 +82,10 @@ def compute_content_hash(content: str) -> int:
 
 def is_near_duplicate(content_a: str, content_b: str, threshold: float = 0.65) -> bool:
     """Rough near-dup check via character trigram overlap."""
+
     def trigrams(text: str) -> set[str]:
         cleaned = re.sub(r"\s+", " ", text.lower()).strip()
-        return {cleaned[i:i+3] for i in range(len(cleaned) - 2)}
+        return {cleaned[i : i + 3] for i in range(len(cleaned) - 2)}
 
     trigs_a = trigrams(content_a)
     trigs_b = trigrams(content_b)

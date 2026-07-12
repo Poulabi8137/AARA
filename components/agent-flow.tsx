@@ -1,6 +1,5 @@
 'use client'
 
-import { useMemo, useCallback } from 'react'
 import {
   ReactFlow,
   Background,
@@ -87,8 +86,8 @@ const defaultEdges: Edge[] = [
 ]
 
 export function AgentFlow({ className }: { className?: string }) {
-  const [nodes, setNodes, onNodesChange] = useNodesState(defaultNodes)
-  const [edges, setEdges, onEdgesChange] = useEdgesState(defaultEdges)
+  const [nodes, , onNodesChange] = useNodesState(defaultNodes)
+  const [edges, , onEdgesChange] = useEdgesState(defaultEdges)
 
   return (
     <div className={cn('h-[300px] rounded-xl overflow-hidden border border-border/50', className)}>

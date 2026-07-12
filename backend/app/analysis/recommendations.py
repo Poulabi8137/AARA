@@ -129,14 +129,18 @@ class RecommendationEngine:
             header = f"Group {i}: {group.label}"
             texts: list[str] = []
             for j, ev in enumerate(group.evidence):
-                key = group.citation_keys[j] if j < len(group.citation_keys) else f"[{j + 1}]"
+                key = (
+                    group.citation_keys[j]
+                    if j < len(group.citation_keys)
+                    else f"[{j + 1}]"
+                )
                 texts.append(f"{key} {ev.content[:400]}")
             parts.append(f"{header}\n" + "\n".join(texts))
         return "\n\n".join(parts)
 
     def _parse_recommendations(self, content: str) -> list[Recommendation]:
         results: list[Recommendation] = []
-        blocks = re.split(r'\n\s*\n', content)
+        blocks = re.split(r"\n\s*\n", content)
         current: dict = {}
         for block in blocks:
             block = block.strip()
@@ -148,7 +152,7 @@ class RecommendationEngine:
             elif low.startswith("category:"):
                 current["category"] = block.split(":", 1)[1].strip().lower()
             elif low.startswith("sources:"):
-                current["sources"] = re.findall(r'\[\d+\]', block)
+                current["sources"] = re.findall(r"\[\d+\]", block)
             elif low.startswith("priority:"):
                 try:
                     current["priority"] = int(block.split(":", 1)[1].strip())

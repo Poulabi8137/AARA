@@ -18,6 +18,17 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   chromadb:
     image: chromadb/chroma:latest
     restart: unless-stopped
@@ -41,22 +52,44 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
       chromadb:
         condition: service_started
+    env_file:
+      - .env
     environment:
-      DATABASE_URL: postgresql+asyncpg://agentwatch:agentwatch@db:5432/agentwatch
-      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is required. Set to a secure random string (min 32 chars).}
+      # Production secrets should be injected via deployment platform
+      # Local development defaults
       ALLOWED_ORIGINS: '["http://localhost:3000"]'
-      LOG_LEVEL: INFO
+      LOG_LEVEL: DEBUG
+      DEBUG: "true"
       CHROMA_HOST: chromadb
       CHROMA_PORT: "8000"
       VECTORSTORE_PERSIST_DIR: /app/chroma_data
+      # Production deployment example (uncomment and use with deployment platform):
+      # SECRET_KEY: ${SECRET_KEY}
+      # DATABASE_URL: ${DATABASE_URL}
+      # REDIS_URL: ${REDIS_URL}
+      # LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      # OPENAI_API_KEY: ${OPENAI_API_KEY}
+      # GEMINI_API_KEY: ${GEMINI_API_KEY}
+      # SENTRY_DSN: ${SENTRY_DSN}
+      # ENV: ${ENV:-development}
     ports:
       - "8000:8000"
     volumes:
       - chroma_data:/app/chroma_data
     command: >
-      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4"
+      sh -c "
+        if [ "$ENV" = "production" ]; then
+          echo "Running in production mode..."
+          alembic upgrade head
+        else
+          echo "Running in development mode..."
+        fi
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+      "
 
 volumes:
   pgdata:

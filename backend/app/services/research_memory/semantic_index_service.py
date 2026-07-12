@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 
 from fastapi import HTTPException, status
-from sqlalchemy import select, func, and_, nullslast
+from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
@@ -134,9 +134,7 @@ class SemanticMemoryIndexService:
         )
         return list(result.scalars().all())
 
-    async def validate_content_hash(
-        self, content_hash: str
-    ) -> bool:
+    async def validate_content_hash(self, content_hash: str) -> bool:
         result = await self.db.execute(
             select(func.count(SemanticMemoryIndex.id)).where(
                 SemanticMemoryIndex.content_hash == content_hash

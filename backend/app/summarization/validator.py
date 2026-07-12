@@ -8,7 +8,6 @@ from app.summarization.models import (
     EvidenceGroup,
     SummaryLevel,
     SummaryResult,
-    SummaryStatistics,
     ValidationReport,
 )
 
@@ -25,11 +24,36 @@ _LEVEL_TOKEN_RANGES: dict[str, tuple[int, int]] = {
 
 _REQUIRED_SECTIONS: dict[str, list[str]] = {
     "brief": ["abstract", "conclusion"],
-    "standard": ["abstract", "background", "methodology", "results", "discussion", "conclusion"],
-    "detailed": ["abstract", "background", "problem_statement", "methodology", "experimental_setup",
-                 "results", "discussion", "limitations", "future_work", "conclusion"],
-    "literature_review": ["abstract", "background", "methodology", "results", "discussion", "limitations",
-                          "future_work", "conclusion"],
+    "standard": [
+        "abstract",
+        "background",
+        "methodology",
+        "results",
+        "discussion",
+        "conclusion",
+    ],
+    "detailed": [
+        "abstract",
+        "background",
+        "problem_statement",
+        "methodology",
+        "experimental_setup",
+        "results",
+        "discussion",
+        "limitations",
+        "future_work",
+        "conclusion",
+    ],
+    "literature_review": [
+        "abstract",
+        "background",
+        "methodology",
+        "results",
+        "discussion",
+        "limitations",
+        "future_work",
+        "conclusion",
+    ],
     "executive_summary": ["abstract", "conclusion"],
 }
 
@@ -72,7 +96,7 @@ class SummaryValidator:
             report.errors.append("Summary is empty")
             return
 
-        citations = re.findall(r'\[\d+\]', result.summary)
+        citations = re.findall(r"\[\d+\]", result.summary)
         if not citations and total_sources > 0:
             report.errors.append("No citations found in summary")
 
@@ -87,7 +111,7 @@ class SummaryValidator:
             report.errors.append("No evidence sources provided")
             return
 
-        cited_keys = set(re.findall(r'\[\d+\]', result.summary))
+        cited_keys = set(re.findall(r"\[\d+\]", result.summary))
         total_keys = sum(len(g.citation_keys) for g in groups)
         if total_keys > 0 and len(cited_keys) < total_keys * 0.3:
             report.warnings.append(
@@ -113,19 +137,31 @@ class SummaryValidator:
         result: SummaryResult,
         report: ValidationReport,
     ) -> None:
-        sentences = re.split(r'[.!?\n]', result.summary)
+        sentences = re.split(r"[.!?\n]", result.summary)
         for sentence in sentences:
             sentence = sentence.strip()
             if not sentence:
                 continue
-            has_citation = bool(re.search(r'\[\d+\]', sentence))
+            has_citation = bool(re.search(r"\[\d+\]", sentence))
             is_heading = sentence.startswith("#") or sentence.startswith("##")
             is_structural = any(
                 kw in sentence.lower()
-                for kw in ["introduction", "background", "methodology", "results",
-                           "discussion", "conclusion", "references"]
+                for kw in [
+                    "introduction",
+                    "background",
+                    "methodology",
+                    "results",
+                    "discussion",
+                    "conclusion",
+                    "references",
+                ]
             )
-            if not has_citation and not is_heading and not is_structural and len(sentence) > 100:
+            if (
+                not has_citation
+                and not is_heading
+                and not is_structural
+                and len(sentence) > 100
+            ):
                 report.warnings.append(
                     f"Long statement without citation: {sentence[:80]}..."
                 )
@@ -146,7 +182,11 @@ class SummaryValidator:
         result: SummaryResult,
         report: ValidationReport,
     ) -> None:
-        level_key = result.metadata.level.value if isinstance(result.metadata.level, SummaryLevel) else result.metadata.level
+        level_key = (
+            result.metadata.level.value
+            if isinstance(result.metadata.level, SummaryLevel)
+            else result.metadata.level
+        )
         required = _REQUIRED_SECTIONS.get(level_key, [])
         if not result.sections:
             return
@@ -155,4 +195,6 @@ class SummaryValidator:
             if section not in found_sections:
                 report.missing_sections.append(section)
         if report.missing_sections:
-            report.errors.append(f"Missing sections: {', '.join(report.missing_sections)}")
+            report.errors.append(
+                f"Missing sections: {', '.join(report.missing_sections)}"
+            )

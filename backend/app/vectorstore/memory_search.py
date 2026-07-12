@@ -4,7 +4,7 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Any
 
-from sqlalchemy import select, and_
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
@@ -14,10 +14,9 @@ from app.models.research_memory import (
     LongTermMemory,
     PaperMemory,
     ProjectMemory,
-    SemanticMemoryIndex,
 )
 from app.vectorstore.collections import CollectionName
-from app.vectorstore.retrieval import similarity_search, RetrievalResult, RetrievedChunk
+from app.vectorstore.retrieval import similarity_search, RetrievalResult
 
 logger = get_logger("vectorstore.memory_search")
 settings = get_settings()
@@ -211,7 +210,9 @@ class MemorySearch:
     async def resolve_batch(
         self, hits: list[MemorySearchHit]
     ) -> list[SessionMemory | LongTermMemory | PaperMemory | ProjectMemory]:
-        resolved: list[SessionMemory | LongTermMemory | PaperMemory | ProjectMemory] = []
+        resolved: list[
+            SessionMemory | LongTermMemory | PaperMemory | ProjectMemory
+        ] = []
         for hit in hits:
             model = await self.resolve_to_model(hit)
             if model is not None:

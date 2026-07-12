@@ -17,6 +17,10 @@ class CollectionName(str, Enum):
     CITATIONS = "citations"
     GENERATED_REPORTS = "generated_reports"
     KNOWLEDGE_BASE = "knowledge_base"
+    MEMORY_SESSION = "memory_session"
+    MEMORY_LONG_TERM = "memory_long_term"
+    MEMORY_PAPER = "memory_paper"
+    MEMORY_PROJECT = "memory_project"
 
 
 _COLLECTION_CACHE: dict[str, chromadb.Collection] = {}
@@ -46,15 +50,13 @@ async def get_collection(
     client = await get_chroma_client()
 
     try:
-        collection = await client.get_collection(
-            name=key, embedding_function=ef
-        )
+        collection = await client.get_collection(name=key, embedding_function=ef)
         logger.debug("retrieved existing collection", extra={"collection": key})
     except Exception:
         collection = await client.create_collection(
             name=key,
             embedding_function=ef,
-            metadata={"description": f"AgentWatch {key}"},
+            metadata={"description": f"AARA {key}"},
         )
         logger.info("created new collection", extra={"collection": key})
 

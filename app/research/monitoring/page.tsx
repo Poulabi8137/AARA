@@ -3,7 +3,7 @@
 import { Suspense, useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Activity, Zap, AlertCircle, CheckCircle, Network, Loader2 } from 'lucide-react'
+import { Activity, Zap, AlertCircle, CheckCircle, Loader2 } from 'lucide-react'
 import { GlassCard } from '@/components/ui/glass-card'
 import { PageTransition, childVariants } from '@/components/page-transition'
 import { AgentFlow } from '@/components/agent-flow'
@@ -46,17 +46,22 @@ function MonitoringPageInner() {
     try {
       const res = await apiClient.listExecutions()
       const data = res.data?.executions || res.data || []
-      const items: AgentExecution[] = Array.isArray(data) ? data.map((e: any) => ({
-        id: e.id,
-        type: e.agent_name || e.type || 'Agent',
-        status: e.execution_status || e.status || 'pending',
-        startTime: e.start_time || e.startTime || null,
-        endTime: e.end_time || e.endTime || null,
-        duration: e.end_time && e.start_time
-          ? `${Math.round((new Date(e.end_time).getTime() - new Date(e.start_time).getTime()) / 60000)}m`
-          : 'Waiting',
-        progress: e.execution_status === 'completed' ? 100 : e.execution_status === 'running' ? 65 : 0,
-      })) : []
+      const items: AgentExecution[] = Array.isArray(data) ? data.map((item: unknown) => {
+        const e = item as Record<string, unknown>
+        const st = e.start_time ?? e.startTime
+        const et = e.end_time ?? e.endTime
+        return {
+          id: String(e.id ?? ''),
+          type: String(e.agent_name ?? e.type ?? 'Agent'),
+          status: String(e.execution_status ?? e.status ?? 'pending'),
+          startTime: st != null ? String(st) : null,
+          endTime: et != null ? String(et) : null,
+          duration: et && st
+            ? `${Math.round((new Date(String(et)).getTime() - new Date(String(st)).getTime()) / 60000)}m`
+            : 'Waiting',
+          progress: e.execution_status === 'completed' ? 100 : e.execution_status === 'running' ? 65 : 0,
+        } as AgentExecution
+      }) : []
       setExecutions(items)
       setStats({
         completed: items.filter(e => e.status === 'completed').length,

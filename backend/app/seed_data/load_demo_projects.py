@@ -10,8 +10,6 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import sys
-from datetime import datetime, timezone
 
 from app.core.logging import get_logger
 from app.repositories.project import ProjectRepository
@@ -33,14 +31,19 @@ async def load_demo_projects(
         logger.info("Clearing existing demo data...")
         existing = await repo.list_projects()
         for p in existing:
-            if "demo" in (p.description or "").lower() or "showcase" in (p.description or "").lower():
+            if (
+                "demo" in (p.description or "").lower()
+                or "showcase" in (p.description or "").lower()
+            ):
                 await repo.delete_project(p.id)
                 logger.info(f"  Deleted: {p.title}")
 
     if dry_run:
         logger.info(f"DRY RUN — Would insert {len(DEMO_PROJECTS)} demo projects:")
         for p in DEMO_PROJECTS:
-            logger.info(f"  [{p['difficulty']}] {p['title']} (expected: {p['expected_quality_score']}/100)")
+            logger.info(
+                f"  [{p['difficulty']}] {p['title']} (expected: {p['expected_quality_score']}/100)"
+            )
         return
 
     count = 0
@@ -67,8 +70,12 @@ async def load_demo_projects(
 
 def main():
     parser = argparse.ArgumentParser(description="Load demo projects into the database")
-    parser.add_argument("--dry-run", action="store_true", help="Preview without inserting")
-    parser.add_argument("--clear", action="store_true", help="Clear existing demo data first")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Preview without inserting"
+    )
+    parser.add_argument(
+        "--clear", action="store_true", help="Clear existing demo data first"
+    )
     args = parser.parse_args()
 
     asyncio.run(load_demo_projects(dry_run=args.dry_run, clear_first=args.clear_first))

@@ -29,34 +29,52 @@ from app.schemas.report_generator import (
 
 # ── Fixtures ──────────────────────────────────────────────
 
+
 def _sample_planner() -> str:
-    return json.dumps({
-        "research_goal": "Analyze security in agentic AI systems",
-        "research_questions": [
-            "What are the main security vulnerabilities?",
-            "How can autonomous agents be governed?",
-            "What threat models apply?",
-            "What is the role of human oversight?",
-            "How do current frameworks address risks?",
-        ],
-        "subtopics": ["Architecture security", "Threat models", "Governance compliance"],
-        "priority_areas": ["Architecture security", "Threat models"],
-        "risk_areas": ["Autonomous decision risks", "Data privacy"],
-        "search_queries": [
-            "AI security 2025", "agent vulnerabilities", "autonomous risks",
-            "governance frameworks", "threat modeling AI",
-        ],
-        "keywords": ["security", "agentic AI", "governance", "threats", "autonomous"],
-        "methodology": "systematic literature review",
-        "planning_score": 85,
-    })
+    return json.dumps(
+        {
+            "research_goal": "Analyze security in agentic AI systems",
+            "research_questions": [
+                "What are the main security vulnerabilities?",
+                "How can autonomous agents be governed?",
+                "What threat models apply?",
+                "What is the role of human oversight?",
+                "How do current frameworks address risks?",
+            ],
+            "subtopics": [
+                "Architecture security",
+                "Threat models",
+                "Governance compliance",
+            ],
+            "priority_areas": ["Architecture security", "Threat models"],
+            "risk_areas": ["Autonomous decision risks", "Data privacy"],
+            "search_queries": [
+                "AI security 2025",
+                "agent vulnerabilities",
+                "autonomous risks",
+                "governance frameworks",
+                "threat modeling AI",
+            ],
+            "keywords": [
+                "security",
+                "agentic AI",
+                "governance",
+                "threats",
+                "autonomous",
+            ],
+            "methodology": "systematic literature review",
+            "planning_score": 85,
+        }
+    )
 
 
-def _sample_summary(subtopic: str, citations: int = 2, conf: float = 75.0) -> dict[str, Any]:
+def _sample_summary(
+    subtopic: str, citations: int = 2, conf: float = 75.0
+) -> dict[str, Any]:
     return {
         "subtopic": subtopic,
         "executive_summary": f"Analysis of {subtopic} reveals significant findings "
-                             f"based on multiple authoritative sources.",
+        f"based on multiple authoritative sources.",
         "key_findings": [
             f"Key finding about {subtopic} number one",
             f"Another important finding regarding {subtopic}",
@@ -65,13 +83,24 @@ def _sample_summary(subtopic: str, citations: int = 2, conf: float = 75.0) -> di
             f"Evidence from arxiv DOI:10.1234/{subtopic.lower().replace(' ', '')}2024",
             f"Evidence from springer journal on {subtopic}",
         ],
-        "important_statistics": ["73% of organisations report concerns", "2.5 million incidents"],
+        "important_statistics": [
+            "73% of organisations report concerns",
+            "2.5 million incidents",
+        ],
         "consensus_points": [f"Multiple sources confirm importance of {subtopic}"],
         "contradictions": [],
         "citations": [
-            {"claim": f"Claim about {subtopic} from arxiv", "source": "arxiv", "supporting_chunk_ids": ["c1"]},
-            {"claim": f"Claim about {subtopic} from springer", "source": "springer", "supporting_chunk_ids": ["c2"]},
-        ][:max(1, citations)],
+            {
+                "claim": f"Claim about {subtopic} from arxiv",
+                "source": "arxiv",
+                "supporting_chunk_ids": ["c1"],
+            },
+            {
+                "claim": f"Claim about {subtopic} from springer",
+                "source": "springer",
+                "supporting_chunk_ids": ["c2"],
+            },
+        ][: max(1, citations)],
         "confidence_score": conf,
         "citation_count": citations,
         "source_count": 2,
@@ -83,7 +112,9 @@ def _sample_summary(subtopic: str, citations: int = 2, conf: float = 75.0) -> di
     }
 
 
-def _sample_gap(gap_type: str = "LOW_EVIDENCE", severity: str = "high") -> dict[str, Any]:
+def _sample_gap(
+    gap_type: str = "LOW_EVIDENCE", severity: str = "high"
+) -> dict[str, Any]:
     return {
         "gap_id": f"gap_{gap_type.lower()}",
         "gap_type": gap_type,
@@ -117,10 +148,17 @@ def _full_state() -> Any:
 
 # ── ResearchReport Schema Tests ─────────────────────────
 
+
 class TestReportSchemas:
     def test_research_report_defaults(self) -> None:
-        r = ResearchReport(title="Test", query="test", executive_summary="", introduction="",
-                           methodology="", conclusion="")
+        r = ResearchReport(
+            title="Test",
+            query="test",
+            executive_summary="",
+            introduction="",
+            methodology="",
+            conclusion="",
+        )
         assert r.title == "Test"
         assert r.sections == []
         assert r.key_findings == []
@@ -157,6 +195,7 @@ class TestReportSchemas:
 
 # ── Reference Aggregation Tests ─────────────────────────
 
+
 class TestReferenceAggregation:
     def test_aggregate_basic(self) -> None:
         summaries = [_sample_summary("Topic A", citations=2)]
@@ -187,7 +226,11 @@ class TestReferenceAggregation:
     def test_build_contradiction_list(self) -> None:
         s = _sample_summary("T1")
         s["contradictions"] = [
-            {"topic": "Conflict", "statements": ["X says A", "Y says B"], "severity": "high"},
+            {
+                "topic": "Conflict",
+                "statements": ["X says A", "Y says B"],
+                "severity": "high",
+            },
         ]
         contras = build_contradiction_list([s])
         assert len(contras) == 1
@@ -196,6 +239,7 @@ class TestReferenceAggregation:
 
 
 # ── Report Builder Tests ────────────────────────────────
+
 
 class TestReportBuilder:
     def test_build_from_state(self) -> None:
@@ -296,13 +340,32 @@ class TestReportBuilder:
 
 # ── Quality Scoring Tests ───────────────────────────────
 
+
 class TestReportScoring:
     def test_compute_quality(self) -> None:
         sections = [
-            {"citation_count": 3, "statistics": ["73%"], "contradictions": [], "confidence_score": 75.0},
-            {"citation_count": 2, "statistics": [], "contradictions": [{"topic": "t1"}], "confidence_score": 65.0},
+            {
+                "citation_count": 3,
+                "statistics": ["73%"],
+                "contradictions": [],
+                "confidence_score": 75.0,
+            },
+            {
+                "citation_count": 2,
+                "statistics": [],
+                "contradictions": [{"topic": "t1"}],
+                "confidence_score": 65.0,
+            },
         ]
-        refs = [{"reference_id": "R1", "source": "arxiv", "claims": [], "subtopics": [], "occurrence_count": 1}]
+        refs = [
+            {
+                "reference_id": "R1",
+                "source": "arxiv",
+                "claims": [],
+                "subtopics": [],
+                "occurrence_count": 1,
+            }
+        ]
         metrics = compute_report_quality(sections, refs, [{"gap_type": "LOW_EVIDENCE"}])
         assert metrics.report_completeness > 0
         assert metrics.evidence_strength > 0
@@ -320,13 +383,21 @@ class TestReportScoring:
         assert metrics.research_quality_score == 0.0
 
     def test_quality_single_section(self) -> None:
-        sections = [{"citation_count": 0, "statistics": [], "contradictions": [], "confidence_score": 0}]
+        sections = [
+            {
+                "citation_count": 0,
+                "statistics": [],
+                "contradictions": [],
+                "confidence_score": 0,
+            }
+        ]
         metrics = compute_report_quality(sections, [{"reference_id": "R1"}], [])
         assert metrics.section_count == 1
         assert metrics.reference_count == 1
 
 
 # ── Validation Tests ────────────────────────────────────
+
 
 class TestValidation:
     def test_valid_report(self) -> None:
@@ -339,7 +410,9 @@ class TestValidation:
         assert result.valid is True
 
     def test_missing_query(self) -> None:
-        result = validate_report_data("", [{"title": "S1", "summary": "x"}], [{"id": "R1"}], "conclusion")
+        result = validate_report_data(
+            "", [{"title": "S1", "summary": "x"}], [{"id": "R1"}], "conclusion"
+        )
         assert result.valid is False
         assert any("query" in e.lower() for e in result.errors)
 
@@ -353,7 +426,9 @@ class TestValidation:
         assert result.valid is False
 
     def test_no_conclusion(self) -> None:
-        result = validate_report_data("q", [{"title": "S1", "summary": "x"}], [{"id": "R1"}], "")
+        result = validate_report_data(
+            "q", [{"title": "S1", "summary": "x"}], [{"id": "R1"}], ""
+        )
         assert result.valid is False
 
     def test_validation_result_defaults(self) -> None:
@@ -362,16 +437,19 @@ class TestValidation:
 
     def test_validate_export_request_missing_report(self) -> None:
         from app.agents.report_validation import validate_export_request
+
         result = validate_export_request(None, "markdown")
         assert result.valid is False
 
     def test_validate_export_request_bad_format(self) -> None:
         from app.agents.report_validation import validate_export_request
+
         result = validate_export_request({"markdown": "# Test"}, "badformat")
         assert result.valid is False
 
 
 # ── ReportGeneratorAgent State Integration Tests ─────────
+
 
 class TestReportGeneratorAgent:
     @pytest.mark.asyncio
@@ -445,10 +523,12 @@ class TestReportGeneratorAgent:
 
 # ── Graph Node Test ─────────────────────────────────────
 
+
 class TestGraphNode:
     @pytest.mark.asyncio
     async def test_report_generator_node_with_real_agent(self) -> None:
         from app.graphs.nodes import report_generator_node
+
         state = _full_state()
         result = await report_generator_node(state)
         assert result.get("generated_report")
@@ -458,18 +538,24 @@ class TestGraphNode:
     @pytest.mark.asyncio
     async def test_execution_history_updated(self) -> None:
         from app.graphs.nodes import report_generator_node
+
         state = _full_state()
         result = await report_generator_node(state)
-        node_entries = [e for e in result.get("execution_history", [])
-                        if e.get("node") == "report_generator"]
+        node_entries = [
+            e
+            for e in result.get("execution_history", [])
+            if e.get("node") == "report_generator"
+        ]
         assert len(node_entries) >= 1
 
 
 # ── API Endpoint Tests ──────────────────────────────────
 
+
 class TestAPIEndpoints:
     def test_generate_request_model(self) -> None:
         from app.api.report_generator import ReportGenerateRequest
+
         req = ReportGenerateRequest(
             query="test",
             planner_output=_sample_planner(),
@@ -482,6 +568,7 @@ class TestAPIEndpoints:
 
     def test_preview_response_model(self) -> None:
         from app.api.report_generator import PreviewResponse
+
         resp = PreviewResponse(
             markdown="# Test",
             report_json="{}",
@@ -495,6 +582,7 @@ class TestAPIEndpoints:
 
     def test_export_response_model(self) -> None:
         from app.api.report_generator import ExportResponse
+
         resp = ExportResponse(
             content="# Report",
             format="markdown",
@@ -506,13 +594,21 @@ class TestAPIEndpoints:
 
     def test_export_request_model(self) -> None:
         from app.api.report_generator import ReportExportRequest
-        report = ResearchReport(title="T", query="q", executive_summary="", introduction="",
-                                methodology="", conclusion="")
+
+        report = ResearchReport(
+            title="T",
+            query="q",
+            executive_summary="",
+            introduction="",
+            methodology="",
+            conclusion="",
+        )
         req = ReportExportRequest(report=report, format=ExportFormat.markdown)
         assert req.format == ExportFormat.markdown
 
 
 # ── Edge Cases ──────────────────────────────────────────
+
 
 class TestEdgeCases:
     def test_no_planner_output(self) -> None:
@@ -528,7 +624,10 @@ class TestEdgeCases:
         s = _sample_summary("No cites")
         s["citations"] = []
         report = build_report_from_state(
-            query="test", planner_raw=None, summaries=[s], gaps=[],
+            query="test",
+            planner_raw=None,
+            summaries=[s],
+            gaps=[],
         )
         assert report.references == []
         assert report.markdown
@@ -546,19 +645,29 @@ class TestEdgeCases:
     def test_build_with_contradictions(self) -> None:
         s = _sample_summary("Controversial")
         s["contradictions"] = [
-            {"topic": "Conflicting findings", "statements": ["A says X", "B says not X"], "severity": "high"},
+            {
+                "topic": "Conflicting findings",
+                "statements": ["A says X", "B says not X"],
+                "severity": "high",
+            },
         ]
         report = build_report_from_state(
-            query="test", planner_raw=None, summaries=[s], gaps=[],
+            query="test",
+            planner_raw=None,
+            summaries=[s],
+            gaps=[],
         )
         assert len(report.contradictions) >= 1
 
     def test_export_pdf_placeholder(self) -> None:
         report = build_report_from_state(
-            query="test", planner_raw=_sample_planner(),
-            summaries=[_sample_summary("S1")], gaps=[],
+            query="test",
+            planner_raw=_sample_planner(),
+            summaries=[_sample_summary("S1")],
+            gaps=[],
         )
         from app.api.report_generator import ExportResponse
+
         r = ExportResponse(
             content=report.markdown,
             format="pdf",

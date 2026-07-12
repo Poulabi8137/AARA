@@ -3,12 +3,12 @@
     {
       "query": "What are the key challenges in AI safety research?",
       "status": "report_generation_complete",
-      "elapsed": 0.246,
+      "elapsed": 0.248,
       "report_length": 12053,
-      "report_preview": "# Research Report: What are the key challenges in AI safety research?\n\n*Generated: 2026-06-15T20:00:06.314189+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'What are the key challenges in AI safety research?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 research gaps (7 critical, 5 ",
+      "report_preview": "# Research Report: What are the key challenges in AI safety research?\n\n*Generated: 2026-06-15T21:02:51.136779+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'What are the key challenges in AI safety research?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 research gaps (7 critical, 5 ",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.185,
+          "latency_seconds": 0.186,
           "token_usage": {
             "prompt_tokens": 50,
             "completion_tokens": 50,
@@ -144,7 +144,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_3228",
+              "gap_id": "unanswered_q_5048",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is What are the key challenges in AI safety research??'",
               "severity": "critical",
@@ -169,7 +169,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_3781",
+              "gap_id": "unanswered_q_2288",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in What are the key challenges in AI safety research??'",
               "severity": "critical",
@@ -194,7 +194,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_4768",
+              "gap_id": "unanswered_q_6398",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for What are the key challenges in AI safety research??'",
               "severity": "critical",
@@ -434,24 +434,24 @@
             "reference_count": 0,
             "citation_count": 0,
             "report_length": 12053,
-            "generation_latency": 0.056
+            "generation_latency": 0.057
           },
           "section_count": 1,
           "reference_count": 0,
           "research_quality_score": 11.8,
-          "latency_seconds": 0.056
+          "latency_seconds": 0.057
         }
       }
     },
     {
       "query": "What is the current state of quantum computing error correction?",
       "status": "report_generation_complete",
-      "elapsed": 0.265,
+      "elapsed": 0.247,
       "report_length": 12711,
-      "report_preview": "# Research Report: What is the current state of quantum computing error correction?\n\n*Generated: 2026-06-15T20:00:06.579443+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'What is the current state of quantum computing error correction?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 r",
+      "report_preview": "# Research Report: What is the current state of quantum computing error correction?\n\n*Generated: 2026-06-15T21:02:51.381872+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'What is the current state of quantum computing error correction?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 r",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.203,
+          "latency_seconds": 0.185,
           "token_usage": {
             "prompt_tokens": 51,
             "completion_tokens": 50,
@@ -468,7 +468,7 @@
           "last_error": null
         },
         "summarizer": {
-          "latency_seconds": 0.001,
+          "latency_seconds": 0.0,
           "bundles_processed": 1,
           "total_evidence_chunks": 0,
           "total_citations": 0,
@@ -587,7 +587,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_1692",
+              "gap_id": "unanswered_q_5421",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is What is the current state of quantum computing error correction??'",
               "severity": "critical",
@@ -612,7 +612,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_7335",
+              "gap_id": "unanswered_q_8678",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in What is the current state of quantum computing error correction??'",
               "severity": "critical",
@@ -637,7 +637,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_4059",
+              "gap_id": "unanswered_q_2854",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for What is the current state of quantum computing error correction??'",
               "severity": "critical",
@@ -862,7 +862,7 @@
             "Limited availability of peer-reviewed sources": "uncovered",
             "Rapidly evolving field may outdate findings": "covered"
           },
-          "latency_seconds": 0.003,
+          "latency_seconds": 0.002,
           "used_fallback": false
         },
         "report_generator": {
@@ -877,21 +877,21 @@
             "reference_count": 0,
             "citation_count": 0,
             "report_length": 12711,
-            "generation_latency": 0.056
+            "generation_latency": 0.059
           },
           "section_count": 1,
           "reference_count": 0,
           "research_quality_score": 11.8,
-          "latency_seconds": 0.056
+          "latency_seconds": 0.059
         }
       }
     },
     {
       "query": "What are the impacts of climate change on global food security?",
       "status": "report_generation_complete",
-      "elapsed": 0.25,
+      "elapsed": 0.251,
       "report_length": 12664,
-      "report_preview": "# Research Report: What are the impacts of climate change on global food security?\n\n*Generated: 2026-06-15T20:00:06.827026+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'What are the impacts of climate change on global food security?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 res",
+      "report_preview": "# Research Report: What are the impacts of climate change on global food security?\n\n*Generated: 2026-06-15T21:02:51.630613+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'What are the impacts of climate change on global food security?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 res",
       "agent_metrics": {
         "planner": {
           "latency_seconds": 0.188,
@@ -911,7 +911,7 @@
           "last_error": null
         },
         "summarizer": {
-          "latency_seconds": 0.001,
+          "latency_seconds": 0.0,
           "bundles_processed": 1,
           "total_evidence_chunks": 0,
           "total_citations": 0,
@@ -1030,7 +1030,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_1944",
+              "gap_id": "unanswered_q_0716",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is What are the impacts of climate change on global food security??'",
               "severity": "critical",
@@ -1055,7 +1055,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_2108",
+              "gap_id": "unanswered_q_6003",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in What are the impacts of climate change on global food security??'",
               "severity": "critical",
@@ -1080,7 +1080,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_1415",
+              "gap_id": "unanswered_q_0404",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for What are the impacts of climate change on global food security??'",
               "severity": "critical",
@@ -1305,7 +1305,7 @@
             "Limited availability of peer-reviewed sources": "uncovered",
             "Rapidly evolving field may outdate findings": "covered"
           },
-          "latency_seconds": 0.002,
+          "latency_seconds": 0.001,
           "used_fallback": false
         },
         "report_generator": {
@@ -1320,24 +1320,24 @@
             "reference_count": 0,
             "citation_count": 0,
             "report_length": 12664,
-            "generation_latency": 0.059
+            "generation_latency": 0.061
           },
           "section_count": 1,
           "reference_count": 0,
           "research_quality_score": 11.8,
-          "latency_seconds": 0.059
+          "latency_seconds": 0.061
         }
       }
     },
     {
       "query": "Ethical considerations in AI transparency and explainability for healthcare applications",
       "status": "report_generation_complete",
-      "elapsed": 0.248,
+      "elapsed": 0.247,
       "report_length": 13802,
-      "report_preview": "# Research Report: Ethical considerations in AI transparency and explainability for healthcare applications\n\n*Generated: 2026-06-15T20:00:07.075288+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Ethical considerations in AI transparency and explainability for healthcare applications' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (conf",
+      "report_preview": "# Research Report: Ethical considerations in AI transparency and explainability for healthcare applications\n\n*Generated: 2026-06-15T21:02:51.880751+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Ethical considerations in AI transparency and explainability for healthcare applications' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (conf",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.187,
+          "latency_seconds": 0.186,
           "token_usage": {
             "prompt_tokens": 51,
             "completion_tokens": 50,
@@ -1473,7 +1473,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_1476",
+              "gap_id": "unanswered_q_2662",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is Ethical considerations in AI transparency and explainability for healthcare applications?'",
               "severity": "critical",
@@ -1498,7 +1498,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_1672",
+              "gap_id": "unanswered_q_6696",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in Ethical considerations in AI transparency and explainability for healthcare applications?'",
               "severity": "critical",
@@ -1523,7 +1523,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_0584",
+              "gap_id": "unanswered_q_5512",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for Ethical considerations in AI transparency and explainability for healthcare applications?'",
               "severity": "critical",
@@ -1763,24 +1763,24 @@
             "reference_count": 0,
             "citation_count": 0,
             "report_length": 13802,
-            "generation_latency": 0.059
+            "generation_latency": 0.058
           },
           "section_count": 1,
           "reference_count": 0,
           "research_quality_score": 11.8,
-          "latency_seconds": 0.059
+          "latency_seconds": 0.058
         }
       }
     },
     {
       "query": "How do transformer architectures compare to state space models for long-context sequence modeling?",
       "status": "report_generation_complete",
-      "elapsed": 0.251,
+      "elapsed": 0.25,
       "report_length": 14227,
-      "report_preview": "# Research Report: How do transformer architectures compare to state space models for long-context sequence modeling?\n\n*Generated: 2026-06-15T20:00:07.324872+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'How do transformer architectures compare to state space models for long-context sequence modeling?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence i",
+      "report_preview": "# Research Report: How do transformer architectures compare to state space models for long-context sequence modeling?\n\n*Generated: 2026-06-15T21:02:52.129541+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'How do transformer architectures compare to state space models for long-context sequence modeling?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence i",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.187,
+          "latency_seconds": 0.188,
           "token_usage": {
             "prompt_tokens": 54,
             "completion_tokens": 50,
@@ -1916,7 +1916,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_2094",
+              "gap_id": "unanswered_q_4594",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is How do transformer architectures compare to state space models for long-context sequence modeling??'",
               "severity": "critical",
@@ -1941,7 +1941,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_3968",
+              "gap_id": "unanswered_q_1763",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in How do transformer architectures compare to state space models for long-context sequence '",
               "severity": "critical",
@@ -1966,7 +1966,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_8691",
+              "gap_id": "unanswered_q_1583",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for How do transformer architectures compare to state space models for long-context sequence m'",
               "severity": "critical",
@@ -2191,7 +2191,7 @@
             "Limited availability of peer-reviewed sources": "uncovered",
             "Rapidly evolving field may outdate findings": "covered"
           },
-          "latency_seconds": 0.003,
+          "latency_seconds": 0.001,
           "used_fallback": false
         },
         "report_generator": {
@@ -2206,24 +2206,24 @@
             "reference_count": 0,
             "citation_count": 0,
             "report_length": 14227,
-            "generation_latency": 0.06
+            "generation_latency": 0.059
           },
           "section_count": 1,
           "reference_count": 0,
           "research_quality_score": 11.8,
-          "latency_seconds": 0.06
+          "latency_seconds": 0.059
         }
       }
     },
     {
       "query": "What methods exist for detecting and mitigating bias in machine learning models?",
       "status": "report_generation_complete",
-      "elapsed": 0.249,
+      "elapsed": 0.25,
       "report_length": 13442,
-      "report_preview": "# Research Report: What methods exist for detecting and mitigating bias in machine learning models?\n\n*Generated: 2026-06-15T20:00:07.576462+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'What methods exist for detecting and mitigating bias in machine learning models?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100",
+      "report_preview": "# Research Report: What methods exist for detecting and mitigating bias in machine learning models?\n\n*Generated: 2026-06-15T21:02:52.380171+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'What methods exist for detecting and mitigating bias in machine learning models?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.186,
+          "latency_seconds": 0.189,
           "token_usage": {
             "prompt_tokens": 53,
             "completion_tokens": 50,
@@ -2359,7 +2359,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_8621",
+              "gap_id": "unanswered_q_2555",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is What methods exist for detecting and mitigating bias in machine learning models??'",
               "severity": "critical",
@@ -2384,7 +2384,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_8071",
+              "gap_id": "unanswered_q_3278",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in What methods exist for detecting and mitigating bias in machine learning models??'",
               "severity": "critical",
@@ -2409,7 +2409,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_8585",
+              "gap_id": "unanswered_q_3041",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for What methods exist for detecting and mitigating bias in machine learning models??'",
               "severity": "critical",
@@ -2634,7 +2634,7 @@
             "Limited availability of peer-reviewed sources": "uncovered",
             "Rapidly evolving field may outdate findings": "covered"
           },
-          "latency_seconds": 0.003,
+          "latency_seconds": 0.002,
           "used_fallback": false
         },
         "report_generator": {
@@ -2661,12 +2661,12 @@
     {
       "query": "How is artificial intelligence being applied to drug discovery and development?",
       "status": "report_generation_complete",
-      "elapsed": 0.252,
+      "elapsed": 0.248,
       "report_length": 13397,
-      "report_preview": "# Research Report: How is artificial intelligence being applied to drug discovery and development?\n\n*Generated: 2026-06-15T20:00:07.824256+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'How is artificial intelligence being applied to drug discovery and development?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).",
+      "report_preview": "# Research Report: How is artificial intelligence being applied to drug discovery and development?\n\n*Generated: 2026-06-15T21:02:52.625918+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'How is artificial intelligence being applied to drug discovery and development?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.188,
+          "latency_seconds": 0.185,
           "token_usage": {
             "prompt_tokens": 52,
             "completion_tokens": 50,
@@ -2802,7 +2802,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_8258",
+              "gap_id": "unanswered_q_2011",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is How is artificial intelligence being applied to drug discovery and development??'",
               "severity": "critical",
@@ -2827,7 +2827,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_2756",
+              "gap_id": "unanswered_q_2885",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in How is artificial intelligence being applied to drug discovery and development??'",
               "severity": "critical",
@@ -2852,7 +2852,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_2754",
+              "gap_id": "unanswered_q_6594",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for How is artificial intelligence being applied to drug discovery and development??'",
               "severity": "critical",
@@ -3077,7 +3077,7 @@
             "Limited availability of peer-reviewed sources": "uncovered",
             "Rapidly evolving field may outdate findings": "covered"
           },
-          "latency_seconds": 0.002,
+          "latency_seconds": 0.001,
           "used_fallback": false
         },
         "report_generator": {
@@ -3104,12 +3104,12 @@
     {
       "query": "What are the major challenges and opportunities in telemedicine adoption?",
       "status": "report_generation_complete",
-      "elapsed": 0.25,
+      "elapsed": 0.248,
       "report_length": 13127,
-      "report_preview": "# Research Report: What are the major challenges and opportunities in telemedicine adoption?\n\n*Generated: 2026-06-15T20:00:08.075600+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'What are the major challenges and opportunities in telemedicine adoption?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analys",
+      "report_preview": "# Research Report: What are the major challenges and opportunities in telemedicine adoption?\n\n*Generated: 2026-06-15T21:02:52.874969+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'What are the major challenges and opportunities in telemedicine adoption?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analys",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.188,
+          "latency_seconds": 0.186,
           "token_usage": {
             "prompt_tokens": 51,
             "completion_tokens": 50,
@@ -3245,7 +3245,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_8344",
+              "gap_id": "unanswered_q_7242",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is What are the major challenges and opportunities in telemedicine adoption??'",
               "severity": "critical",
@@ -3270,7 +3270,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_4791",
+              "gap_id": "unanswered_q_4524",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in What are the major challenges and opportunities in telemedicine adoption??'",
               "severity": "critical",
@@ -3295,7 +3295,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_7275",
+              "gap_id": "unanswered_q_2007",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for What are the major challenges and opportunities in telemedicine adoption??'",
               "severity": "critical",
@@ -3535,24 +3535,24 @@
             "reference_count": 0,
             "citation_count": 0,
             "report_length": 13127,
-            "generation_latency": 0.059
+            "generation_latency": 0.06
           },
           "section_count": 1,
           "reference_count": 0,
           "research_quality_score": 11.8,
-          "latency_seconds": 0.059
+          "latency_seconds": 0.06
         }
       }
     },
     {
       "query": "How effective are AI-powered intrusion detection systems compared to traditional signature-based methods?",
       "status": "report_generation_complete",
-      "elapsed": 0.253,
+      "elapsed": 0.246,
       "report_length": 14521,
-      "report_preview": "# Research Report: How effective are AI-powered intrusion detection systems compared to traditional signature-based methods?\n\n*Generated: 2026-06-15T20:00:08.327583+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'How effective are AI-powered intrusion detection systems compared to traditional signature-based methods?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strong",
+      "report_preview": "# Research Report: How effective are AI-powered intrusion detection systems compared to traditional signature-based methods?\n\n*Generated: 2026-06-15T21:02:53.122440+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'How effective are AI-powered intrusion detection systems compared to traditional signature-based methods?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strong",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.19,
+          "latency_seconds": 0.185,
           "token_usage": {
             "prompt_tokens": 53,
             "completion_tokens": 50,
@@ -3688,7 +3688,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_5222",
+              "gap_id": "unanswered_q_3855",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is How effective are AI-powered intrusion detection systems compared to traditional signature-based methods??'",
               "severity": "critical",
@@ -3713,7 +3713,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_1894",
+              "gap_id": "unanswered_q_7148",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in How effective are AI-powered intrusion detection systems compared to traditional signatur'",
               "severity": "critical",
@@ -3738,7 +3738,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_0929",
+              "gap_id": "unanswered_q_0331",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for How effective are AI-powered intrusion detection systems compared to traditional signature'",
               "severity": "critical",
@@ -3963,7 +3963,7 @@
             "Limited availability of peer-reviewed sources": "uncovered",
             "Rapidly evolving field may outdate findings": "covered"
           },
-          "latency_seconds": 0.002,
+          "latency_seconds": 0.001,
           "used_fallback": false
         },
         "report_generator": {
@@ -3978,24 +3978,24 @@
             "reference_count": 0,
             "citation_count": 0,
             "report_length": 14521,
-            "generation_latency": 0.06
+            "generation_latency": 0.059
           },
           "section_count": 1,
           "reference_count": 0,
           "research_quality_score": 11.8,
-          "latency_seconds": 0.06
+          "latency_seconds": 0.059
         }
       }
     },
     {
       "query": "What role does carbon capture utilization and storage play in achieving net-zero emissions?",
       "status": "report_generation_complete",
-      "elapsed": 0.25,
+      "elapsed": 0.246,
       "report_length": 13932,
-      "report_preview": "# Research Report: What role does carbon capture utilization and storage play in achieving net-zero emissions?\n\n*Generated: 2026-06-15T20:00:08.578407+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'What role does carbon capture utilization and storage play in achieving net-zero emissions?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general'",
+      "report_preview": "# Research Report: What role does carbon capture utilization and storage play in achieving net-zero emissions?\n\n*Generated: 2026-06-15T21:02:53.368956+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'What role does carbon capture utilization and storage play in achieving net-zero emissions?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general'",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.187,
+          "latency_seconds": 0.184,
           "token_usage": {
             "prompt_tokens": 54,
             "completion_tokens": 50,
@@ -4131,7 +4131,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_2132",
+              "gap_id": "unanswered_q_8800",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is What role does carbon capture utilization and storage play in achieving net-zero emissions??'",
               "severity": "critical",
@@ -4156,7 +4156,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_1104",
+              "gap_id": "unanswered_q_4320",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in What role does carbon capture utilization and storage play in achieving net-zero emission'",
               "severity": "critical",
@@ -4181,7 +4181,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_3719",
+              "gap_id": "unanswered_q_1637",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for What role does carbon capture utilization and storage play in achieving net-zero emissions'",
               "severity": "critical",
@@ -4406,7 +4406,7 @@
             "Limited availability of peer-reviewed sources": "uncovered",
             "Rapidly evolving field may outdate findings": "covered"
           },
-          "latency_seconds": 0.002,
+          "latency_seconds": 0.001,
           "used_fallback": false
         },
         "report_generator": {
@@ -4421,24 +4421,24 @@
             "reference_count": 0,
             "citation_count": 0,
             "report_length": 13932,
-            "generation_latency": 0.06
+            "generation_latency": 0.059
           },
           "section_count": 1,
           "reference_count": 0,
           "research_quality_score": 11.8,
-          "latency_seconds": 0.06
+          "latency_seconds": 0.059
         }
       }
     },
     {
       "query": "How do large language models change software testing and debugging practices?",
       "status": "report_generation_complete",
-      "elapsed": 0.25,
+      "elapsed": 0.248,
       "report_length": 13307,
-      "report_preview": "# Research Report: How do large language models change software testing and debugging practices?\n\n*Generated: 2026-06-15T20:00:08.827880+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'How do large language models change software testing and debugging practices?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nTh",
+      "report_preview": "# Research Report: How do large language models change software testing and debugging practices?\n\n*Generated: 2026-06-15T21:02:53.616095+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'How do large language models change software testing and debugging practices?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nTh",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.187,
+          "latency_seconds": 0.186,
           "token_usage": {
             "prompt_tokens": 52,
             "completion_tokens": 50,
@@ -4574,7 +4574,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_1418",
+              "gap_id": "unanswered_q_8327",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is How do large language models change software testing and debugging practices??'",
               "severity": "critical",
@@ -4599,7 +4599,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_4557",
+              "gap_id": "unanswered_q_9569",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in How do large language models change software testing and debugging practices??'",
               "severity": "critical",
@@ -4624,7 +4624,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_3040",
+              "gap_id": "unanswered_q_2309",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for How do large language models change software testing and debugging practices??'",
               "severity": "critical",
@@ -4864,12 +4864,12 @@
             "reference_count": 0,
             "citation_count": 0,
             "report_length": 13307,
-            "generation_latency": 0.061
+            "generation_latency": 0.06
           },
           "section_count": 1,
           "reference_count": 0,
           "research_quality_score": 11.8,
-          "latency_seconds": 0.061
+          "latency_seconds": 0.06
         }
       }
     },
@@ -4878,10 +4878,10 @@
       "status": "report_generation_complete",
       "elapsed": 0.25,
       "report_length": 13082,
-      "report_preview": "# Research Report: What is the economic impact of artificial intelligence on labor markets?\n\n*Generated: 2026-06-15T20:00:09.078950+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'What is the economic impact of artificial intelligence on labor markets?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis",
+      "report_preview": "# Research Report: What is the economic impact of artificial intelligence on labor markets?\n\n*Generated: 2026-06-15T21:02:53.866499+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'What is the economic impact of artificial intelligence on labor markets?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.187,
+          "latency_seconds": 0.188,
           "token_usage": {
             "prompt_tokens": 52,
             "completion_tokens": 50,
@@ -5017,7 +5017,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_5791",
+              "gap_id": "unanswered_q_1936",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is What is the economic impact of artificial intelligence on labor markets??'",
               "severity": "critical",
@@ -5042,7 +5042,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_7815",
+              "gap_id": "unanswered_q_9088",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in What is the economic impact of artificial intelligence on labor markets??'",
               "severity": "critical",
@@ -5067,7 +5067,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_1111",
+              "gap_id": "unanswered_q_2099",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for What is the economic impact of artificial intelligence on labor markets??'",
               "severity": "critical",
@@ -5307,24 +5307,24 @@
             "reference_count": 0,
             "citation_count": 0,
             "report_length": 13082,
-            "generation_latency": 0.059
+            "generation_latency": 0.06
           },
           "section_count": 1,
           "reference_count": 0,
           "research_quality_score": 11.8,
-          "latency_seconds": 0.059
+          "latency_seconds": 0.06
         }
       }
     },
     {
       "query": "What is the effectiveness of adaptive learning technologies in personalized education?",
       "status": "report_generation_complete",
-      "elapsed": 0.28,
+      "elapsed": 0.25,
       "report_length": 13712,
-      "report_preview": "# Research Report: What is the effectiveness of adaptive learning technologies in personalized education?\n\n*Generated: 2026-06-15T20:00:09.360028+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'What is the effectiveness of adaptive learning technologies in personalized education?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confiden",
+      "report_preview": "# Research Report: What is the effectiveness of adaptive learning technologies in personalized education?\n\n*Generated: 2026-06-15T21:02:54.117281+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'What is the effectiveness of adaptive learning technologies in personalized education?' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confiden",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.218,
+          "latency_seconds": 0.188,
           "token_usage": {
             "prompt_tokens": 52,
             "completion_tokens": 50,
@@ -5460,7 +5460,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_0244",
+              "gap_id": "unanswered_q_6333",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is What is the effectiveness of adaptive learning technologies in personalized education??'",
               "severity": "critical",
@@ -5485,7 +5485,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_9133",
+              "gap_id": "unanswered_q_2240",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in What is the effectiveness of adaptive learning technologies in personalized education??'",
               "severity": "critical",
@@ -5510,7 +5510,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_1008",
+              "gap_id": "unanswered_q_9362",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for What is the effectiveness of adaptive learning technologies in personalized education??'",
               "severity": "critical",
@@ -5764,9 +5764,9 @@
     {
       "query": "AI Ethics and Transparency in Healthcare Decision-Making",
       "status": "report_generation_complete",
-      "elapsed": 0.25,
+      "elapsed": 0.251,
       "report_length": 12335,
-      "report_preview": "# Research Report: AI Ethics and Transparency in Healthcare Decision-Making\n\n*Generated: 2026-06-15T20:00:09.610962+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'AI Ethics and Transparency in Healthcare Decision-Making' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 research gaps (7 ",
+      "report_preview": "# Research Report: AI Ethics and Transparency in Healthcare Decision-Making\n\n*Generated: 2026-06-15T21:02:54.366010+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'AI Ethics and Transparency in Healthcare Decision-Making' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 research gaps (7 ",
       "agent_metrics": {
         "planner": {
           "latency_seconds": 0.188,
@@ -5905,7 +5905,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_2834",
+              "gap_id": "unanswered_q_4494",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is AI Ethics and Transparency in Healthcare Decision-Making?'",
               "severity": "critical",
@@ -5930,7 +5930,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_9673",
+              "gap_id": "unanswered_q_8478",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in AI Ethics and Transparency in Healthcare Decision-Making?'",
               "severity": "critical",
@@ -5955,7 +5955,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_7539",
+              "gap_id": "unanswered_q_7998",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for AI Ethics and Transparency in Healthcare Decision-Making?'",
               "severity": "critical",
@@ -6180,7 +6180,7 @@
             "Limited availability of peer-reviewed sources": "uncovered",
             "Rapidly evolving field may outdate findings": "covered"
           },
-          "latency_seconds": 0.002,
+          "latency_seconds": 0.001,
           "used_fallback": false
         },
         "report_generator": {
@@ -6195,24 +6195,24 @@
             "reference_count": 0,
             "citation_count": 0,
             "report_length": 12335,
-            "generation_latency": 0.058
+            "generation_latency": 0.061
           },
           "section_count": 1,
           "reference_count": 0,
           "research_quality_score": 11.8,
-          "latency_seconds": 0.058
+          "latency_seconds": 0.061
         }
       }
     },
     {
       "query": "Quantum Machine Learning: Algorithms, Hardware, and Applications",
       "status": "report_generation_complete",
-      "elapsed": 0.251,
+      "elapsed": 0.248,
       "report_length": 12711,
-      "report_preview": "# Research Report: Quantum Machine Learning: Algorithms, Hardware, and Applications\n\n*Generated: 2026-06-15T20:00:09.860424+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Quantum Machine Learning: Algorithms, Hardware, and Applications' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 r",
+      "report_preview": "# Research Report: Quantum Machine Learning: Algorithms, Hardware, and Applications\n\n*Generated: 2026-06-15T21:02:54.614658+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Quantum Machine Learning: Algorithms, Hardware, and Applications' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 r",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.189,
+          "latency_seconds": 0.186,
           "token_usage": {
             "prompt_tokens": 48,
             "completion_tokens": 50,
@@ -6348,7 +6348,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_0901",
+              "gap_id": "unanswered_q_2188",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is Quantum Machine Learning: Algorithms, Hardware, and Applications?'",
               "severity": "critical",
@@ -6373,7 +6373,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_6822",
+              "gap_id": "unanswered_q_2099",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in Quantum Machine Learning: Algorithms, Hardware, and Applications?'",
               "severity": "critical",
@@ -6398,7 +6398,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_3719",
+              "gap_id": "unanswered_q_7105",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for Quantum Machine Learning: Algorithms, Hardware, and Applications?'",
               "severity": "critical",
@@ -6650,12 +6650,12 @@
     {
       "query": "Federated Learning and Differential Privacy for Distributed Healthcare Data",
       "status": "report_generation_complete",
-      "elapsed": 0.252,
+      "elapsed": 0.25,
       "report_length": 13217,
-      "report_preview": "# Research Report: Federated Learning and Differential Privacy for Distributed Healthcare Data\n\n*Generated: 2026-06-15T20:00:10.112832+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Federated Learning and Differential Privacy for Distributed Healthcare Data' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe an",
+      "report_preview": "# Research Report: Federated Learning and Differential Privacy for Distributed Healthcare Data\n\n*Generated: 2026-06-15T21:02:54.864891+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Federated Learning and Differential Privacy for Distributed Healthcare Data' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe an",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.19,
+          "latency_seconds": 0.188,
           "token_usage": {
             "prompt_tokens": 50,
             "completion_tokens": 50,
@@ -6791,7 +6791,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_7970",
+              "gap_id": "unanswered_q_4031",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is Federated Learning and Differential Privacy for Distributed Healthcare Data?'",
               "severity": "critical",
@@ -6816,7 +6816,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_2277",
+              "gap_id": "unanswered_q_0387",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in Federated Learning and Differential Privacy for Distributed Healthcare Data?'",
               "severity": "critical",
@@ -6841,7 +6841,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_6192",
+              "gap_id": "unanswered_q_6515",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for Federated Learning and Differential Privacy for Distributed Healthcare Data?'",
               "severity": "critical",
@@ -7066,7 +7066,7 @@
             "Limited availability of peer-reviewed sources": "uncovered",
             "Rapidly evolving field may outdate findings": "covered"
           },
-          "latency_seconds": 0.002,
+          "latency_seconds": 0.001,
           "used_fallback": false
         },
         "report_generator": {
@@ -7081,24 +7081,24 @@
             "reference_count": 0,
             "citation_count": 0,
             "report_length": 13217,
-            "generation_latency": 0.059
+            "generation_latency": 0.06
           },
           "section_count": 1,
           "reference_count": 0,
           "research_quality_score": 11.8,
-          "latency_seconds": 0.059
+          "latency_seconds": 0.06
         }
       }
     },
     {
       "query": "Direct Air Capture: Technology Readiness and Economic Viability",
       "status": "report_generation_complete",
-      "elapsed": 0.249,
+      "elapsed": 0.248,
       "report_length": 12664,
-      "report_preview": "# Research Report: Direct Air Capture: Technology Readiness and Economic Viability\n\n*Generated: 2026-06-15T20:00:10.362767+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Direct Air Capture: Technology Readiness and Economic Viability' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 res",
+      "report_preview": "# Research Report: Direct Air Capture: Technology Readiness and Economic Viability\n\n*Generated: 2026-06-15T21:02:55.115007+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Direct Air Capture: Technology Readiness and Economic Viability' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 res",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.187,
+          "latency_seconds": 0.186,
           "token_usage": {
             "prompt_tokens": 49,
             "completion_tokens": 50,
@@ -7234,7 +7234,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_2000",
+              "gap_id": "unanswered_q_8274",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is Direct Air Capture: Technology Readiness and Economic Viability?'",
               "severity": "critical",
@@ -7259,7 +7259,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_0808",
+              "gap_id": "unanswered_q_0261",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in Direct Air Capture: Technology Readiness and Economic Viability?'",
               "severity": "critical",
@@ -7284,7 +7284,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_1610",
+              "gap_id": "unanswered_q_8306",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for Direct Air Capture: Technology Readiness and Economic Viability?'",
               "severity": "critical",
@@ -7524,24 +7524,24 @@
             "reference_count": 0,
             "citation_count": 0,
             "report_length": 12664,
-            "generation_latency": 0.059
+            "generation_latency": 0.058
           },
           "section_count": 1,
           "reference_count": 0,
           "research_quality_score": 11.8,
-          "latency_seconds": 0.059
+          "latency_seconds": 0.058
         }
       }
     },
     {
       "query": "Adversarial Robustness in Deep Learning Systems",
       "status": "report_generation_complete",
-      "elapsed": 0.245,
+      "elapsed": 0.25,
       "report_length": 11912,
-      "report_preview": "# Research Report: Adversarial Robustness in Deep Learning Systems\n\n*Generated: 2026-06-15T20:00:10.609502+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Adversarial Robustness in Deep Learning Systems' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 research gaps (7 critical, 5 high s",
+      "report_preview": "# Research Report: Adversarial Robustness in Deep Learning Systems\n\n*Generated: 2026-06-15T21:02:55.362898+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Adversarial Robustness in Deep Learning Systems' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 research gaps (7 critical, 5 high s",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.185,
+          "latency_seconds": 0.188,
           "token_usage": {
             "prompt_tokens": 47,
             "completion_tokens": 50,
@@ -7677,7 +7677,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_8217",
+              "gap_id": "unanswered_q_4815",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is Adversarial Robustness in Deep Learning Systems?'",
               "severity": "critical",
@@ -7702,7 +7702,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_6435",
+              "gap_id": "unanswered_q_4147",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in Adversarial Robustness in Deep Learning Systems?'",
               "severity": "critical",
@@ -7727,7 +7727,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_7743",
+              "gap_id": "unanswered_q_0422",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for Adversarial Robustness in Deep Learning Systems?'",
               "severity": "critical",
@@ -7952,7 +7952,7 @@
             "Limited availability of peer-reviewed sources": "uncovered",
             "Rapidly evolving field may outdate findings": "covered"
           },
-          "latency_seconds": 0.002,
+          "latency_seconds": 0.001,
           "used_fallback": false
         },
         "report_generator": {
@@ -7967,24 +7967,24 @@
             "reference_count": 0,
             "citation_count": 0,
             "report_length": 11912,
-            "generation_latency": 0.058
+            "generation_latency": 0.06
           },
           "section_count": 1,
           "reference_count": 0,
           "research_quality_score": 11.8,
-          "latency_seconds": 0.058
+          "latency_seconds": 0.06
         }
       }
     },
     {
       "query": "Large Language Models for Code Generation and Software Engineering",
       "status": "report_generation_complete",
-      "elapsed": 0.251,
+      "elapsed": 0.249,
       "report_length": 12805,
-      "report_preview": "# Research Report: Large Language Models for Code Generation and Software Engineering\n\n*Generated: 2026-06-15T20:00:10.858446+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Large Language Models for Code Generation and Software Engineering' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified ",
+      "report_preview": "# Research Report: Large Language Models for Code Generation and Software Engineering\n\n*Generated: 2026-06-15T21:02:55.612740+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Large Language Models for Code Generation and Software Engineering' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified ",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.187,
+          "latency_seconds": 0.188,
           "token_usage": {
             "prompt_tokens": 50,
             "completion_tokens": 50,
@@ -8120,7 +8120,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_6917",
+              "gap_id": "unanswered_q_0920",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is Large Language Models for Code Generation and Software Engineering?'",
               "severity": "critical",
@@ -8145,7 +8145,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_2479",
+              "gap_id": "unanswered_q_0648",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in Large Language Models for Code Generation and Software Engineering?'",
               "severity": "critical",
@@ -8170,7 +8170,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_7797",
+              "gap_id": "unanswered_q_2751",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for Large Language Models for Code Generation and Software Engineering?'",
               "severity": "critical",
@@ -8395,7 +8395,7 @@
             "Limited availability of peer-reviewed sources": "uncovered",
             "Rapidly evolving field may outdate findings": "covered"
           },
-          "latency_seconds": 0.002,
+          "latency_seconds": 0.001,
           "used_fallback": false
         },
         "report_generator": {
@@ -8410,24 +8410,24 @@
             "reference_count": 0,
             "citation_count": 0,
             "report_length": 12805,
-            "generation_latency": 0.059
+            "generation_latency": 0.06
           },
           "section_count": 1,
           "reference_count": 0,
           "research_quality_score": 11.8,
-          "latency_seconds": 0.059
+          "latency_seconds": 0.06
         }
       }
     },
     {
       "query": "Climate Risk Assessment for Global Supply Chains",
       "status": "report_generation_complete",
-      "elapsed": 0.248,
+      "elapsed": 0.249,
       "report_length": 11959,
-      "report_preview": "# Research Report: Climate Risk Assessment for Global Supply Chains\n\n*Generated: 2026-06-15T20:00:11.106302+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Climate Risk Assessment for Global Supply Chains' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 research gaps (7 critical, 5 high",
+      "report_preview": "# Research Report: Climate Risk Assessment for Global Supply Chains\n\n*Generated: 2026-06-15T21:02:55.862911+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Climate Risk Assessment for Global Supply Chains' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 research gaps (7 critical, 5 high",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.185,
+          "latency_seconds": 0.188,
           "token_usage": {
             "prompt_tokens": 48,
             "completion_tokens": 50,
@@ -8563,7 +8563,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_6791",
+              "gap_id": "unanswered_q_3618",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is Climate Risk Assessment for Global Supply Chains?'",
               "severity": "critical",
@@ -8588,7 +8588,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_1588",
+              "gap_id": "unanswered_q_7114",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in Climate Risk Assessment for Global Supply Chains?'",
               "severity": "critical",
@@ -8613,7 +8613,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_6275",
+              "gap_id": "unanswered_q_6392",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for Climate Risk Assessment for Global Supply Chains?'",
               "severity": "critical",
@@ -8838,7 +8838,7 @@
             "Limited availability of peer-reviewed sources": "uncovered",
             "Rapidly evolving field may outdate findings": "covered"
           },
-          "latency_seconds": 0.002,
+          "latency_seconds": 0.001,
           "used_fallback": false
         },
         "report_generator": {
@@ -8865,12 +8865,12 @@
     {
       "query": "AI-Driven Drug Discovery: Methods, Successes, and Limitations",
       "status": "report_generation_complete",
-      "elapsed": 0.253,
+      "elapsed": 0.25,
       "report_length": 12570,
-      "report_preview": "# Research Report: AI-Driven Drug Discovery: Methods, Successes, and Limitations\n\n*Generated: 2026-06-15T20:00:11.357497+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'AI-Driven Drug Discovery: Methods, Successes, and Limitations' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 researc",
+      "report_preview": "# Research Report: AI-Driven Drug Discovery: Methods, Successes, and Limitations\n\n*Generated: 2026-06-15T21:02:56.111943+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'AI-Driven Drug Discovery: Methods, Successes, and Limitations' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 researc",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.189,
+          "latency_seconds": 0.188,
           "token_usage": {
             "prompt_tokens": 48,
             "completion_tokens": 50,
@@ -9006,7 +9006,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_7981",
+              "gap_id": "unanswered_q_9352",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is AI-Driven Drug Discovery: Methods, Successes, and Limitations?'",
               "severity": "critical",
@@ -9031,7 +9031,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_1218",
+              "gap_id": "unanswered_q_3388",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in AI-Driven Drug Discovery: Methods, Successes, and Limitations?'",
               "severity": "critical",
@@ -9056,7 +9056,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_4184",
+              "gap_id": "unanswered_q_0340",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for AI-Driven Drug Discovery: Methods, Successes, and Limitations?'",
               "severity": "critical",
@@ -9296,24 +9296,24 @@
             "reference_count": 0,
             "citation_count": 0,
             "report_length": 12570,
-            "generation_latency": 0.061
+            "generation_latency": 0.059
           },
           "section_count": 1,
           "reference_count": 0,
           "research_quality_score": 11.8,
-          "latency_seconds": 0.061
+          "latency_seconds": 0.059
         }
       }
     },
     {
       "query": "Low-Resource NLP: Transfer Learning and Cross-Lingual Methods",
       "status": "report_generation_complete",
-      "elapsed": 0.252,
+      "elapsed": 0.25,
       "report_length": 12570,
-      "report_preview": "# Research Report: Low-Resource NLP: Transfer Learning and Cross-Lingual Methods\n\n*Generated: 2026-06-15T20:00:11.610550+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Low-Resource NLP: Transfer Learning and Cross-Lingual Methods' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 researc",
+      "report_preview": "# Research Report: Low-Resource NLP: Transfer Learning and Cross-Lingual Methods\n\n*Generated: 2026-06-15T21:02:56.362073+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Low-Resource NLP: Transfer Learning and Cross-Lingual Methods' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 researc",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.189,
+          "latency_seconds": 0.188,
           "token_usage": {
             "prompt_tokens": 48,
             "completion_tokens": 50,
@@ -9449,7 +9449,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_4670",
+              "gap_id": "unanswered_q_1024",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is Low-Resource NLP: Transfer Learning and Cross-Lingual Methods?'",
               "severity": "critical",
@@ -9474,7 +9474,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_2405",
+              "gap_id": "unanswered_q_8233",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in Low-Resource NLP: Transfer Learning and Cross-Lingual Methods?'",
               "severity": "critical",
@@ -9499,7 +9499,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_2280",
+              "gap_id": "unanswered_q_8407",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for Low-Resource NLP: Transfer Learning and Cross-Lingual Methods?'",
               "severity": "critical",
@@ -9724,7 +9724,7 @@
             "Limited availability of peer-reviewed sources": "uncovered",
             "Rapidly evolving field may outdate findings": "covered"
           },
-          "latency_seconds": 0.002,
+          "latency_seconds": 0.001,
           "used_fallback": false
         },
         "report_generator": {
@@ -9739,12 +9739,12 @@
             "reference_count": 0,
             "citation_count": 0,
             "report_length": 12570,
-            "generation_latency": 0.06
+            "generation_latency": 0.059
           },
           "section_count": 1,
           "reference_count": 0,
           "research_quality_score": 11.8,
-          "latency_seconds": 0.06
+          "latency_seconds": 0.059
         }
       }
     },
@@ -9753,10 +9753,10 @@
       "status": "report_generation_complete",
       "elapsed": 0.251,
       "report_length": 12382,
-      "report_preview": "# Research Report: Economic Impacts of AI Automation on Global Labor Markets\n\n*Generated: 2026-06-15T20:00:11.861252+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Economic Impacts of AI Automation on Global Labor Markets' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 research gaps (",
+      "report_preview": "# Research Report: Economic Impacts of AI Automation on Global Labor Markets\n\n*Generated: 2026-06-15T21:02:56.612372+00:00*\n\n> **Quality Assessment**: \ud83d\udd34 Needs Improvement (11.8/100)\n\n## Executive Summary\n\nThis report investigates 'Economic Impacts of AI Automation on Global Labor Markets' across 1 subtopics with an average confidence score of 10.0/100.\n\nThe analysis yielded 1 key findings.\n\nThe strongest evidence is in 'general' (confidence: 10.0/100).\n\nThe analysis identified 13 research gaps (",
       "agent_metrics": {
         "planner": {
-          "latency_seconds": 0.188,
+          "latency_seconds": 0.189,
           "token_usage": {
             "prompt_tokens": 50,
             "completion_tokens": 50,
@@ -9892,7 +9892,7 @@
               "confidence": 85.0
             },
             {
-              "gap_id": "unanswered_q_3351",
+              "gap_id": "unanswered_q_0029",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What is Economic Impacts of AI Automation on Global Labor Markets?'",
               "severity": "critical",
@@ -9917,7 +9917,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_3056",
+              "gap_id": "unanswered_q_7100",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What are the key challenges in Economic Impacts of AI Automation on Global Labor Markets?'",
               "severity": "critical",
@@ -9942,7 +9942,7 @@
               "confidence": 80.0
             },
             {
-              "gap_id": "unanswered_q_5812",
+              "gap_id": "unanswered_q_1255",
               "gap_type": "MISSING_RESEARCH_QUESTION",
               "description": "Research question not answered by any summary: 'What best practices exist for Economic Impacts of AI Automation on Global Labor Markets?'",
               "severity": "critical",
@@ -10167,7 +10167,7 @@
             "Limited availability of peer-reviewed sources": "uncovered",
             "Rapidly evolving field may outdate findings": "covered"
           },
-          "latency_seconds": 0.002,
+          "latency_seconds": 0.001,
           "used_fallback": false
         },
         "report_generator": {
@@ -10192,5 +10192,5 @@
       }
     }
   ],
-  "timestamp": "2026-06-15T20:00:06.124511+00:00"
+  "timestamp": "2026-06-15T21:02:50.944998+00:00"
 }

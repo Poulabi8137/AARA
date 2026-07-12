@@ -1,4 +1,5 @@
 """Tests for paper authoring agents, schemas, and API."""
+
 from __future__ import annotations
 
 import json
@@ -13,11 +14,15 @@ from app.agents.citation_validator_agent import CitationValidatorAgent
 from app.agents.evidence_validator_agent import EvidenceValidatorAgent
 from app.agents.state import make_initial_state
 from app.schemas.paper import (
-    ProposalCreate, PaperGenerateRequest,
-    SectionRewriteRequest, BasePaperAnalysisCreate,
+    ProposalCreate,
+    PaperGenerateRequest,
+    SectionRewriteRequest,
+    BasePaperAnalysisCreate,
 )
 from app.models.paper import (
-    PaperStatus, SectionStatus, PaperOperation,
+    PaperStatus,
+    SectionStatus,
+    PaperOperation,
     EvidenceClass,
 )
 
@@ -27,7 +32,9 @@ class TestProposalAgent:
         mock_llm = MagicMock()
         mock_llm.generate = AsyncMock(side_effect=Exception("LLM failed"))
         agent = ProposalAgent(llm_provider=mock_llm)
-        state = make_initial_state(query="test gap", project_id="p1", objective="test objective")
+        state = make_initial_state(
+            query="test gap", project_id="p1", objective="test objective"
+        )
         state["selected_gap"] = {"description": "research gap in AI", "id": "gap1"}
         state["domain"] = "Artificial Intelligence"
         state["keywords"] = "machine learning, deep learning"
@@ -44,18 +51,20 @@ class TestProposalAgent:
 
     async def test_arun_with_llm_response(self):
         mock_response = MagicMock()
-        mock_response.content = json.dumps({
-            "proposed_title": "Novel AI Approach",
-            "problem_statement": "Key problem in AI",
-            "motivation": "Why this matters",
-            "research_questions": ["Q1?", "Q2?", "Q3?"],
-            "hypothesis": "Our approach will improve accuracy",
-            "objectives": ["O1", "O2"],
-            "expected_contributions": ["C1", "C2"],
-            "proposed_methodology": "Deep learning approach",
-            "evaluation_strategy": "Benchmark evaluation",
-            "future_scope": "Extension to other domains",
-        })
+        mock_response.content = json.dumps(
+            {
+                "proposed_title": "Novel AI Approach",
+                "problem_statement": "Key problem in AI",
+                "motivation": "Why this matters",
+                "research_questions": ["Q1?", "Q2?", "Q3?"],
+                "hypothesis": "Our approach will improve accuracy",
+                "objectives": ["O1", "O2"],
+                "expected_contributions": ["C1", "C2"],
+                "proposed_methodology": "Deep learning approach",
+                "evaluation_strategy": "Benchmark evaluation",
+                "future_scope": "Extension to other domains",
+            }
+        )
         mock_llm = MagicMock()
         mock_llm.generate = AsyncMock(return_value=mock_response)
         agent = ProposalAgent(llm_provider=mock_llm)
@@ -72,10 +81,16 @@ class TestProposalAgent:
         agent = ProposalAgent(llm_provider=mock_llm)
         proposal = agent._fallback_proposal("AI safety alignment", "AI")
         required_keys = [
-            "proposed_title", "problem_statement", "motivation",
-            "research_questions", "hypothesis", "objectives",
-            "expected_contributions", "proposed_methodology",
-            "evaluation_strategy", "future_scope",
+            "proposed_title",
+            "problem_statement",
+            "motivation",
+            "research_questions",
+            "hypothesis",
+            "objectives",
+            "expected_contributions",
+            "proposed_methodology",
+            "evaluation_strategy",
+            "future_scope",
         ]
         for key in required_keys:
             assert key in proposal, f"Missing key: {key}"
@@ -134,10 +149,23 @@ class TestPaperAuthorAgent:
         paper = agent._template_paper(proposal)
         assert len(paper["sections"]) == 15
         titles = [s["section_title"] for s in paper["sections"]]
-        expected = ["Introduction", "Related Work", "Problem Statement", "Research Gap",
-                     "Proposed Solution", "System Architecture", "Methodology", "Algorithm",
-                     "Mathematical Model", "Experimental Design", "Expected Results",
-                     "Discussion", "Threats to Validity", "Future Work", "Conclusion"]
+        expected = [
+            "Introduction",
+            "Related Work",
+            "Problem Statement",
+            "Research Gap",
+            "Proposed Solution",
+            "System Architecture",
+            "Methodology",
+            "Algorithm",
+            "Mathematical Model",
+            "Experimental Design",
+            "Expected Results",
+            "Discussion",
+            "Threats to Validity",
+            "Future Work",
+            "Conclusion",
+        ]
         assert titles == expected
 
 
@@ -158,8 +186,13 @@ class TestQualityReviewAgent:
         state["paper_draft"] = {
             "title": "Test Paper",
             "abstract": "Abstract here",
-            "sections": [{"section_number": i, "section_title": f"S{i}", "content": "x"} for i in range(1, 16)],
-            "references": [{"citation_key": "[1]", "authors": "A", "title": "T", "year": 2024}],
+            "sections": [
+                {"section_number": i, "section_title": f"S{i}", "content": "x"}
+                for i in range(1, 16)
+            ],
+            "references": [
+                {"citation_key": "[1]", "authors": "A", "title": "T", "year": 2024}
+            ],
         }
         state = await agent.arun(state)
         review = state.get("quality_review", {})
@@ -183,9 +216,26 @@ class TestCitationValidatorAgent:
         mock_llm = MagicMock()
         agent = CitationValidatorAgent(llm_provider=mock_llm)
         refs = [
-            {"citation_key": "[1]", "authors": "Smith, J.", "title": "AI Advances", "year": 2024, "doi": "10.1234/test"},
-            {"citation_key": "[2]", "authors": "Placeholder", "title": "Placeholder Title", "year": 2023},
-            {"citation_key": "[1]", "authors": "Smith, J.", "title": "AI Advances", "year": 2024, "doi": "10.1234/test"},
+            {
+                "citation_key": "[1]",
+                "authors": "Smith, J.",
+                "title": "AI Advances",
+                "year": 2024,
+                "doi": "10.1234/test",
+            },
+            {
+                "citation_key": "[2]",
+                "authors": "Placeholder",
+                "title": "Placeholder Title",
+                "year": 2023,
+            },
+            {
+                "citation_key": "[1]",
+                "authors": "Smith, J.",
+                "title": "AI Advances",
+                "year": 2024,
+                "doi": "10.1234/test",
+            },
         ]
         results = agent._rule_based_validation(refs)
         assert len(results) == 3
@@ -197,7 +247,9 @@ class TestCitationValidatorAgent:
     def test_ieee_format(self):
         mock_llm = MagicMock()
         agent = CitationValidatorAgent(llm_provider=mock_llm)
-        formatted = agent._format_ieee({"authors": "J. Smith", "title": "AI", "journal": "IEEE", "year": 2024})
+        formatted = agent._format_ieee(
+            {"authors": "J. Smith", "title": "AI", "journal": "IEEE", "year": 2024}
+        )
         assert "J. Smith" in formatted
         assert "AI" in formatted
 
@@ -251,7 +303,9 @@ class TestPaperModels:
 
 class TestPaperSchemas:
     def test_proposal_create_schema(self):
-        data = ProposalCreate(project_id=str(uuid.uuid4()), domain="AI", objective="Test")
+        data = ProposalCreate(
+            project_id=str(uuid.uuid4()), domain="AI", objective="Test"
+        )
         assert data.project_id
         assert data.domain == "AI"
 
@@ -263,7 +317,9 @@ class TestPaperSchemas:
         assert req2.operation == "expand"
 
     def test_paper_generate_request(self):
-        req = PaperGenerateRequest(project_id=str(uuid.uuid4()), proposal_id=str(uuid.uuid4()))
+        req = PaperGenerateRequest(
+            project_id=str(uuid.uuid4()), proposal_id=str(uuid.uuid4())
+        )
         assert req.project_id
         assert req.proposal_id
 

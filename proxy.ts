@@ -68,11 +68,6 @@ function isValidToken(token: string | undefined): boolean {
   if (!secret) {
     if (!_warnedMissingSecret) {
       _warnedMissingSecret = true
-      console.error(
-        '[proxy.ts] FATAL: JWT_SECRET environment variable is not set. ' +
-        'All protected routes will redirect to login. ' +
-        'Set JWT_SECRET to match backend SECRET_KEY for authentication to work.'
-      )
     }
     return false
   }
@@ -87,7 +82,7 @@ function isValidToken(token: string | undefined): boolean {
   return true
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = request.cookies.get('auth_token')?.value
   const isAuthenticated = isValidToken(token)

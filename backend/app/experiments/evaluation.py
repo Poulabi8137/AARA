@@ -76,7 +76,9 @@ class EvaluationPlanner:
         outcomes = self._default_outcomes()
 
         if self._llm and settings.enable_llm:
-            llm_metrics, llm_outcomes = await self._llm_plan(query, methodology_result, phases)
+            llm_metrics, llm_outcomes = await self._llm_plan(
+                query, methodology_result, phases
+            )
             metrics = self._dedup(metrics, llm_metrics)
             outcomes = self._dedup(outcomes, llm_outcomes)
 
@@ -162,7 +164,9 @@ class EvaluationPlanner:
         phases: list[ExperimentPhase],
     ) -> tuple[list[EvaluationMetric], list[ExpectedOutcome]]:
         try:
-            methods_text = ", ".join(m.method for m in mr.methods[:5]) if mr.methods else "none"
+            methods_text = (
+                ", ".join(m.method for m in mr.methods[:5]) if mr.methods else "none"
+            )
             content = await self._llm.generate(
                 prompt=_EVALUATION_USER.format(
                     query=query,
@@ -182,7 +186,6 @@ class EvaluationPlanner:
         self,
         content: str,
     ) -> tuple[list[EvaluationMetric], list[ExpectedOutcome]]:
-        import re
         metrics: list[EvaluationMetric] = []
         outcomes: list[ExpectedOutcome] = []
         current_metric: dict = {}
@@ -232,13 +235,17 @@ class EvaluationPlanner:
                     current_outcome["category"] = line.split(":", 1)[1].strip().lower()
                 elif low.startswith("likelihood:"):
                     try:
-                        current_outcome["likelihood"] = float(line.split(":")[1].strip())
+                        current_outcome["likelihood"] = float(
+                            line.split(":")[1].strip()
+                        )
                     except (ValueError, TypeError):
                         current_outcome["likelihood"] = 0.5
                 elif low.startswith("impact:"):
                     current_outcome["impact"] = line.split(":", 1)[1].strip().lower()
                 elif low.startswith("evidence:"):
-                    current_outcome["evidence"] = [e.strip() for e in line.split(":", 1)[1].split(",") if e.strip()]
+                    current_outcome["evidence"] = [
+                        e.strip() for e in line.split(":", 1)[1].split(",") if e.strip()
+                    ]
 
         if current_metric.get("name"):
             metrics.append(self._build_metric(current_metric))

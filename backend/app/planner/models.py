@@ -4,7 +4,6 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any
 
 from app.rag.models import RetrievalStrategy, SearchIntent, SourceType
 
@@ -139,7 +138,9 @@ class ExecutionStep:
 
 @dataclass
 class PlanningMetadata:
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     duration_ms: float = 0.0
     strategy_used: ResearchStrategyType = ResearchStrategyType.GENERAL
     validation_passed: bool = True

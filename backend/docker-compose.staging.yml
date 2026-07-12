@@ -106,7 +106,7 @@ services:
       chromadb:
         condition: service_started
     environment:
-      APP_NAME: "AgentWatch API (Staging)"
+      APP_NAME: "AARA API (Staging)"
       ENV: staging
       DEBUG: "false"
       LOG_LEVEL: INFO
@@ -184,7 +184,7 @@ services:
       redis:
         condition: service_healthy
     environment:
-      APP_NAME: "AgentWatch Worker (Staging)"
+      APP_NAME: "AARA Worker (Staging)"
       ENV: staging
       LOG_LEVEL: INFO
       DATABASE_URL: postgresql+asyncpg://agentwatch_staging:${STAGING_DB_PASSWORD:-agentwatch_staging_pass}@db:5432/agentwatch_staging

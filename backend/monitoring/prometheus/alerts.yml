@@ -61,5 +61,5 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "AgentWatch API instance down"
+          summary: "AARA API instance down"
           description: "Instance {{ $labels.instance }} has been down for more than 1 minute."

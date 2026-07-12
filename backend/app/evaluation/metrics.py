@@ -7,10 +7,41 @@ from typing import Any
 
 
 STOP_WORDS = {
-    "what", "how", "why", "does", "the", "a", "an", "is", "are", "was", "were",
-    "will", "would", "could", "should", "this", "that", "these", "those",
-    "with", "from", "about", "into", "through", "during", "before", "after",
-    "above", "below", "between", "such", "each", "your", "their", "its",
+    "what",
+    "how",
+    "why",
+    "does",
+    "the",
+    "a",
+    "an",
+    "is",
+    "are",
+    "was",
+    "were",
+    "will",
+    "would",
+    "could",
+    "should",
+    "this",
+    "that",
+    "these",
+    "those",
+    "with",
+    "from",
+    "about",
+    "into",
+    "through",
+    "during",
+    "before",
+    "after",
+    "above",
+    "below",
+    "between",
+    "such",
+    "each",
+    "your",
+    "their",
+    "its",
 }
 
 
@@ -116,8 +147,11 @@ def compute_summary_quality(
     total = 0.0
     count = 0
     quality_fields = [
-        "coverage_score", "citation_strength",
-        "consistency_score", "summary_score", "evidence_density",
+        "coverage_score",
+        "citation_strength",
+        "consistency_score",
+        "summary_score",
+        "evidence_density",
     ]
     for s in summaries:
         for field in quality_fields:
@@ -148,11 +182,18 @@ def compute_report_completeness(
     if report is None:
         return 0.0
     expected = {
-        "executive_summary", "introduction", "methodology",
-        "conclusion", "key_findings", "limitations",
-        "recommendations", "future_research",
+        "executive_summary",
+        "introduction",
+        "methodology",
+        "conclusion",
+        "key_findings",
+        "limitations",
+        "recommendations",
+        "future_research",
     }
-    present = sum(1 for key in expected if report.get(key) is not None and report.get(key) != "")
+    present = sum(
+        1 for key in expected if report.get(key) is not None and report.get(key) != ""
+    )
     return (present / len(expected)) * 100.0
 
 
@@ -160,14 +201,26 @@ def _detect_hallucination_patterns(text: str) -> list[str]:
     """Detect linguistic patterns that correlate with hallucinated content."""
     patterns = []
     hedging_patterns = [
-        r"\bmay\b", r"\bmight\b", r"\bcould\b", r"\bpossibly\b",
-        r"\bpresumably\b", r"\bto the best of our knowledge\b",
-        r"\bit is believed\b", r"\bsome argue\b", r"\bit is thought\b",
+        r"\bmay\b",
+        r"\bmight\b",
+        r"\bcould\b",
+        r"\bpossibly\b",
+        r"\bpresumably\b",
+        r"\bto the best of our knowledge\b",
+        r"\bit is believed\b",
+        r"\bsome argue\b",
+        r"\bit is thought\b",
     ]
     unsupported_absolute = [
-        r"\balways\b", r"\bnever\b", r"\bevery\b", r"\bno one\b",
-        r"\beveryone\b", r"\bdefinitely\b", r"\bundoubtedly\b",
-        r"\bproves\b", r"\birrefutably\b",
+        r"\balways\b",
+        r"\bnever\b",
+        r"\bevery\b",
+        r"\bno one\b",
+        r"\beveryone\b",
+        r"\bdefinitely\b",
+        r"\bundoubtedly\b",
+        r"\bproves\b",
+        r"\birrefutably\b",
     ]
     for pat in hedging_patterns:
         if re.search(pat, text, re.IGNORECASE):
@@ -178,9 +231,13 @@ def _detect_hallucination_patterns(text: str) -> list[str]:
             patterns.append(f"unsupported absolute: {pat}")
             break
     speculative_phrases = [
-        "it would seem", "one can imagine", "it is conceivable",
-        "it stands to reason", "it goes without saying",
-        "as one might expect", "naturally",
+        "it would seem",
+        "one can imagine",
+        "it is conceivable",
+        "it stands to reason",
+        "it goes without saying",
+        "as one might expect",
+        "naturally",
     ]
     for phrase in speculative_phrases:
         if phrase in text.lower():
@@ -237,7 +294,11 @@ def compute_hallucination_proxy(
                     if not supported:
                         unsupported_claims += 1
                     else:
-                        txt = items[len(results) - 1] if len(results) <= len(items) else ""
+                        txt = (
+                            items[len(results) - 1]
+                            if len(results) <= len(items)
+                            else ""
+                        )
                         if txt and _detect_hallucination_patterns(txt):
                             hallucination_patterns_found += 1
 

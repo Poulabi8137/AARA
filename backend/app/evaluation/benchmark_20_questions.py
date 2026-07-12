@@ -7,7 +7,6 @@ expectations to enable objective scoring of AARA's research output quality.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
 
 
 @dataclass

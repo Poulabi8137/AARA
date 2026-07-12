@@ -6,7 +6,6 @@ seed report data that demonstrates AARA's research capabilities.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
 from typing import Any
 
 DEMO_PROJECTS: list[dict[str, Any]] = [
@@ -243,12 +242,16 @@ DEMO_STATS = {
     "total_projects": len(DEMO_PROJECTS),
     "categories": len(DEMO_CATEGORIES),
     "unique_tags": len(DEMO_TAGS),
-    "avg_expected_quality": round(sum(p["expected_quality_score"] for p in DEMO_PROJECTS) / len(DEMO_PROJECTS), 1),
+    "avg_expected_quality": round(
+        sum(p["expected_quality_score"] for p in DEMO_PROJECTS) / len(DEMO_PROJECTS), 1
+    ),
     "highest_quality": max(p["expected_quality_score"] for p in DEMO_PROJECTS),
     "lowest_quality": min(p["expected_quality_score"] for p in DEMO_PROJECTS),
     "difficulty_distribution": {
         "basic": sum(1 for p in DEMO_PROJECTS if p["difficulty"] == "basic"),
-        "intermediate": sum(1 for p in DEMO_PROJECTS if p["difficulty"] == "intermediate"),
+        "intermediate": sum(
+            1 for p in DEMO_PROJECTS if p["difficulty"] == "intermediate"
+        ),
         "advanced": sum(1 for p in DEMO_PROJECTS if p["difficulty"] == "advanced"),
     },
 }

@@ -42,9 +42,7 @@ class EvidenceFusion:
         content_prefix = ev.content.strip()[:200]
         return content_prefix
 
-    def _merge_group(
-        self, group: list[RetrievedEvidence]
-    ) -> RetrievedEvidence:
+    def _merge_group(self, group: list[RetrievedEvidence]) -> RetrievedEvidence:
         best = max(group, key=lambda e: e.score)
         all_collections: list[SourceType] = []
         seen_coll: set[SourceType] = set()

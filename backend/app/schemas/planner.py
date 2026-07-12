@@ -10,18 +10,40 @@ class PlannerOutput(BaseModel):
     report-generator) reads from this schema.
     """
 
-    research_goal: str = Field(..., min_length=10, description="Single-sentence research objective")
-    research_questions: list[str] = Field(..., min_length=3, description="Minimum 3 research questions")
-    keywords: list[str] = Field(..., min_length=3, description="Core keywords for search")
-    search_queries: list[str] = Field(..., min_length=5, description="Search queries for retrieval phase")
-    subtopics: list[str] = Field(..., min_length=3, description="Sub-areas to investigate")
-    methodology: str = Field(default="literature review", description="Research methodology")
-    expected_deliverables: list[str] = Field(..., min_length=1, description="Tangible outputs")
-    priority_areas: list[str] = Field(..., min_length=1, description="High-priority focus zones")
-    risk_areas: list[str] = Field(..., min_length=0, description="Potential risks or gaps")
-    estimated_steps: int = Field(default=5, ge=1, le=20, description="Estimated workflow steps")
+    research_goal: str = Field(
+        ..., min_length=10, description="Single-sentence research objective"
+    )
+    research_questions: list[str] = Field(
+        ..., min_length=3, description="Minimum 3 research questions"
+    )
+    keywords: list[str] = Field(
+        ..., min_length=3, description="Core keywords for search"
+    )
+    search_queries: list[str] = Field(
+        ..., min_length=5, description="Search queries for retrieval phase"
+    )
+    subtopics: list[str] = Field(
+        ..., min_length=3, description="Sub-areas to investigate"
+    )
+    methodology: str = Field(
+        default="literature review", description="Research methodology"
+    )
+    expected_deliverables: list[str] = Field(
+        ..., min_length=1, description="Tangible outputs"
+    )
+    priority_areas: list[str] = Field(
+        ..., min_length=1, description="High-priority focus zones"
+    )
+    risk_areas: list[str] = Field(
+        ..., min_length=0, description="Potential risks or gaps"
+    )
+    estimated_steps: int = Field(
+        default=5, ge=1, le=20, description="Estimated workflow steps"
+    )
 
-    planning_score: int = Field(default=0, ge=0, le=100, description="Overall plan quality 0-100")
+    planning_score: int = Field(
+        default=0, ge=0, le=100, description="Overall plan quality 0-100"
+    )
     completeness: int = Field(default=0, ge=0, le=100, description="Completeness score")
     coverage: int = Field(default=0, ge=0, le=100, description="Breadth of coverage")
     specificity: int = Field(default=0, ge=0, le=100, description="Level of detail")

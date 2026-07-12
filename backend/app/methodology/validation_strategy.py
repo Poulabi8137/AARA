@@ -55,14 +55,20 @@ class ValidationStrategyDesigner:
 
         if not self._llm or not settings.enable_llm:
             defaults = [
-                ValidationStrategy(strategy="cross_validation", confidence=0.7,
-                                   description="K-fold cross-validation to ensure generalization",
-                                   strengths=["reduces overfitting", "uses all data"],
-                                   weaknesses=["computationally expensive"]),
-                ValidationStrategy(strategy="statistical_testing", confidence=0.6,
-                                   description="Statistical tests to validate significance",
-                                   strengths=["rigorous", "quantifiable"],
-                                   weaknesses=["requires assumptions"]),
+                ValidationStrategy(
+                    strategy="cross_validation",
+                    confidence=0.7,
+                    description="K-fold cross-validation to ensure generalization",
+                    strengths=["reduces overfitting", "uses all data"],
+                    weaknesses=["computationally expensive"],
+                ),
+                ValidationStrategy(
+                    strategy="statistical_testing",
+                    confidence=0.6,
+                    description="Statistical tests to validate significance",
+                    strengths=["rigorous", "quantifiable"],
+                    weaknesses=["requires assumptions"],
+                ),
             ]
             logger.info("LLM disabled, using default validation strategies")
             return defaults
@@ -96,13 +102,15 @@ class ValidationStrategyDesigner:
         parts = [
             f"Consensus: {len(ar.consensus)} findings",
             f"Contradictions: {len(ar.contradictions)}",
-            f"Confidence: {ar.confidence.overall:.2f}" if hasattr(ar.confidence, "overall") else "",
+            f"Confidence: {ar.confidence.overall:.2f}"
+            if hasattr(ar.confidence, "overall")
+            else "",
         ]
         return "\n".join(p for p in parts if p)
 
     def _parse_strategies(self, content: str) -> list[ValidationStrategy]:
         results: list[ValidationStrategy] = []
-        blocks = re.split(r'\n\s*\n', content)
+        blocks = re.split(r"\n\s*\n", content)
         current: dict = {}
         for block in blocks:
             block = block.strip()
@@ -114,9 +122,13 @@ class ValidationStrategyDesigner:
             elif low.startswith("description:"):
                 current["description"] = block.split(":", 1)[1].strip()
             elif low.startswith("strengths:"):
-                current["strengths"] = [s.strip() for s in block.split(":", 1)[1].split(",") if s.strip()]
+                current["strengths"] = [
+                    s.strip() for s in block.split(":", 1)[1].split(",") if s.strip()
+                ]
             elif low.startswith("weaknesses:"):
-                current["weaknesses"] = [w.strip() for w in block.split(":", 1)[1].split(",") if w.strip()]
+                current["weaknesses"] = [
+                    w.strip() for w in block.split(":", 1)[1].split(",") if w.strip()
+                ]
             elif low.startswith("confidence:"):
                 try:
                     current["confidence"] = float(block.split(":", 1)[1].strip())

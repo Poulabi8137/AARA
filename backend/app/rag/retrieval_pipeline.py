@@ -129,9 +129,7 @@ class RetrievalPipeline:
                 result.append(ev)
         return result
 
-    def _calculate_confidence(
-        self, evidence: list[RetrievedEvidence]
-    ) -> float:
+    def _calculate_confidence(self, evidence: list[RetrievedEvidence]) -> float:
         if not evidence:
             return 0.0
         scores = [e.score for e in evidence if e.score > 0]

@@ -22,8 +22,8 @@ class ExperimentValidator:
         incomplete_protocols: list[str] = []
         reproducibility_issues: list[str] = []
 
-        self._check_missing_baselines(plan, errors, missing_baselines)
-        self._check_missing_metrics(plan, errors, missing_metrics)
+        self._check_missing_baselines(plan, errors, warnings, missing_baselines)
+        self._check_missing_metrics(plan, errors, warnings, missing_metrics)
         self._check_unsupported_hypotheses(plan, warnings, unsupported_hypotheses)
         self._check_inconsistent_variables(plan, warnings, inconsistent_variables)
         self._check_incomplete_protocols(plan, warnings, incomplete_protocols)
@@ -66,26 +66,32 @@ class ExperimentValidator:
         self,
         plan: ExperimentPlan,
         errors: list[str],
+        warnings: list[str],
         missing: list[str],
     ) -> None:
         if not plan.baselines:
             errors.append("No baseline models defined for comparison")
             missing.append("baselines")
         elif len(plan.baselines) < 2:
-            warnings.append(f"Only {len(plan.baselines)} baseline(s); expected at least 2")
+            warnings.append(
+                f"Only {len(plan.baselines)} baseline(s); expected at least 2"
+            )
             missing.append("baselines")
 
     def _check_missing_metrics(
         self,
         plan: ExperimentPlan,
         errors: list[str],
+        warnings: list[str],
         missing: list[str],
     ) -> None:
         if not plan.evaluation_metrics:
             errors.append("No evaluation metrics defined")
             missing.append("evaluation_metrics")
         elif len(plan.evaluation_metrics) < 2:
-            warnings.append(f"Only {len(plan.evaluation_metrics)} metric(s); expected at least 2")
+            warnings.append(
+                f"Only {len(plan.evaluation_metrics)} metric(s); expected at least 2"
+            )
             missing.append("evaluation_metrics")
 
     def _check_unsupported_hypotheses(
@@ -151,8 +157,7 @@ class ExperimentValidator:
         issues: list[str],
     ) -> None:
         has_seed = any(
-            v.name.lower() in ("random_seed", "seed")
-            for v in plan.variables
+            v.name.lower() in ("random_seed", "seed") for v in plan.variables
         )
         if not has_seed:
             warnings.append("No random seed variable defined for reproducibility")

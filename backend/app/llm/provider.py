@@ -11,7 +11,9 @@ class LLMResponse:
     model: str
     usage: dict[str, int] | None = None
     finish_reason: str | None = None
-    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    timestamp: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
 
 @dataclass
@@ -34,15 +36,14 @@ class LLMProvider(Protocol):
 
     config: ProviderConfig
 
-    async def generate(self, prompt: str, system_prompt: str | None = None) -> LLMResponse:
-        ...
+    async def generate(
+        self, prompt: str, system_prompt: str | None = None
+    ) -> LLMResponse: ...
 
     async def generate_with_history(
         self,
         messages: list[dict[str, str]],
         system_prompt: str | None = None,
-    ) -> LLMResponse:
-        ...
+    ) -> LLMResponse: ...
 
-    async def count_tokens(self, text: str) -> int:
-        ...
+    async def count_tokens(self, text: str) -> int: ...

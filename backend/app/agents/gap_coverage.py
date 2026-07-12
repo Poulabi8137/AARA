@@ -36,21 +36,29 @@ def compute_coverage_metrics(
     src_div = _source_diversity_score(summaries)
 
     raw_coverage = (
-        subtopic_rate * 30.0 +
-        question_rate * 30.0 +
-        priority_rate * 15.0 +
-        risk_rate * 15.0 +
-        (avg_conf / 100.0) * 10.0
-    ) * 100.0 / 85.0
+        (
+            subtopic_rate * 30.0
+            + question_rate * 30.0
+            + priority_rate * 15.0
+            + risk_rate * 15.0
+            + (avg_conf / 100.0) * 10.0
+        )
+        * 100.0
+        / 85.0
+    )
     coverage_score = round(min(100.0, raw_coverage), 2)
 
     raw_completeness = (
-        subtopic_rate * 25.0 +
-        question_rate * 25.0 +
-        priority_rate * 20.0 +
-        risk_rate * 20.0 +
-        (avg_conf / 100.0) * 10.0
-    ) * 100.0 / 85.0
+        (
+            subtopic_rate * 25.0
+            + question_rate * 25.0
+            + priority_rate * 20.0
+            + risk_rate * 20.0
+            + (avg_conf / 100.0) * 10.0
+        )
+        * 100.0
+        / 85.0
+    )
     completeness = round(min(100.0, raw_completeness), 2)
 
     severity_counts = _count_by_severity(gaps)
@@ -197,7 +205,9 @@ def _summary_text(summary: dict[str, Any]) -> str:
 def _average_confidence(summaries: list[dict[str, Any]]) -> float:
     if not summaries:
         return 0.0
-    scores = [s.get("confidence_score", 0) or s.get("summary_score", 0) for s in summaries]
+    scores = [
+        s.get("confidence_score", 0) or s.get("summary_score", 0) for s in summaries
+    ]
     if not scores:
         return 0.0
     return sum(scores) / len(scores)

@@ -44,7 +44,9 @@ async def get_evaluation_run(
     """Get a single evaluation run by ID."""
     run = _evaluation_store.get(run_id)
     if not run:
-        raise HTTPException(status_code=404, detail=f"Evaluation run {run_id} not found")
+        raise HTTPException(
+            status_code=404, detail=f"Evaluation run {run_id} not found"
+        )
     return run
 
 
@@ -99,7 +101,9 @@ async def evaluate_execution(
     project_id: str | None = None,
 ) -> dict[str, Any]:
     """Run full evaluation on a research state and store the result."""
-    result = await _evaluator.evaluate(state, execution_id=execution_id, project_id=project_id)
+    result = await _evaluator.evaluate(
+        state, execution_id=execution_id, project_id=project_id
+    )
     run_id = execution_id or result.get("evaluated_at", "")
     _evaluation_store[run_id] = result
     return result

@@ -6,7 +6,7 @@ from typing import Any
 
 from app.core.logging import get_logger
 from app.knowledge_graph.config import get_knowledge_graph_settings
-from app.knowledge_graph.models import KnowledgeGraph, NodeType, RelationshipType
+from app.knowledge_graph.models import KnowledgeGraph, NodeType
 
 logger = get_logger("knowledge_graph.confidence")
 settings = get_knowledge_graph_settings()
@@ -45,9 +45,9 @@ class ConfidencePropagator:
             NodeType.ANALYSIS,
         }
         return [
-            nid for nid, node in graph.nodes.items()
-            if node.node_type in source_types
-            and node.metadata.confidence >= 0.5
+            nid
+            for nid, node in graph.nodes.items()
+            if node.node_type in source_types and node.metadata.confidence >= 0.5
         ]
 
     def _propagate_from(self, graph: KnowledgeGraph, start_id: str) -> int:
@@ -64,7 +64,9 @@ class ConfidencePropagator:
                 continue
 
             for edge in graph.adjacency.get(current_id, []):
-                neighbor_id = edge.target_id if edge.source_id == current_id else edge.source_id
+                neighbor_id = (
+                    edge.target_id if edge.source_id == current_id else edge.source_id
+                )
                 if neighbor_id not in graph.nodes:
                     continue
 
@@ -150,20 +152,26 @@ class ConfidencePropagator:
         for eid, edge in graph.edges.items():
             if edge.target_id == node_id:
                 source_node = graph.nodes.get(edge.source_id)
-                incoming.append({
-                    "edge_id": eid,
-                    "source_id": edge.source_id,
-                    "source_type": source_node.node_type.value if source_node else "unknown",
-                    "source_confidence": source_node.metadata.confidence if source_node else 0.0,
-                    "edge_confidence": edge.metadata.confidence,
-                    "edge_weight": edge.metadata.weight,
-                    "relationship_type": edge.relationship_type.value,
-                    "propagated_confidence": round(
-                        (source_node.metadata.confidence if source_node else 0.0)
-                        * settings.graph_confidence_decay
-                        * edge.metadata.confidence,
-                        4,
-                    ),
-                })
+                incoming.append(
+                    {
+                        "edge_id": eid,
+                        "source_id": edge.source_id,
+                        "source_type": source_node.node_type.value
+                        if source_node
+                        else "unknown",
+                        "source_confidence": source_node.metadata.confidence
+                        if source_node
+                        else 0.0,
+                        "edge_confidence": edge.metadata.confidence,
+                        "edge_weight": edge.metadata.weight,
+                        "relationship_type": edge.relationship_type.value,
+                        "propagated_confidence": round(
+                            (source_node.metadata.confidence if source_node else 0.0)
+                            * settings.graph_confidence_decay
+                            * edge.metadata.confidence,
+                            4,
+                        ),
+                    }
+                )
         result["incoming_edges"] = incoming
         return result

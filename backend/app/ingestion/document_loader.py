@@ -67,6 +67,7 @@ async def _extract_pdf(path: Path) -> str:
 async def _extract_pdf_bytes(content: bytes) -> str:
     import pypdf
     import io
+
     reader = pypdf.PdfReader(io.BytesIO(content))
     text_parts: list[str] = []
     for page in reader.pages:
@@ -80,7 +81,9 @@ async def _extract_docx(path: Path) -> str:
     try:
         from docx import Document
     except ImportError:
-        raise ImportError("python-docx is required for DOCX extraction: pip install python-docx")
+        raise ImportError(
+            "python-docx is required for DOCX extraction: pip install python-docx"
+        )
 
     doc = Document(str(path))
     paragraphs = [p.text for p in doc.paragraphs if p.text]
@@ -92,6 +95,7 @@ async def _extract_docx(path: Path) -> str:
 async def _extract_docx_bytes(content: bytes) -> str:
     from docx import Document
     import io
+
     doc = Document(io.BytesIO(content))
     paragraphs = [p.text for p in doc.paragraphs if p.text]
     return "\n".join(paragraphs)

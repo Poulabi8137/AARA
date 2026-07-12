@@ -15,6 +15,7 @@ logger = get_logger("agents.base")
 @dataclass
 class AgentResult:
     """Standardised result envelope from any agent execution."""
+
     success: bool
     output: Any = None
     error: str | None = None
@@ -87,7 +88,9 @@ class BaseAgent(ABC):
         except Exception as exc:
             state = await self.handle_error(state, exc)
             await self.log_execution(state, start)
-            return AgentResult(success=False, error=str(exc), metadata={"agent": self.agent_name})
+            return AgentResult(
+                success=False, error=str(exc), metadata={"agent": self.agent_name}
+            )
 
         # Preserve agent-specific status (e.g. "planner_complete") if already set
         if state.get("status") in ("running", None):

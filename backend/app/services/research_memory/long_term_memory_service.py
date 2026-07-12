@@ -8,7 +8,11 @@ from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
-from app.models.research_memory import LongTermMemory, LongTermMemoryCategory, MemoryImportance
+from app.models.research_memory import (
+    LongTermMemory,
+    LongTermMemoryCategory,
+    MemoryImportance,
+)
 from app.schemas.research_memory import LongTermMemoryCreate, LongTermMemoryUpdate
 from app.vectorstore.memory_indexer import MemoryIndexer
 
@@ -102,9 +106,7 @@ class LongTermMemoryService:
         if self._indexer is not None:
             await self._indexer.remove_long_term_memory(memory_id)
 
-    async def merge_duplicates(
-        self, memory_ids: list[uuid.UUID]
-    ) -> LongTermMemory:
+    async def merge_duplicates(self, memory_ids: list[uuid.UUID]) -> LongTermMemory:
         if len(memory_ids) < 2:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -224,11 +226,13 @@ class LongTermMemoryService:
 
         tag_set = set(tags)
         matched = [
-            m for m in all_memories
-            if m.memory_metadata and isinstance(m.memory_metadata.get("tags"), list)
+            m
+            for m in all_memories
+            if m.memory_metadata
+            and isinstance(m.memory_metadata.get("tags"), list)
             and tag_set.intersection(m.memory_metadata["tags"])
         ]
         total = len(matched)
-        paginated = matched[skip:skip + limit]
+        paginated = matched[skip : skip + limit]
 
         return paginated, total

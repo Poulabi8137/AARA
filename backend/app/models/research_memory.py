@@ -4,7 +4,17 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any
 
-from sqlalchemy import String, Text, DateTime, ForeignKey, Enum as SAEnum, JSON, Float, Integer, UUID
+from sqlalchemy import (
+    String,
+    Text,
+    DateTime,
+    ForeignKey,
+    Enum as SAEnum,
+    JSON,
+    Float,
+    Integer,
+    UUID,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import enum
 
@@ -67,16 +77,32 @@ class ProjectMemoryCategory(str, enum.Enum):
 class UserResearchProfile(Base):
     __tablename__ = "research_user_profiles"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, unique=True, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id"),
+        nullable=False,
+        unique=True,
+        index=True,
+    )
     expertise_areas: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
     research_interests: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
-    preferred_methodologies: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
+    preferred_methodologies: Mapped[list[str] | None] = mapped_column(
+        JSON, nullable=True
+    )
     domains: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
     skill_level: Mapped[str | None] = mapped_column(String(64), nullable=True)
     preferences: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
 
     user = relationship("User", back_populates="research_profile")
 
@@ -87,18 +113,42 @@ class UserResearchProfile(Base):
 class SessionMemory(Base):
     __tablename__ = "session_memories"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    session_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("research_sessions.id"), nullable=False, index=True)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
-    memory_type: Mapped[SessionMemoryType] = mapped_column(SAEnum(SessionMemoryType, name="session_memory_type", create_constraint=True), nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    session_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("research_sessions.id"),
+        nullable=False,
+        index=True,
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+    )
+    memory_type: Mapped[SessionMemoryType] = mapped_column(
+        SAEnum(SessionMemoryType, name="session_memory_type", create_constraint=True),
+        nullable=False,
+    )
     content: Mapped[str] = mapped_column(Text, nullable=False)
     summary: Mapped[str | None] = mapped_column(Text, nullable=True)
-    source: Mapped[MemorySource] = mapped_column(SAEnum(MemorySource, name="memory_source", create_constraint=True), default=MemorySource.SYSTEM, nullable=False)
-    importance: Mapped[MemoryImportance] = mapped_column(SAEnum(MemoryImportance, name="memory_importance", create_constraint=True), default=MemoryImportance.MEDIUM, nullable=False)
+    source: Mapped[MemorySource] = mapped_column(
+        SAEnum(MemorySource, name="memory_source", create_constraint=True),
+        default=MemorySource.SYSTEM,
+        nullable=False,
+    )
+    importance: Mapped[MemoryImportance] = mapped_column(
+        SAEnum(MemoryImportance, name="memory_importance", create_constraint=True),
+        default=MemoryImportance.MEDIUM,
+        nullable=False,
+    )
     confidence: Mapped[float] = mapped_column(Float, default=1.0)
     memory_metadata: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
-    embedding_id: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    embedding_id: Mapped[str | None] = mapped_column(
+        String(128), nullable=True, index=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
 
     session = relationship("ResearchSession", back_populates="session_memories")
     user = relationship("User", back_populates="session_memories")
@@ -110,18 +160,41 @@ class SessionMemory(Base):
 class LongTermMemory(Base):
     __tablename__ = "long_term_memories"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
-    category: Mapped[LongTermMemoryCategory] = mapped_column(SAEnum(LongTermMemoryCategory, name="long_term_memory_category", create_constraint=True), nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+    )
+    category: Mapped[LongTermMemoryCategory] = mapped_column(
+        SAEnum(
+            LongTermMemoryCategory,
+            name="long_term_memory_category",
+            create_constraint=True,
+        ),
+        nullable=False,
+    )
     content: Mapped[str] = mapped_column(Text, nullable=False)
     summary: Mapped[str | None] = mapped_column(Text, nullable=True)
     source_session_ids: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
-    importance: Mapped[MemoryImportance] = mapped_column(SAEnum(MemoryImportance, name="long_term_memory_importance", create_constraint=True), default=MemoryImportance.MEDIUM, nullable=False)
+    importance: Mapped[MemoryImportance] = mapped_column(
+        SAEnum(
+            MemoryImportance, name="long_term_memory_importance", create_constraint=True
+        ),
+        default=MemoryImportance.MEDIUM,
+        nullable=False,
+    )
     confidence: Mapped[float] = mapped_column(Float, default=1.0)
     memory_metadata: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
-    embedding_id: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
-    consolidated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    embedding_id: Mapped[str | None] = mapped_column(
+        String(128), nullable=True, index=True
+    )
+    consolidated_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
 
     user = relationship("User", back_populates="long_term_memories")
 
@@ -132,19 +205,37 @@ class LongTermMemory(Base):
 class PaperMemory(Base):
     __tablename__ = "paper_memories"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("research_projects.id"), nullable=False, index=True)
-    document_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("documents.id"), nullable=True, index=True)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
-    memory_type: Mapped[PaperMemoryType] = mapped_column(SAEnum(PaperMemoryType, name="paper_memory_type", create_constraint=True), nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("research_projects.id"),
+        nullable=False,
+        index=True,
+    )
+    document_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("documents.id"), nullable=True, index=True
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+    )
+    memory_type: Mapped[PaperMemoryType] = mapped_column(
+        SAEnum(PaperMemoryType, name="paper_memory_type", create_constraint=True),
+        nullable=False,
+    )
     content: Mapped[str] = mapped_column(Text, nullable=False)
     summary: Mapped[str | None] = mapped_column(Text, nullable=True)
     source_paper_title: Mapped[str | None] = mapped_column(String(512), nullable=True)
     source_doi: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     relevance_score: Mapped[float] = mapped_column(Float, default=1.0)
     memory_metadata: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
-    embedding_id: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    embedding_id: Mapped[str | None] = mapped_column(
+        String(128), nullable=True, index=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
 
     project = relationship("ResearchProject", back_populates="paper_memories")
     document = relationship("Document", back_populates="paper_memories")
@@ -157,19 +248,49 @@ class PaperMemory(Base):
 class ProjectMemory(Base):
     __tablename__ = "project_memories"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("research_projects.id"), nullable=False, index=True)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
-    category: Mapped[ProjectMemoryCategory] = mapped_column(SAEnum(ProjectMemoryCategory, name="project_memory_category", create_constraint=True), nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("research_projects.id"),
+        nullable=False,
+        index=True,
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+    )
+    category: Mapped[ProjectMemoryCategory] = mapped_column(
+        SAEnum(
+            ProjectMemoryCategory,
+            name="project_memory_category",
+            create_constraint=True,
+        ),
+        nullable=False,
+    )
     content: Mapped[str] = mapped_column(Text, nullable=False)
     summary: Mapped[str | None] = mapped_column(Text, nullable=True)
-    importance: Mapped[MemoryImportance] = mapped_column(SAEnum(MemoryImportance, name="project_memory_importance", create_constraint=True), default=MemoryImportance.MEDIUM, nullable=False)
+    importance: Mapped[MemoryImportance] = mapped_column(
+        SAEnum(
+            MemoryImportance, name="project_memory_importance", create_constraint=True
+        ),
+        default=MemoryImportance.MEDIUM,
+        nullable=False,
+    )
     confidence: Mapped[float] = mapped_column(Float, default=1.0)
     memory_metadata: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
-    embedding_id: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
+    embedding_id: Mapped[str | None] = mapped_column(
+        String(128), nullable=True, index=True
+    )
     source_memory_ids: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
 
     project = relationship("ResearchProject", back_populates="project_memories")
     user = relationship("User", back_populates="project_memories")
@@ -181,16 +302,24 @@ class ProjectMemory(Base):
 class SemanticMemoryIndex(Base):
     __tablename__ = "semantic_memory_indices"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
     memory_type: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
-    memory_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False, index=True)
-    user_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True, index=True)
+    memory_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), nullable=False, index=True
+    )
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=True, index=True
+    )
     embedding_id: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     collection_name: Mapped[str] = mapped_column(String(128), nullable=False)
     content_hash: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     chunk_index: Mapped[int | None] = mapped_column(Integer, nullable=True)
     memory_metadata: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
 
     user = relationship("User", back_populates="semantic_memory_indices")
 

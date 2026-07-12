@@ -35,7 +35,7 @@ def validate_report_data(
         for i, s in enumerate(sections):
             title = s.get("title") or s.get("subtopic", "")
             if not title.strip():
-                result.errors.append(f"Section {i+1} is missing a title")
+                result.errors.append(f"Section {i + 1} is missing a title")
             if not s.get("summary", "").strip():
                 result.warnings.append(f"Section '{title}' has no summary text")
 

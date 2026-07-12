@@ -19,7 +19,9 @@ logger = get_logger("agents.proposal")
 @AgentRegistry.register
 class ProposalAgent(BaseAgent):
     agent_name = "proposal_agent"
-    description = "Generates structured research proposals from identified research gaps"
+    description = (
+        "Generates structured research proposals from identified research gaps"
+    )
     requires_human_approval = True
 
     async def arun(self, state: ResearchState) -> ResearchState:
@@ -50,17 +52,22 @@ class ProposalAgent(BaseAgent):
         }
 
         history = state.get("execution_history", [])
-        history.append({
-            "node": "proposal_agent",
-            "timestamp": state.get("timestamp"),
-            "status": "proposal_complete",
-            "proposal_title": proposal.get("proposed_title", ""),
-        })
+        history.append(
+            {
+                "node": "proposal_agent",
+                "timestamp": state.get("timestamp"),
+                "status": "proposal_complete",
+                "proposal_title": proposal.get("proposed_title", ""),
+            }
+        )
         state["execution_history"] = history
 
-        logger.info("proposal generation complete", extra={
-            "title": proposal.get("proposed_title", ""),
-        })
+        logger.info(
+            "proposal generation complete",
+            extra={
+                "title": proposal.get("proposed_title", ""),
+            },
+        )
         return state
 
     async def _generate_proposal(
@@ -89,7 +96,10 @@ class ProposalAgent(BaseAgent):
                 raw = raw.rsplit("\n```", 1)[0]
             return json.loads(raw)
         except Exception as exc:
-            logger.warning("LLM proposal generation failed, using fallback", extra={"error": str(exc)})
+            logger.warning(
+                "LLM proposal generation failed, using fallback",
+                extra={"error": str(exc)},
+            )
             return self._fallback_proposal(gap_description, domain)
 
     def _fallback_proposal(self, gap: str, domain: str) -> dict[str, Any]:

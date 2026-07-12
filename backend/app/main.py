@@ -20,6 +20,7 @@ from app.api.router import (
     evaluation_router,
     human_approval_router,
     research_outputs_router,
+    papers_router,
 )
 from app.core.logging import setup_logging, get_logger
 from app.middleware.setup import setup_middleware
@@ -37,32 +38,50 @@ logger = get_logger("main")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    logger.info("starting AgentWatch API")
+    logger.info("starting AARA API")
 
     settings = get_settings()
 
-    # ── Secret validation (fail-fast) ──────────────────────────
-    secret_key = settings.secret_key or os.environ.get("SECRET_KEY", "")
-    if not secret_key or secret_key in ("", "change-me-in-production"):
-        msg = (
-            "FATAL: SECRET_KEY is not set or is using a default value. "
-            "Set SECRET_KEY environment variable to a secure random string (min 32 chars)."
-        )
-        logger.error(msg)
-        raise RuntimeError(msg)
-    if len(secret_key) < 32:
-        msg = (
-            f"FATAL: SECRET_KEY is too short ({len(secret_key)} chars). "
-            "Must be at least 32 characters."
-        )
-        logger.error(msg)
-        raise RuntimeError(msg)
+    # ── Production environment validation (fail-fast) ────────────────────
+    if settings.env == "production":
+        logger.info("production mode validation")
+        secret_key = settings.secret_key or os.environ.get("SECRET_KEY", "")
+        if not secret_key or secret_key in (
+            "",
+            "change-me-in-production",
+            "dev-secret-key-change-in-production-but-at-least-32-chars",
+        ):
+            msg = (
+                "FATAL: SECRET_KEY is not set or is using a default value. "
+                "Set SECRET_KEY environment variable to a secure random string (min 32 chars)."
+            )
+            logger.error(msg)
+            raise RuntimeError(msg)
+        if len(secret_key) < 32:
+            msg = (
+                f"FATAL: SECRET_KEY is too short ({len(secret_key)} chars). "
+                "Must be at least 32 characters."
+            )
+            logger.error(msg)
+            raise RuntimeError(msg)
+
+    # ── Database migration on startup ───────────────────────────────────
+    if settings.database_migration_on_startup:
+        logger.info("running database migrations on startup")
+        try:
+            from app.db.migrations import run_migrations
+
+            await run_migrations()
+            logger.info("database migrations completed successfully")
+        except Exception as exc:
+            logger.error("database migration failed", extra={"error": str(exc)})
+            raise
 
     # Init Redis if configured and attach to app.state for lazy access by middleware
     if settings.redis_url and settings.redis_url != "memory":
         try:
             app.state.redis_client = await get_redis()
-            logger.info("Redis connection established")
+            logger.info("Redis connection established", extra={"url": "***hidden***"})
         except Exception as exc:
             logger.warning(
                 "Redis unavailable, rate limiting disabled",
@@ -75,7 +94,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     AgentRegistry.discover()
     registered = AgentRegistry.list_agents()
-    logger.info("agent registry seeded", extra={"agent_count": len(registered), "agents": [a["name"] for a in registered]})
+    logger.info(
+        "agent registry seeded",
+        extra={
+            "agent_count": len(registered),
+            "agents": [a["name"] for a in registered],
+        },
+    )
 
     # LLM provider startup validation
     provider_errors = validate_provider_config(settings)
@@ -94,19 +119,24 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     yield
 
-    logger.info("shutting down AgentWatch API")
-    if app.state.redis_client is not None:
-        await close_redis()
-        logger.info("Redis connection closed")
+    logger.info("shutting down AARA API")
+    try:
+        if app.state.redis_client is not None:
+            await close_redis()
+            logger.info("Redis connection closed")
+    except Exception as exc:
+        logger.warning("Redis shutdown warning", extra={"error": str(exc)})
+
+    logger.info("shutdown completed successfully")
 
 
 def create_app() -> FastAPI:
     setup_logging()
 
     app = FastAPI(
-        title="AgentWatch API",
-        description="AI-powered autonomous agent observability and governance platform",
-        version="0.1.0",
+        title="AARA API",
+        description="Agentic AI Research Assistant — multi-agent research platform",
+        version="1.0.0",
         docs_url="/docs",
         redoc_url="/redoc",
         lifespan=lifespan,
@@ -132,6 +162,7 @@ def create_app() -> FastAPI:
     app.include_router(evaluation_router)
     app.include_router(human_approval_router)
     app.include_router(research_outputs_router)
+    app.include_router(papers_router)
 
     return app
 

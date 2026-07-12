@@ -17,11 +17,13 @@ _provider = get_llm_provider(_settings)
 def _record_execution(state: ResearchState, node_name: str) -> None:
     """Append a step to execution_history."""
     history = state.get("execution_history", [])
-    history.append({
-        "node": node_name,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "status": state.get("status", "unknown"),
-    })
+    history.append(
+        {
+            "node": node_name,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "status": state.get("status", "unknown"),
+        }
+    )
     state["execution_history"] = history
 
 
@@ -35,7 +37,9 @@ async def planner_node(state: ResearchState) -> dict[str, Any]:
     agent = PlannerAgent(llm_provider=_provider)
     result = await agent.run(state)
     if not result.success:
-        logger.warning("planner_node completed with errors", extra={"error": result.error})
+        logger.warning(
+            "planner_node completed with errors", extra={"error": result.error}
+        )
 
     state["status"] = "planner_complete"
     return state
@@ -51,7 +55,9 @@ async def retrieval_node(state: ResearchState) -> dict[str, Any]:
     agent = RetrievalAgent(llm_provider=_provider)
     result = await agent.run(state)
     if not result.success:
-        logger.warning("retrieval_node completed with errors", extra={"error": result.error})
+        logger.warning(
+            "retrieval_node completed with errors", extra={"error": result.error}
+        )
 
     state["status"] = "retrieval_complete"
     return state
@@ -67,7 +73,9 @@ async def summarizer_node(state: ResearchState) -> dict[str, Any]:
     agent = SummarizerAgent(llm_provider=_provider)
     result = await agent.run(state)
     if not result.success:
-        logger.warning("summarizer_node completed with errors", extra={"error": result.error})
+        logger.warning(
+            "summarizer_node completed with errors", extra={"error": result.error}
+        )
 
     state["status"] = "summarizer_complete"
     return state
@@ -83,7 +91,9 @@ async def gap_detection_node(state: ResearchState) -> dict[str, Any]:
     agent = GapDetectionAgent(llm_provider=_provider)
     result = await agent.run(state)
     if not result.success:
-        logger.warning("gap_detection_node completed with errors", extra={"error": result.error})
+        logger.warning(
+            "gap_detection_node completed with errors", extra={"error": result.error}
+        )
 
     state["status"] = "gap_detection_complete"
     return state
@@ -99,7 +109,9 @@ async def report_generator_node(state: ResearchState) -> dict[str, Any]:
     agent = ReportGeneratorAgent(llm_provider=_provider)
     result = await agent.run(state)
     if not result.success:
-        logger.warning("report_generator_node completed with errors", extra={"error": result.error})
+        logger.warning(
+            "report_generator_node completed with errors", extra={"error": result.error}
+        )
 
     state["status"] = "report_generation_complete"
     return state

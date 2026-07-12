@@ -41,12 +41,14 @@ def verify_citations_against_evidence(
         chunk_match = any(cid in known_chunk_ids for cid in chunk_ids)
 
         if not source_match and not chunk_match:
-            warnings.append({
-                "type": "unverifiable_citation",
-                "source": source,
-                "claim": c.claim[:120],
-                "reason": "Source not found in retrieved evidence and no matching chunk_ids",
-            })
+            warnings.append(
+                {
+                    "type": "unverifiable_citation",
+                    "source": source,
+                    "claim": c.claim[:120],
+                    "reason": "Source not found in retrieved evidence and no matching chunk_ids",
+                }
+            )
 
     return warnings
 
@@ -126,12 +128,14 @@ def build_citation_list(summaries: list[dict[str, Any]]) -> list[ReportCitation]
                 continue
             seen.add(dedup_key)
 
-            citations.append(ReportCitation(
-                claim=claim[:200],
-                source=source,
-                supporting_chunk_ids=chunk_ids[:5],
-                subtopic=subtopic,
-            ))
+            citations.append(
+                ReportCitation(
+                    claim=claim[:200],
+                    source=source,
+                    supporting_chunk_ids=chunk_ids[:5],
+                    subtopic=subtopic,
+                )
+            )
 
     return citations
 
@@ -151,12 +155,14 @@ def build_contradiction_list(summaries: list[dict[str, Any]]) -> list[dict[str, 
         for c in raw:
             if not isinstance(c, dict):
                 continue
-            result.append(ReportContradiction(
-                topic=c.get("topic", f"Contradiction in {subtopic}"),
-                statements=c.get("statements", []),
-                subtopic=subtopic,
-                severity=c.get("severity", "medium"),
-            ))
+            result.append(
+                ReportContradiction(
+                    topic=c.get("topic", f"Contradiction in {subtopic}"),
+                    statements=c.get("statements", []),
+                    subtopic=subtopic,
+                    severity=c.get("severity", "medium"),
+                )
+            )
 
     return result
 

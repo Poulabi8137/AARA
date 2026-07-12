@@ -76,33 +76,37 @@ class BestPracticesEngine:
         practices: list[BestPractice] = []
 
         practices.append(
-            BestPractice(practice="Report all hyperparameters and configuration details",
-                         category="reproducibility",
-                         rationale="Essential for result reproducibility",
-                         source="ML Reproducibility Checklist")
+            BestPractice(
+                practice="Report all hyperparameters and configuration details",
+                category="reproducibility",
+                rationale="Essential for result reproducibility",
+                source="ML Reproducibility Checklist",
+            )
         )
 
         if ar.limitations:
             practices.append(
-                BestPractice(practice=f"Address identified limitations: {ar.limitations[0].limitation[:80]}",
-                             category="methodology",
-                             rationale="Limitations should be acknowledged and addressed",
-                             source="Research Methodology Standards")
+                BestPractice(
+                    practice=f"Address identified limitations: {ar.limitations[0].limitation[:80]}",
+                    category="methodology",
+                    rationale="Limitations should be acknowledged and addressed",
+                    source="Research Methodology Standards",
+                )
             )
 
         if ar.confidence.overall < 0.5:
             practices.append(
-                BestPractice(practice="Improve evidence quality before drawing strong conclusions",
-                             category="evaluation",
-                             rationale="Low confidence requires more rigorous validation",
-                             source="Evidence-Based Research Principles")
+                BestPractice(
+                    practice="Improve evidence quality before drawing strong conclusions",
+                    category="evaluation",
+                    rationale="Low confidence requires more rigorous validation",
+                    source="Evidence-Based Research Principles",
+                )
             )
 
         return practices
 
-    async def _llm_assisted(
-        self, query: str, ar: AnalysisResult
-    ) -> list[BestPractice]:
+    async def _llm_assisted(self, query: str, ar: AnalysisResult) -> list[BestPractice]:
         try:
             domain = self._extract_domain(ar)
             summary = self._summarize_analysis(ar)
@@ -132,13 +136,15 @@ class BestPracticesEngine:
             f"Consensus: {len(ar.consensus)}",
             f"Contradictions: {len(ar.contradictions)}",
             f"Limitations: {len(ar.limitations)}",
-            f"Confidence: {ar.confidence.overall:.2f}" if hasattr(ar.confidence, "overall") else "",
+            f"Confidence: {ar.confidence.overall:.2f}"
+            if hasattr(ar.confidence, "overall")
+            else "",
         ]
         return "\n".join(p for p in parts if p)
 
     def _parse_practices(self, content: str) -> list[BestPractice]:
         results: list[BestPractice] = []
-        blocks = re.split(r'\n\s*\n', content)
+        blocks = re.split(r"\n\s*\n", content)
         current: dict = {}
         for block in blocks:
             block = block.strip()

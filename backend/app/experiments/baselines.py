@@ -62,10 +62,14 @@ class BaselineBenchmarkPlanner:
         start = time.monotonic()
 
         baselines: list[BaselineModel] = self._default_baselines(methodology_result)
-        benchmarks: list[BenchmarkExecution] = self._default_benchmarks(methodology_result)
+        benchmarks: list[BenchmarkExecution] = self._default_benchmarks(
+            methodology_result
+        )
 
         if self._llm and settings.enable_llm:
-            llm_baselines, llm_benchmarks = await self._llm_plan(query, methodology_result)
+            llm_baselines, llm_benchmarks = await self._llm_plan(
+                query, methodology_result
+            )
             baselines = self._dedup_merge(baselines, llm_baselines)
             benchmarks = self._dedup_merge(benchmarks, llm_benchmarks)
 
@@ -77,7 +81,9 @@ class BaselineBenchmarkPlanner:
                 "duration_ms": round((time.monotonic() - start) * 1000, 1),
             },
         )
-        return baselines[: settings.baseline_limits], benchmarks[: settings.benchmark_limits]
+        return baselines[: settings.baseline_limits], benchmarks[
+            : settings.benchmark_limits
+        ]
 
     def _default_baselines(self, mr: MethodologyResult) -> list[BaselineModel]:
         bl: list[BaselineModel] = []
@@ -90,7 +96,9 @@ class BaselineBenchmarkPlanner:
                         description=f"Standard implementation of {m.method}",
                         expected_performance="Baseline performance range",
                         category="standard_baseline",
-                        rationale=f"Recommended methodology: {m.rationale[:80]}" if m.rationale else "",
+                        rationale=f"Recommended methodology: {m.rationale[:80]}"
+                        if m.rationale
+                        else "",
                     )
                 )
 
@@ -126,8 +134,14 @@ class BaselineBenchmarkPlanner:
         mr: MethodologyResult,
     ) -> tuple[list[BaselineModel], list[BenchmarkExecution]]:
         try:
-            methods_text = ", ".join(m.method for m in mr.methods[:5]) if mr.methods else "none"
-            datasets_text = ", ".join(d.dataset_name for d in mr.datasets[:5]) if mr.datasets else "none"
+            methods_text = (
+                ", ".join(m.method for m in mr.methods[:5]) if mr.methods else "none"
+            )
+            datasets_text = (
+                ", ".join(d.dataset_name for d in mr.datasets[:5])
+                if mr.datasets
+                else "none"
+            )
 
             content = await self._llm.generate(
                 prompt=_BASELINE_USER.format(
@@ -150,7 +164,6 @@ class BaselineBenchmarkPlanner:
         self,
         content: str,
     ) -> tuple[list[BaselineModel], list[BenchmarkExecution]]:
-        import re
         baselines: list[BaselineModel] = []
         benchmarks: list[BenchmarkExecution] = []
         current_baseline: dict = {}
@@ -191,7 +204,9 @@ class BaselineBenchmarkPlanner:
                 if low.startswith("dataset:"):
                     current_benchmark["dataset"] = line.split(":", 1)[1].strip()
                 elif low.startswith("metrics:"):
-                    current_benchmark["metrics"] = [m.strip() for m in line.split(":", 1)[1].split(",") if m.strip()]
+                    current_benchmark["metrics"] = [
+                        m.strip() for m in line.split(":", 1)[1].split(",") if m.strip()
+                    ]
                 elif low.startswith("comparison:"):
                     current_benchmark["comparison"] = line.split(":", 1)[1].strip()
                 elif low.startswith("ablation:"):

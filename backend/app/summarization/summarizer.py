@@ -13,21 +13,18 @@ from app.summarization.models import (
     ExtractedFinding,
     GroupingStrategy,
     ResearchGap,
-    SectionType,
     SummaryLevel,
     SummaryMetadata,
     SummaryRequest,
     SummaryResult,
     SummarySection,
     SummaryStatistics,
-    ValidationReport,
 )
 from app.summarization.multi_document import MultiDocumentSummarizer
 from app.summarization.section_builder import SectionBuilder
 from app.summarization.validator import SummaryValidator
 from app.rag.context_builder import ContextBuilder
 from app.rag.llm import RAGLLMProvider
-from app.rag.models import RetrievedEvidence
 from app.rag.retrieval_pipeline import RetrievalPipeline
 
 logger = get_logger("summarization.orchestrator")
@@ -70,7 +67,11 @@ class Summarizer:
 
         gaps = await self._extract_gaps(request, groups)
 
-        level = request.level if isinstance(request.level, SummaryLevel) else SummaryLevel.STANDARD
+        level = (
+            request.level
+            if isinstance(request.level, SummaryLevel)
+            else SummaryLevel.STANDARD
+        )
         stats = self._build_statistics(groups, sections, findings, gaps)
         validation = self._validator.validate(
             SummaryResult(
@@ -128,7 +129,11 @@ class Summarizer:
             logger.warning("no evidence provided for summarization")
             return []
 
-        strategy = request.grouping if isinstance(request.grouping, GroupingStrategy) else GroupingStrategy.TOPIC
+        strategy = (
+            request.grouping
+            if isinstance(request.grouping, GroupingStrategy)
+            else GroupingStrategy.TOPIC
+        )
         return self._evidence_grouper.group(evidence, strategy)
 
     async def _generate_summary(
@@ -136,7 +141,11 @@ class Summarizer:
         request: SummaryRequest,
         groups: list[EvidenceGroup],
     ) -> tuple[str, list[SummarySection]]:
-        level = request.level if isinstance(request.level, SummaryLevel) else SummaryLevel.STANDARD
+        level = (
+            request.level
+            if isinstance(request.level, SummaryLevel)
+            else SummaryLevel.STANDARD
+        )
 
         if level == SummaryLevel.LITERATURE_REVIEW and self._literature_review:
             content, sections, _, _ = await self._literature_review.synthesize(

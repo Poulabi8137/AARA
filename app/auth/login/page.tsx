@@ -31,8 +31,8 @@ function LoginForm() {
       await login(formData.email, formData.password)
       const redirect = searchParams.get('redirect') || '/dashboard'
       router.push(redirect)
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Login failed')
+    } catch (err: unknown) {
+      setError((err as { response?: { data?: { detail?: string } } })?.response?.data?.detail || (err instanceof Error ? err.message : 'Login failed'))
     } finally {
       setIsLoading(false)
     }

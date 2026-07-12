@@ -83,7 +83,7 @@ async def get_research_outputs(
         papers = [
             {
                 "id": f"paper_{i}",
-                "title": f"Research Finding {i+1}",
+                "title": f"Research Finding {i + 1}",
                 "summary": "Derived from agent execution analysis.",
                 "source": "agent",
                 "relevanceScore": 85 - i * 5,
@@ -95,7 +95,7 @@ async def get_research_outputs(
         research_gaps = [
             {
                 "id": f"gap_{i}",
-                "title": f"Research Gap {i+1}",
+                "title": f"Research Gap {i + 1}",
                 "severity": "medium",
                 "description": "Identified during automated gap analysis.",
                 "relatedTopics": ["Analysis"],
@@ -109,8 +109,12 @@ async def get_research_outputs(
             "id": str(execution.id),
             "status": execution.execution_status.value,
             "query": execution.input_query,
-            "started_at": execution.start_time.isoformat() if execution.start_time else None,
-            "completed_at": execution.end_time.isoformat() if execution.end_time else None,
+            "started_at": execution.start_time.isoformat()
+            if execution.start_time
+            else None,
+            "completed_at": execution.end_time.isoformat()
+            if execution.end_time
+            else None,
             "history": execution_history,
         },
         "summaries": summaries,

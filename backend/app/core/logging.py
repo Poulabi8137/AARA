@@ -29,13 +29,20 @@ class JSONFormatter(logging.Formatter):
         extra = getattr(record, "extra", None) or {}
         if isinstance(extra, dict):
             # Promote key context fields to top level for log aggregation tools
-            for key in ("request_id", "correlation_id", "user_id", "endpoint",
-                        "execution_time_ms", "status_code", "error_type", "service"):
+            for key in (
+                "request_id",
+                "correlation_id",
+                "user_id",
+                "endpoint",
+                "execution_time_ms",
+                "status_code",
+                "error_type",
+                "service",
+            ):
                 if key in extra:
                     log[key] = extra[key]
             # Remaining extra fields nested under "context"
-            remaining = {k: v for k, v in extra.items()
-                         if k not in log}
+            remaining = {k: v for k, v in extra.items() if k not in log}
             if remaining:
                 log["context"] = remaining
 

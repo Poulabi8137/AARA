@@ -1,9 +1,9 @@
 apiVersion: 1
 
 providers:
-  - name: "AgentWatch Dashboards"
-    orgId: 1
-    folder: "AgentWatch"
+  - name: "AARA Dashboards"
+    org_id: 1
+    folder: "AARA"
     type: file
     disableDeletion: false
     updateIntervalSeconds: 10

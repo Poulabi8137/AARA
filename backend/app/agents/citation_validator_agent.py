@@ -43,35 +43,50 @@ class CitationValidatorAgent(BaseAgent):
             "citations": validated,
             "total": len(validated),
             "duplicates": list(set(duplicates)),
-            "verified_count": sum(1 for c in validated if not c.get("is_fabricated", False)),
+            "verified_count": sum(
+                1 for c in validated if not c.get("is_fabricated", False)
+            ),
             "has_issues": any(
-                c.get("is_fabricated") or c.get("is_duplicate") or (not c.get("has_doi") and not c.get("has_url"))
+                c.get("is_fabricated")
+                or c.get("is_duplicate")
+                or (not c.get("has_doi") and not c.get("has_url"))
                 for c in validated
             ),
         }
         state["status"] = "citation_validation_complete"
         state["agent_metrics"]["citation_validator_agent"] = {
             "total_citations": len(validated),
-            "verified_count": sum(1 for c in validated if not c.get("is_fabricated", False)),
+            "verified_count": sum(
+                1 for c in validated if not c.get("is_fabricated", False)
+            ),
             "latency_seconds": round(time.monotonic() - start, 3),
         }
 
         history = state.get("execution_history", [])
-        history.append({
-            "node": "citation_validator_agent",
-            "timestamp": state.get("timestamp"),
-            "status": "citation_validation_complete",
-            "citation_count": len(validated),
-        })
+        history.append(
+            {
+                "node": "citation_validator_agent",
+                "timestamp": state.get("timestamp"),
+                "status": "citation_validation_complete",
+                "citation_count": len(validated),
+            }
+        )
         state["execution_history"] = history
 
-        logger.info("citation validation complete", extra={
-            "total": len(validated),
-            "verified": sum(1 for c in validated if not c.get("is_fabricated", False)),
-        })
+        logger.info(
+            "citation validation complete",
+            extra={
+                "total": len(validated),
+                "verified": sum(
+                    1 for c in validated if not c.get("is_fabricated", False)
+                ),
+            },
+        )
         return state
 
-    async def _validate_citations(self, refs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    async def _validate_citations(
+        self, refs: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         if not refs:
             return []
         refs_text = "\n".join(
@@ -81,7 +96,9 @@ class CitationValidatorAgent(BaseAgent):
         )
         try:
             response = await self.llm.generate(
-                prompt=CITATION_VALIDATION_USER_PROMPT.format(references_text=refs_text),
+                prompt=CITATION_VALIDATION_USER_PROMPT.format(
+                    references_text=refs_text
+                ),
                 system_prompt=CITATION_VALIDATION_SYSTEM_PROMPT,
             )
             raw = response.content.strip()
@@ -91,10 +108,15 @@ class CitationValidatorAgent(BaseAgent):
             result = json.loads(raw)
             return result.get("citations", [])
         except Exception as exc:
-            logger.warning("LLM citation validation failed, using rule-based", extra={"error": str(exc)})
+            logger.warning(
+                "LLM citation validation failed, using rule-based",
+                extra={"error": str(exc)},
+            )
             return self._rule_based_validation(refs)
 
-    def _rule_based_validation(self, refs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def _rule_based_validation(
+        self, refs: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         results = []
         seen_titles = set()
         for r in refs:
@@ -105,15 +127,17 @@ class CitationValidatorAgent(BaseAgent):
             is_dup = title in seen_titles
             seen_titles.add(title)
             ieee_format = self._format_ieee(r)
-            results.append({
-                "citation_key": key,
-                "ieee_format": ieee_format,
-                "has_doi": bool(doi and doi.strip()),
-                "has_url": bool(url and url.strip()),
-                "is_duplicate": is_dup,
-                "is_fabricated": self._looks_fabricated(r),
-                "verification_notes": self._get_notes(r, is_dup),
-            })
+            results.append(
+                {
+                    "citation_key": key,
+                    "ieee_format": ieee_format,
+                    "has_doi": bool(doi and doi.strip()),
+                    "has_url": bool(url and url.strip()),
+                    "is_duplicate": is_dup,
+                    "is_fabricated": self._looks_fabricated(r),
+                    "verification_notes": self._get_notes(r, is_dup),
+                }
+            )
         return results
 
     def _format_ieee(self, ref: dict[str, Any]) -> str:

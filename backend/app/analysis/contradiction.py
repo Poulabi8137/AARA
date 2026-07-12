@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import time
 import re
-from collections import defaultdict
 
 from app.core.logging import get_logger
 from app.analysis.config import get_analysis_settings
@@ -83,14 +82,18 @@ class ContradictionDetector:
             header = f"Group {i}: {group.label}"
             texts: list[str] = []
             for j, ev in enumerate(group.evidence):
-                key = group.citation_keys[j] if j < len(group.citation_keys) else f"[{j + 1}]"
+                key = (
+                    group.citation_keys[j]
+                    if j < len(group.citation_keys)
+                    else f"[{j + 1}]"
+                )
                 texts.append(f"{key} {ev.content[:400]}")
             parts.append(f"{header}\n" + "\n".join(texts))
         return "\n\n".join(parts)
 
     def _parse_contradictions(self, content: str) -> list[Contradiction]:
         results: list[Contradiction] = []
-        blocks = re.split(r'\n\s*\n', content)
+        blocks = re.split(r"\n\s*\n", content)
         current: dict = {}
         for block in blocks:
             block = block.strip()
@@ -111,10 +114,14 @@ class ContradictionDetector:
 
     def _parse_side(self, block: str) -> dict:
         parts = block.split("|")
-        result: dict = {"position": parts[0].split(":", 1)[1].strip() if ":" in parts[0] else parts[0].strip()}
+        result: dict = {
+            "position": parts[0].split(":", 1)[1].strip()
+            if ":" in parts[0]
+            else parts[0].strip()
+        }
         for part in parts[1:]:
             if "sources:" in part.lower():
-                result["sources"] = re.findall(r'\[\d+\]', part)
+                result["sources"] = re.findall(r"\[\d+\]", part)
             if "methodology:" in part.lower():
                 result["methodology"] = part.split(":", 1)[1].strip()
         return result

@@ -21,7 +21,6 @@ class ContextBuilder:
         budget = budget_tokens or settings.context_max_tokens
         chunk_limit = settings.context_chunk_max_tokens
         dedup_enabled = settings.context_deduplication_enabled
-        dedup_threshold = settings.context_deduplication_similarity
 
         chunks: list[ContextChunk] = []
         total_tokens = 0
@@ -46,7 +45,9 @@ class ContextBuilder:
             citation = self._make_citation(ev)
 
             chunk = ContextChunk(
-                content=ev.content[:chunk_limit] if len(ev.content) > chunk_limit else ev.content,
+                content=ev.content[:chunk_limit]
+                if len(ev.content) > chunk_limit
+                else ev.content,
                 source_type=ev.source_type,
                 source_id=ev.source_id,
                 score=ev.score,
@@ -61,7 +62,9 @@ class ContextBuilder:
                 truncated = True
                 break
 
-        sources = sorted({c.citation or c.source_id for c in chunks if c.citation or c.source_id})
+        sources = sorted(
+            {c.citation or c.source_id for c in chunks if c.citation or c.source_id}
+        )
 
         logger.info(
             "context built",

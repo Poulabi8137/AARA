@@ -8,7 +8,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
 from app.models.research_memory import UserResearchProfile
-from app.schemas.research_memory import UserResearchProfileCreate, UserResearchProfileUpdate
+from app.schemas.research_memory import (
+    UserResearchProfileCreate,
+    UserResearchProfileUpdate,
+)
 
 logger = get_logger("services.research_memory.user_profile")
 

@@ -21,7 +21,7 @@ async def test_health_check(client: AsyncClient) -> None:
     assert response.status_code == 200
     data = response.json()
     assert data["status"] in ("healthy", "degraded", "unhealthy")
-    assert data["version"] == "0.1.0"
+    assert data["version"] == "1.0.0"
     assert "services" in data
     assert "database" in data["services"]
     assert "redis" in data["services"]
@@ -29,7 +29,9 @@ async def test_health_check(client: AsyncClient) -> None:
 
 @pytest.mark.asyncio
 async def test_register_validation(client: AsyncClient) -> None:
-    response = await client.post("/auth/register", json={"name": "", "email": "bad", "password": "short"})
+    response = await client.post(
+        "/auth/register", json={"name": "", "email": "bad", "password": "short"}
+    )
     assert response.status_code == 422
     data = response.json()
     assert "errors" in data
@@ -37,7 +39,9 @@ async def test_register_validation(client: AsyncClient) -> None:
 
 @pytest.mark.asyncio
 async def test_login_validation(client: AsyncClient) -> None:
-    response = await client.post("/auth/login", json={"email": "not-an-email", "password": "short"})
+    response = await client.post(
+        "/auth/login", json={"email": "not-an-email", "password": "short"}
+    )
     assert response.status_code == 422
 
 
@@ -67,6 +71,7 @@ async def test_reports_requires_auth(client: AsyncClient) -> None:
 
 # --- Document & Retrieval tests ---
 
+
 @pytest.mark.asyncio
 async def test_documents_requires_auth(client: AsyncClient) -> None:
     response = await client.get("/documents")
@@ -82,9 +87,10 @@ async def test_upload_requires_auth(client: AsyncClient) -> None:
 @pytest.mark.skipif(_chroma_unavailable, reason="ChromaDB server not available")
 @pytest.mark.asyncio
 async def test_upload_unsupported_format(client: AsyncClient) -> None:
-    result = await client.post("/auth/register", json={
-        "name": "Test User", "email": "test@test.com", "password": "Password123"
-    })
+    result = await client.post(
+        "/auth/register",
+        json={"name": "Test User", "email": "test@test.com", "password": "Password123"},
+    )
     token = result.json()["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
 
@@ -99,45 +105,55 @@ async def test_upload_unsupported_format(client: AsyncClient) -> None:
 
 @pytest.mark.asyncio
 async def test_search_requires_auth(client: AsyncClient) -> None:
-    response = await client.post("/retrieval/search", json={
-        "query": "test", "top_k": 5
-    })
+    response = await client.post(
+        "/retrieval/search", json={"query": "test", "top_k": 5}
+    )
     assert response.status_code == 401
 
 
 @pytest.mark.asyncio
 async def test_context_requires_auth(client: AsyncClient) -> None:
-    response = await client.post("/retrieval/context", json={
-        "query": "test", "top_k": 5
-    })
+    response = await client.post(
+        "/retrieval/context", json={"query": "test", "top_k": 5}
+    )
     assert response.status_code == 401
 
 
 @pytest.mark.skipif(_chroma_unavailable, reason="ChromaDB server not available")
 @pytest.mark.asyncio
 async def test_search_validation(client: AsyncClient) -> None:
-    result = await client.post("/auth/register", json={
-        "name": "Test User", "email": "test2@test.com", "password": "Password123"
-    })
+    result = await client.post(
+        "/auth/register",
+        json={
+            "name": "Test User",
+            "email": "test2@test.com",
+            "password": "Password123",
+        },
+    )
     token = result.json()["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
 
-    response = await client.post("/retrieval/search", headers=headers, json={
-        "query": "", "top_k": 5
-    })
+    response = await client.post(
+        "/retrieval/search", headers=headers, json={"query": "", "top_k": 5}
+    )
     assert response.status_code == 422
 
 
 @pytest.mark.skipif(_chroma_unavailable, reason="ChromaDB server not available")
 @pytest.mark.asyncio
 async def test_context_validation(client: AsyncClient) -> None:
-    result = await client.post("/auth/register", json={
-        "name": "Test User", "email": "test3@test.com", "password": "Password123"
-    })
+    result = await client.post(
+        "/auth/register",
+        json={
+            "name": "Test User",
+            "email": "test3@test.com",
+            "password": "Password123",
+        },
+    )
     token = result.json()["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
 
-    response = await client.post("/retrieval/context", headers=headers, json={
-        "query": "", "top_k": 5
-    })
+    response = await client.post(
+        "/retrieval/context", headers=headers, json={"query": "", "top_k": 5}
+    )
     assert response.status_code == 422

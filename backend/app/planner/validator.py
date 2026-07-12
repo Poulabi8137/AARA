@@ -83,9 +83,7 @@ class PlanValidator:
                 report.duplicate_tasks.append(task.task_id)
             seen.add(task.task_id)
         if report.duplicate_tasks:
-            report.errors.append(
-                f"Duplicate tasks: {len(report.duplicate_tasks)}"
-            )
+            report.errors.append(f"Duplicate tasks: {len(report.duplicate_tasks)}")
 
     def _check_incomplete_objectives(
         self,
@@ -114,6 +112,4 @@ class PlanValidator:
         unreachable = task_ids - ordered_ids
         if unreachable:
             report.unreachable_tasks = list(unreachable)
-            report.errors.append(
-                f"Unreachable tasks: {len(unreachable)}"
-            )
+            report.errors.append(f"Unreachable tasks: {len(unreachable)}")

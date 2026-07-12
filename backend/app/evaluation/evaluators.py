@@ -44,11 +44,13 @@ class WorkflowEvaluator:
 
         metrics_list = []
         for name, score in scorecard.get("scores", {}).items():
-            metrics_list.append({
-                "metric_name": name,
-                "score": round(score, 2),
-                "weight": self._weights.get(name, 1.0),
-            })
+            metrics_list.append(
+                {
+                    "metric_name": name,
+                    "score": round(score, 2),
+                    "weight": self._weights.get(name, 1.0),
+                }
+            )
 
         elapsed = (datetime.now(timezone.utc) - start).total_seconds()
 
@@ -106,7 +108,9 @@ class WorkflowEvaluator:
 
         if len(scores) >= 2:
             first_half = sum(scores[: len(scores) // 2]) / (len(scores) // 2)
-            second_half = sum(scores[len(scores) // 2 :]) / (len(scores) - len(scores) // 2)
+            second_half = sum(scores[len(scores) // 2 :]) / (
+                len(scores) - len(scores) // 2
+            )
             if second_half > first_half + 2:
                 direction = "improving"
             elif second_half < first_half - 2:
@@ -152,7 +156,8 @@ class WorkflowEvaluator:
                 "max": round(max(vals), 2),
                 "avg": round(sum(vals) / n, 2),
                 "median": round(
-                    sorted_vals[n // 2] if n % 2 == 1
+                    sorted_vals[n // 2]
+                    if n % 2 == 1
                     else (sorted_vals[n // 2 - 1] + sorted_vals[n // 2]) / 2,
                     2,
                 ),

@@ -12,6 +12,7 @@ from app.api.report_generator import router as report_generator_router
 from app.api.evaluation import router as evaluation_router
 from app.api.human_approval import router as human_approval_router
 from app.api.research_outputs import router as research_outputs_router
+from app.api.papers import router as papers_router
 
 __all__ = [
     "auth_router",
@@ -28,4 +29,5 @@ __all__ = [
     "evaluation_router",
     "human_approval_router",
     "research_outputs_router",
+    "papers_router",
 ]

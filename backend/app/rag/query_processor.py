@@ -14,27 +14,126 @@ from app.rag.models import (
 logger = get_logger("rag.query_processor")
 
 _RESEARCH_QUESTION_PATTERNS: list[tuple[re.Pattern, SearchIntent]] = [
-    (re.compile(r"\b(what|how|why|when|where)\b.*\?", re.IGNORECASE), SearchIntent.FACTUAL),
-    (re.compile(r"\bcompare|contrast|difference|similarities?\b", re.IGNORECASE), SearchIntent.COMPARATIVE),
-    (re.compile(r"\bexplore|overview|survey|review\b", re.IGNORECASE), SearchIntent.EXPLORATORY),
-    (re.compile(r"\bmethod|approach|technique|algorithm\b", re.IGNORECASE), SearchIntent.METHODOLOGICAL),
-    (re.compile(r"\blimit|drawback|critique|challenge|problem\b", re.IGNORECASE), SearchIntent.CRITICAL),
-    (re.compile(r"\bsummarize|summary|abstract|synthesize\b", re.IGNORECASE), SearchIntent.SUMMARIZATION),
+    (
+        re.compile(r"\b(what|how|why|when|where)\b.*\?", re.IGNORECASE),
+        SearchIntent.FACTUAL,
+    ),
+    (
+        re.compile(r"\bcompare|contrast|difference|similarities?\b", re.IGNORECASE),
+        SearchIntent.COMPARATIVE,
+    ),
+    (
+        re.compile(r"\bexplore|overview|survey|review\b", re.IGNORECASE),
+        SearchIntent.EXPLORATORY,
+    ),
+    (
+        re.compile(r"\bmethod|approach|technique|algorithm\b", re.IGNORECASE),
+        SearchIntent.METHODOLOGICAL,
+    ),
+    (
+        re.compile(r"\blimit|drawback|critique|challenge|problem\b", re.IGNORECASE),
+        SearchIntent.CRITICAL,
+    ),
+    (
+        re.compile(r"\bsummarize|summary|abstract|synthesize\b", re.IGNORECASE),
+        SearchIntent.SUMMARIZATION,
+    ),
 ]
 
 _STOP_WORDS: set[str] = {
-    "a", "an", "the", "is", "are", "was", "were", "be", "been",
-    "being", "have", "has", "had", "do", "does", "did", "will",
-    "would", "could", "should", "may", "might", "shall", "can",
-    "to", "of", "in", "for", "on", "with", "at", "by", "from",
-    "as", "into", "through", "during", "before", "after", "above",
-    "below", "between", "out", "off", "over", "under", "again",
-    "further", "then", "once", "here", "there", "when", "where",
-    "why", "how", "all", "each", "every", "both", "few", "more",
-    "most", "other", "some", "such", "no", "nor", "not", "only",
-    "own", "same", "so", "than", "too", "very", "just", "it", "its",
-    "this", "that", "these", "those", "about", "up", "what", "which",
-    "who", "and", "but", "or", "if", "because",
+    "a",
+    "an",
+    "the",
+    "is",
+    "are",
+    "was",
+    "were",
+    "be",
+    "been",
+    "being",
+    "have",
+    "has",
+    "had",
+    "do",
+    "does",
+    "did",
+    "will",
+    "would",
+    "could",
+    "should",
+    "may",
+    "might",
+    "shall",
+    "can",
+    "to",
+    "of",
+    "in",
+    "for",
+    "on",
+    "with",
+    "at",
+    "by",
+    "from",
+    "as",
+    "into",
+    "through",
+    "during",
+    "before",
+    "after",
+    "above",
+    "below",
+    "between",
+    "out",
+    "off",
+    "over",
+    "under",
+    "again",
+    "further",
+    "then",
+    "once",
+    "here",
+    "there",
+    "when",
+    "where",
+    "why",
+    "how",
+    "all",
+    "each",
+    "every",
+    "both",
+    "few",
+    "more",
+    "most",
+    "other",
+    "some",
+    "such",
+    "no",
+    "nor",
+    "not",
+    "only",
+    "own",
+    "same",
+    "so",
+    "than",
+    "too",
+    "very",
+    "just",
+    "it",
+    "its",
+    "this",
+    "that",
+    "these",
+    "those",
+    "about",
+    "up",
+    "what",
+    "which",
+    "who",
+    "and",
+    "but",
+    "or",
+    "if",
+    "because",
 }
 
 
@@ -50,7 +149,9 @@ class QueryProcessor:
         normalized = self._normalize(query)
         intent = intent_override or self._detect_intent(normalized)
         keywords = self._extract_keywords(normalized)
-        metadata_filters = self._extract_metadata_filters(raw=query, normalized=normalized)
+        metadata_filters = self._extract_metadata_filters(
+            raw=query, normalized=normalized
+        )
         strategies = self._select_strategies(intent)
         rewritten = self._rewrite(normalized, intent)
 
@@ -89,9 +190,7 @@ class QueryProcessor:
                 result.append(t)
         return result
 
-    def _extract_metadata_filters(
-        self, raw: str, normalized: str
-    ) -> dict[str, Any]:
+    def _extract_metadata_filters(self, raw: str, normalized: str) -> dict[str, Any]:
         filters: dict[str, Any] = {}
         year_match = re.search(r"\b(19|20)\d{2}\b", normalized)
         if year_match:
@@ -102,7 +201,11 @@ class QueryProcessor:
         return filters
 
     def _select_strategies(self, intent: SearchIntent) -> list[RetrievalStrategy]:
-        if intent in (SearchIntent.FACTUAL, SearchIntent.METHODOLOGICAL, SearchIntent.COMPARATIVE):
+        if intent in (
+            SearchIntent.FACTUAL,
+            SearchIntent.METHODOLOGICAL,
+            SearchIntent.COMPARATIVE,
+        ):
             return [RetrievalStrategy.HYBRID, RetrievalStrategy.SEMANTIC]
         if intent == SearchIntent.SUMMARIZATION:
             return [RetrievalStrategy.SEMANTIC]
@@ -110,7 +213,9 @@ class QueryProcessor:
 
     def _rewrite(self, normalized: str, intent: SearchIntent) -> str:
         if intent == SearchIntent.COMPARATIVE:
-            terms = re.split(r"\b(?:vs\.?|versus|compare|and|or)\b", normalized, flags=re.IGNORECASE)
+            terms = re.split(
+                r"\b(?:vs\.?|versus|compare|and|or)\b", normalized, flags=re.IGNORECASE
+            )
             if len(terms) >= 2:
                 return " ".join(t.strip() for t in terms if t.strip())
         return normalized

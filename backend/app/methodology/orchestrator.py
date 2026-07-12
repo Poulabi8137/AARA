@@ -43,8 +43,12 @@ class MethodologyEngine:
         self._method_selector = method_selector or MethodSelector(llm)
         self._dataset_recommender = dataset_recommender or DatasetRecommender(llm)
         self._benchmark_recommender = benchmark_recommender or BenchmarkRecommender(llm)
-        self._evaluation_designer = evaluation_designer or EvaluationProtocolDesigner(llm)
-        self._validation_designer = validation_designer or ValidationStrategyDesigner(llm)
+        self._evaluation_designer = evaluation_designer or EvaluationProtocolDesigner(
+            llm
+        )
+        self._validation_designer = validation_designer or ValidationStrategyDesigner(
+            llm
+        )
         self._risk_assessor = risk_assessor or RiskAssessor(llm)
         self._best_practices = best_practices or BestPracticesEngine(llm)
         self._validator = validator or MethodologyValidator()
@@ -54,37 +58,51 @@ class MethodologyEngine:
 
         profile = self._build_profile(request)
 
-        methods = await self._method_selector.select(request.query, request.analysis_result)
+        methods = await self._method_selector.select(
+            request.query, request.analysis_result
+        )
         method_names = [m.method for m in methods]
 
         analysis_result: AnalysisResult = request.analysis_result
 
         datasets = await self._dataset_recommender.recommend(
-            request.query, analysis_result, method_names,
+            request.query,
+            analysis_result,
+            method_names,
         )
 
         benchmarks = await self._benchmark_recommender.recommend(
-            request.query, method_names,
+            request.query,
+            method_names,
         )
 
         evaluation = await self._evaluation_designer.design(
-            request.query, analysis_result, method_names,
+            request.query,
+            analysis_result,
+            method_names,
         )
 
         validation_strategies = await self._validation_designer.design(
-            request.query, analysis_result,
+            request.query,
+            analysis_result,
         )
 
         risks = await self._risk_assessor.assess(
-            request.query, analysis_result,
+            request.query,
+            analysis_result,
         )
 
         practices = await self._best_practices.generate(
-            request.query, analysis_result,
+            request.query,
+            analysis_result,
         )
 
         stats = self._build_statistics(
-            methods, datasets, benchmarks, risks, practices,
+            methods,
+            datasets,
+            benchmarks,
+            risks,
+            practices,
         )
 
         result = MethodologyResult(
@@ -130,7 +148,9 @@ class MethodologyEngine:
         return MethodologyProfile(
             domain=request.domain or "",
             complexity=getattr(request.analysis_result, "complexity", "moderate"),
-            evidence_quality=getattr(request.analysis_result.confidence, "overall", 0.0),
+            evidence_quality=getattr(
+                request.analysis_result.confidence, "overall", 0.0
+            ),
             research_goal=request.query[:200],
         )
 

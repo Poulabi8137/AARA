@@ -51,7 +51,9 @@ class TestHumanApprovalNode:
             assert result["approval_data"]["gaps_summary"]["total"] == 1
 
     @pytest.mark.asyncio
-    async def test_approval_record_created(self, mock_db_session, mock_async_session_factory):
+    async def test_approval_record_created(
+        self, mock_db_session, mock_async_session_factory
+    ):
         state = {
             "query": "approval test",
             "project_id": "proj-3",

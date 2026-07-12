@@ -122,6 +122,7 @@ def _build(
     module_path, _, class_name = entry.rpartition(".")
 
     import importlib
+
     try:
         module = importlib.import_module(module_path)
     except ImportError as exc:

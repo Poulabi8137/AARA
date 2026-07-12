@@ -3,7 +3,6 @@ from __future__ import annotations
 from app.core.logging import get_logger
 from app.summarization.config import get_summarization_settings
 from app.summarization.models import (
-    EvidenceGroup,
     SectionType,
     SummaryChunk,
     SummaryLevel,

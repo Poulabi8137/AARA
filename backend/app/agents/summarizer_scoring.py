@@ -5,7 +5,9 @@ from typing import Any
 from app.schemas.summarizer import SectionSummary
 
 
-def compute_summary_quality(summary: SectionSummary, bundle: dict[str, Any] | None = None) -> SectionSummary:
+def compute_summary_quality(
+    summary: SectionSummary, bundle: dict[str, Any] | None = None
+) -> SectionSummary:
     """Compute all quality scores for a SectionSummary."""
 
     # Coverage score: what fraction of key fields are populated

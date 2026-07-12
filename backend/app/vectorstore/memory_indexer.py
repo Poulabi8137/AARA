@@ -21,8 +21,6 @@ from app.vectorstore.embeddings import EmbeddingProvider
 from app.vectorstore.provider_factory import get_embedding_provider
 from app.vectorstore.retrieval import (
     add_document,
-    update_document,
-    delete_document,
     delete_documents_by_filter,
 )
 
@@ -263,9 +261,7 @@ class MemoryIndexer:
         )
         return index_record
 
-    async def _remove_memory(
-        self, memory_type: str, memory_id: uuid.UUID
-    ) -> None:
+    async def _remove_memory(self, memory_type: str, memory_id: uuid.UUID) -> None:
         collection = _MEMORY_TYPE_COLLECTION_MAP.get(memory_type)
         if collection is None:
             return
@@ -341,5 +337,7 @@ class MemoryIndexer:
             memory = result.scalar_one_or_none()
             return await self.index_project_memory(memory) if memory else None
 
-        logger.warning("unknown memory type for reindex", extra={"memory_type": memory_type})
+        logger.warning(
+            "unknown memory type for reindex", extra={"memory_type": memory_type}
+        )
         return None

@@ -150,7 +150,9 @@ class DependencyGraphBuilder:
                     continue
                 self_deps = dep_set.get(other, set())
                 other_deps = dep_set.get(tid, set())
-                if not self_deps.intersection({tid}) and not other_deps.intersection({other}):
+                if not self_deps.intersection({tid}) and not other_deps.intersection(
+                    {other}
+                ):
                     group.append(other)
                     assigned.add(other)
             groups.append(group)

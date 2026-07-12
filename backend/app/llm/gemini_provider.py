@@ -13,7 +13,9 @@ logger = get_logger("llm.gemini")
 class GeminiProvider:
     """Google Gemini LLM provider implementation."""
 
-    config: ProviderConfig = field(default_factory=lambda: ProviderConfig(model="gemini-2.0-flash"))
+    config: ProviderConfig = field(
+        default_factory=lambda: ProviderConfig(model="gemini-2.0-flash")
+    )
     api_key: str | None = None
 
     def __post_init__(self) -> None:
@@ -24,12 +26,16 @@ class GeminiProvider:
             try:
                 import google.generativeai as genai
             except ImportError:
-                raise ImportError("google-generativeai is required: pip install google-generativeai")
+                raise ImportError(
+                    "google-generativeai is required: pip install google-generativeai"
+                )
             genai.configure(api_key=self.api_key or "")
             self._client = genai.GenerativeModel(self.config.model)
         return self._client
 
-    async def generate(self, prompt: str, system_prompt: str | None = None) -> LLMResponse:
+    async def generate(
+        self, prompt: str, system_prompt: str | None = None
+    ) -> LLMResponse:
 
         client = self._get_client()
         full_prompt = f"{system_prompt}\n\n{prompt}" if system_prompt else prompt
@@ -44,16 +50,21 @@ class GeminiProvider:
                 "total_tokens": response.usage_metadata.total_token_count,
             }
 
-        logger.info("gemini generation complete", extra={
-            "model": self.config.model,
-            "usage": usage_data,
-        })
+        logger.info(
+            "gemini generation complete",
+            extra={
+                "model": self.config.model,
+                "usage": usage_data,
+            },
+        )
 
         return LLMResponse(
             content=response.text or "",
             model=self.config.model,
             usage=usage_data,
-            finish_reason=str(response.candidates[0].finish_reason) if response.candidates else None,
+            finish_reason=str(response.candidates[0].finish_reason)
+            if response.candidates
+            else None,
         )
 
     async def generate_with_history(

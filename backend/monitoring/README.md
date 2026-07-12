@@ -62,8 +62,8 @@ Exposed at `GET /metrics` (Prometheus text format).
 ## Grafana Dashboards
 
 Pre-configured dashboards are in `monitoring/grafana/dashboards/`:
-- **AgentWatch Overview** (`agentwatch_overview.json`): Global system metrics
-- **AgentWatch Alerts** (`agentwatch_alerts.json`): Alerting dashboard
+- **AARA Overview** (`agentwatch_overview.json`): Global system metrics
+- **AARA Alerts** (`agentwatch_alerts.json`): Alerting dashboard
 
 ## Prometheus Alerts
 

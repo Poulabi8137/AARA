@@ -57,24 +57,57 @@ _INTENT_ROUTES: dict[SearchIntent, list[SourceType]] = {
 }
 
 _KEYWORD_ROUTES: list[tuple[re.Pattern, list[SourceType]]] = [
-    (re.compile(r"\b(literature|survey|review|paper|publication)\b", re.IGNORECASE), [
-        SourceType.CHROMA_PAPER, SourceType.CHROMA_CITATION, SourceType.CHROMA_KNOWLEDGE, SourceType.MEMORY_PAPER,
-    ]),
-    (re.compile(r"\b(experiment|result|finding|observation)\b", re.IGNORECASE), [
-        SourceType.MEMORY_PROJECT, SourceType.CHROMA_REPORT, SourceType.MEMORY_LONG_TERM, SourceType.MEMORY_SESSION,
-    ]),
-    (re.compile(r"\b(method|approach|technique|algorithm|framework)\b", re.IGNORECASE), [
-        SourceType.MEMORY_PAPER, SourceType.CHROMA_PAPER, SourceType.CHROMA_KNOWLEDGE, SourceType.MEMORY_PROJECT,
-    ]),
-    (re.compile(r"\b(cite|citation|reference|bibliography)\b", re.IGNORECASE), [
-        SourceType.CHROMA_CITATION, SourceType.CHROMA_PAPER, SourceType.MEMORY_PAPER,
-    ]),
-    (re.compile(r"\b(web|news|blog|article|online)\b", re.IGNORECASE), [
-        SourceType.CHROMA_WEB, SourceType.CHROMA_KNOWLEDGE,
-    ]),
-    (re.compile(r"\b(report|summary|generated|output)\b", re.IGNORECASE), [
-        SourceType.CHROMA_REPORT, SourceType.MEMORY_LONG_TERM,
-    ]),
+    (
+        re.compile(r"\b(literature|survey|review|paper|publication)\b", re.IGNORECASE),
+        [
+            SourceType.CHROMA_PAPER,
+            SourceType.CHROMA_CITATION,
+            SourceType.CHROMA_KNOWLEDGE,
+            SourceType.MEMORY_PAPER,
+        ],
+    ),
+    (
+        re.compile(r"\b(experiment|result|finding|observation)\b", re.IGNORECASE),
+        [
+            SourceType.MEMORY_PROJECT,
+            SourceType.CHROMA_REPORT,
+            SourceType.MEMORY_LONG_TERM,
+            SourceType.MEMORY_SESSION,
+        ],
+    ),
+    (
+        re.compile(
+            r"\b(method|approach|technique|algorithm|framework)\b", re.IGNORECASE
+        ),
+        [
+            SourceType.MEMORY_PAPER,
+            SourceType.CHROMA_PAPER,
+            SourceType.CHROMA_KNOWLEDGE,
+            SourceType.MEMORY_PROJECT,
+        ],
+    ),
+    (
+        re.compile(r"\b(cite|citation|reference|bibliography)\b", re.IGNORECASE),
+        [
+            SourceType.CHROMA_CITATION,
+            SourceType.CHROMA_PAPER,
+            SourceType.MEMORY_PAPER,
+        ],
+    ),
+    (
+        re.compile(r"\b(web|news|blog|article|online)\b", re.IGNORECASE),
+        [
+            SourceType.CHROMA_WEB,
+            SourceType.CHROMA_KNOWLEDGE,
+        ],
+    ),
+    (
+        re.compile(r"\b(report|summary|generated|output)\b", re.IGNORECASE),
+        [
+            SourceType.CHROMA_REPORT,
+            SourceType.MEMORY_LONG_TERM,
+        ],
+    ),
 ]
 
 
@@ -117,14 +150,28 @@ class CollectionRouter:
         )
 
     def memory_collections(self, route: CollectionRoute) -> list[SourceType]:
-        return [c for c in route.collections if c in {
-            SourceType.MEMORY_SESSION, SourceType.MEMORY_LONG_TERM,
-            SourceType.MEMORY_PAPER, SourceType.MEMORY_PROJECT,
-        }]
+        return [
+            c
+            for c in route.collections
+            if c
+            in {
+                SourceType.MEMORY_SESSION,
+                SourceType.MEMORY_LONG_TERM,
+                SourceType.MEMORY_PAPER,
+                SourceType.MEMORY_PROJECT,
+            }
+        ]
 
     def platform_collections(self, route: CollectionRoute) -> list[SourceType]:
-        return [c for c in route.collections if c in {
-            SourceType.CHROMA_PAPER, SourceType.CHROMA_WEB,
-            SourceType.CHROMA_CITATION, SourceType.CHROMA_REPORT,
-            SourceType.CHROMA_KNOWLEDGE,
-        }]
+        return [
+            c
+            for c in route.collections
+            if c
+            in {
+                SourceType.CHROMA_PAPER,
+                SourceType.CHROMA_WEB,
+                SourceType.CHROMA_CITATION,
+                SourceType.CHROMA_REPORT,
+                SourceType.CHROMA_KNOWLEDGE,
+            }
+        ]

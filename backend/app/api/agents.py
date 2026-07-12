@@ -79,7 +79,10 @@ async def run_workflow(
         execution_status=ExecutionStatus.PENDING,
         input_query=request.query,
         thread_id=str(uuid.uuid4()),
-        execution_metadata={"objective": request.objective or "", "user_id": str(current_user.id)},
+        execution_metadata={
+            "objective": request.objective or "",
+            "user_id": str(current_user.id),
+        },
         start_time=datetime.now(timezone.utc),
     )
     session.add(execution)
@@ -145,12 +148,16 @@ async def list_executions(
     """List agent executions accessible to the current user."""
     from sqlalchemy import select, func
 
-    user_project_ids = select(ResearchProject.id).where(
-        ResearchProject.created_by == current_user.id
-    ).scalar_subquery()
+    user_project_ids = (
+        select(ResearchProject.id)
+        .where(ResearchProject.created_by == current_user.id)
+        .scalar_subquery()
+    )
 
-    count_q = select(func.count()).select_from(AgentExecution).where(
-        AgentExecution.project_id.in_(user_project_ids)
+    count_q = (
+        select(func.count())
+        .select_from(AgentExecution)
+        .where(AgentExecution.project_id.in_(user_project_ids))
     )
     total_result = await session.execute(count_q)
     total = total_result.scalar_one()
@@ -191,7 +198,10 @@ async def cancel_execution(
     """Cancel a running or pending execution via Dramatiq cancel actor."""
     exec_obj = await _check_execution_owner(execution_id, current_user, session)
 
-    if exec_obj.execution_status not in (ExecutionStatus.PENDING, ExecutionStatus.RUNNING):
+    if exec_obj.execution_status not in (
+        ExecutionStatus.PENDING,
+        ExecutionStatus.RUNNING,
+    ):
         raise HTTPException(
             status_code=400,
             detail=f"Cannot cancel execution with status: {exec_obj.execution_status.value}",
@@ -213,6 +223,4 @@ async def list_registered_agents(
 ) -> Any:
     """List all agents registered in the agent registry."""
     agents = AgentRegistry.list_agents()
-    return AgentListResponse(
-        agents=[AgentInfoResponse(**a) for a in agents]
-    )
+    return AgentListResponse(agents=[AgentInfoResponse(**a) for a in agents])

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 
 from app.core.logging import get_logger
 from app.analysis.config import get_analysis_settings
@@ -88,7 +87,9 @@ class AnalysisValidator:
                 key = insight.insight[:80].lower()
                 if key in seen:
                     report.duplicate_insights.append(insight.insight[:60])
-                    report.warnings.append(f"Duplicate insight: {insight.insight[:60]}...")
+                    report.warnings.append(
+                        f"Duplicate insight: {insight.insight[:60]}..."
+                    )
                 seen.add(key)
 
     def _check_contradictory_recommendations(

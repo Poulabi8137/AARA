@@ -17,7 +17,9 @@ from app.services.session_service import SessionService
 router = APIRouter(prefix="/sessions", tags=["Research Sessions"])
 
 
-async def _check_project_owner(project_id: uuid.UUID, user: User, db: AsyncSession) -> None:
+async def _check_project_owner(
+    project_id: uuid.UUID, user: User, db: AsyncSession
+) -> None:
     result = await db.execute(
         select(ResearchProject).where(
             ResearchProject.id == project_id,
@@ -25,7 +27,9 @@ async def _check_project_owner(project_id: uuid.UUID, user: User, db: AsyncSessi
         )
     )
     if result.scalar_one_or_none() is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+        )
 
 
 @router.get("", response_model=SessionListResponse)
@@ -35,9 +39,11 @@ async def list_sessions(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> SessionListResponse:
-    user_project_ids = select(ResearchProject.id).where(
-        ResearchProject.created_by == current_user.id
-    ).scalar_subquery()
+    user_project_ids = (
+        select(ResearchProject.id)
+        .where(ResearchProject.created_by == current_user.id)
+        .scalar_subquery()
+    )
 
     count_q = select(func.count(ResearchSession.id)).where(
         ResearchSession.project_id.in_(user_project_ids)
@@ -82,6 +88,8 @@ async def get_session(
     service = SessionService(db)
     session = await service.get_session(session_id=session_id)
     if session is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Session not found"
+        )
     await _check_project_owner(session.project_id, current_user, db)
     return SessionResponse.model_validate(session)

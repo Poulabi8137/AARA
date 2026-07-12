@@ -26,5 +26,13 @@ async def run_research_workflow(state: dict[str, Any]) -> dict[str, Any]:
     objective = state.get("objective", "")
     execution_id = state.get("execution_id", "")
 
-    logger.info("running research workflow from state", extra={"query": query[:50] if query else ""})
-    return await workflow.arun(query=query, project_id=project_id, objective=objective, execution_id=execution_id)
+    logger.info(
+        "running research workflow from state",
+        extra={"query": query[:50] if query else ""},
+    )
+    return await workflow.arun(
+        query=query,
+        project_id=project_id,
+        objective=objective,
+        execution_id=execution_id,
+    )

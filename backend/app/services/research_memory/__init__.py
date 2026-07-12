@@ -3,7 +3,9 @@ from app.services.research_memory.session_memory_service import SessionMemorySer
 from app.services.research_memory.long_term_memory_service import LongTermMemoryService
 from app.services.research_memory.paper_memory_service import PaperMemoryService
 from app.services.research_memory.project_memory_service import ProjectMemoryService
-from app.services.research_memory.semantic_index_service import SemanticMemoryIndexService
+from app.services.research_memory.semantic_index_service import (
+    SemanticMemoryIndexService,
+)
 from app.services.research_memory.manager import ResearchMemoryManager
 from app.services.research_memory.consolidation import (
     ConsolidationConfig,

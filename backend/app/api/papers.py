@@ -16,19 +16,32 @@ from app.agents.quality_review_agent import QualityReviewAgent
 from app.agents.citation_validator_agent import CitationValidatorAgent
 from app.agents.evidence_validator_agent import EvidenceValidatorAgent
 from app.models.paper import (
-    Proposal, Paper, PaperSection, PaperRevision, PaperCitation,
-    PaperExport, PaperMetrics, PaperStatus, SectionStatus,
+    Proposal,
+    Paper,
+    PaperSection,
+    PaperRevision,
+    PaperCitation,
+    PaperExport,
+    PaperMetrics,
+    PaperStatus,
+    SectionStatus,
     PaperOperation,
 )
 from app.models.research_project import ResearchProject
 from app.models.user import User
 from app.schemas.paper import (
-    ProposalCreate, ProposalResponse,
-    PaperGenerateRequest, PaperResponse, PaperSectionResponse,
+    ProposalCreate,
+    ProposalResponse,
+    PaperGenerateRequest,
+    PaperResponse,
+    PaperSectionResponse,
     PaperExportResponse,
-    SectionRewriteRequest, SectionRewriteResponse,
-    QualityReviewResponse, CitationValidationResponse,
-    EvidenceValidationResponse, PaperListResponse,
+    SectionRewriteRequest,
+    SectionRewriteResponse,
+    QualityReviewResponse,
+    CitationValidationResponse,
+    EvidenceValidationResponse,
+    PaperListResponse,
 )
 from app.db.session import get_async_session
 from app.core.logging import get_logger
@@ -41,7 +54,9 @@ logger = get_logger("api.papers")
 router = APIRouter(prefix="/papers", tags=["papers"])
 
 
-async def _get_project(user: User, project_id: str, session: AsyncSession) -> ResearchProject:
+async def _get_project(
+    user: User, project_id: str, session: AsyncSession
+) -> ResearchProject:
     result = await session.execute(
         select(ResearchProject).where(
             ResearchProject.id == uuid.UUID(project_id),
@@ -54,7 +69,9 @@ async def _get_project(user: User, project_id: str, session: AsyncSession) -> Re
     return project
 
 
-async def _get_proposal(user: User, proposal_id: str, session: AsyncSession) -> Proposal:
+async def _get_proposal(
+    user: User, proposal_id: str, session: AsyncSession
+) -> Proposal:
     result = await session.execute(
         select(Proposal).where(Proposal.id == uuid.UUID(proposal_id))
     )
@@ -65,9 +82,7 @@ async def _get_proposal(user: User, proposal_id: str, session: AsyncSession) -> 
 
 
 async def _get_paper(user: User, paper_id: str, session: AsyncSession) -> Paper:
-    result = await session.execute(
-        select(Paper).where(Paper.id == uuid.UUID(paper_id))
-    )
+    result = await session.execute(select(Paper).where(Paper.id == uuid.UUID(paper_id)))
     paper = result.scalar_one_or_none()
     if paper is None:
         raise HTTPException(status_code=404, detail="Paper not found")
@@ -80,11 +95,16 @@ def _get_llm() -> LLMProvider:
 
 
 def _build_state_from_proposal(proposal: Proposal) -> ResearchState:
-    state = make_initial_state(query=proposal.proposed_title, project_id=str(proposal.project_id))
+    state = make_initial_state(
+        query=proposal.proposed_title, project_id=str(proposal.project_id)
+    )
     state["objective"] = proposal.problem_statement
     state["domain"] = proposal.domain or ""
     state["keywords"] = ", ".join(proposal.keywords) if proposal.keywords else ""
-    state["selected_gap"] = {"description": proposal.problem_statement, "id": proposal.gap_id}
+    state["selected_gap"] = {
+        "description": proposal.problem_statement,
+        "id": proposal.gap_id,
+    }
     state["proposal"] = {
         "proposed_title": proposal.proposed_title,
         "problem_statement": proposal.problem_statement,
@@ -118,14 +138,19 @@ async def create_proposal(
         project_id=request.project_id,
         objective=request.objective,
     )
-    state["selected_gap"] = {"description": request.gap_id or request.objective, "id": request.gap_id or ""}
+    state["selected_gap"] = {
+        "description": request.gap_id or request.objective,
+        "id": request.gap_id or "",
+    }
     state["domain"] = request.domain
     state["keywords"] = request.keywords
     state["methodology_preference"] = request.methodology_preference
 
     base_paper_analysis = None
     if request.base_paper_doi or request.base_paper_url:
-        analysis_result = await _analyze_base_paper(llm, request.base_paper_doi, request.base_paper_url)
+        analysis_result = await _analyze_base_paper(
+            llm, request.base_paper_doi, request.base_paper_url
+        )
         state["base_paper_context"] = json.dumps(analysis_result, indent=2)
         base_paper_analysis = analysis_result
 
@@ -153,7 +178,10 @@ async def create_proposal(
     await session.commit()
     await session.refresh(db_proposal)
 
-    logger.info("proposal created", extra={"proposal_id": str(db_proposal.id), "title": db_proposal.proposed_title})
+    logger.info(
+        "proposal created",
+        extra={"proposal_id": str(db_proposal.id), "title": db_proposal.proposed_title},
+    )
     return db_proposal
 
 
@@ -161,6 +189,7 @@ async def _analyze_base_paper(llm, doi: str | None, url: str | None) -> dict[str
     from app.agents.paper_authoring_prompts import (
         PAPER_AUTHOR_SYSTEM_PROMPT,
     )
+
     source = doi or url or ""
     prompt = f"""Analyze the following base paper and extract key information. Return JSON only.
 Source: {source}
@@ -171,18 +200,27 @@ If you cannot access the full paper, extract what you can from the metadata and 
 
 Return ONLY valid JSON with exactly these keys: abstract, keywords, methodology, dataset_description, experiments, limitations, future_work, references"""
     try:
-        response = await llm.generate(prompt=prompt, system_prompt=PAPER_AUTHOR_SYSTEM_PROMPT)
+        response = await llm.generate(
+            prompt=prompt, system_prompt=PAPER_AUTHOR_SYSTEM_PROMPT
+        )
         raw = response.content.strip()
         if raw.startswith("```"):
             raw = raw.split("\n", 1)[-1]
             raw = raw.rsplit("\n```", 1)[0]
         return json.loads(raw)
     except Exception as exc:
-        logger.warning("base paper analysis failed", extra={"error": str(exc), "source": source})
+        logger.warning(
+            "base paper analysis failed", extra={"error": str(exc), "source": source}
+        )
         return {
-            "abstract": None, "keywords": [], "methodology": None,
-            "dataset_description": None, "experiments": None,
-            "limitations": None, "future_work": None, "references": [],
+            "abstract": None,
+            "keywords": [],
+            "methodology": None,
+            "dataset_description": None,
+            "experiments": None,
+            "limitations": None,
+            "future_work": None,
+            "references": [],
             "originality_note": "Analysis incomplete — verify against original source.",
         }
 
@@ -271,12 +309,15 @@ async def generate_paper(
     await session.commit()
     await session.refresh(db_paper)
 
-    logger.info("paper generated", extra={
-        "paper_id": str(db_paper.id),
-        "title": db_paper.title,
-        "sections": len(sections_data),
-        "references": len(refs_data),
-    })
+    logger.info(
+        "paper generated",
+        extra={
+            "paper_id": str(db_paper.id),
+            "title": db_paper.title,
+            "sections": len(sections_data),
+            "references": len(refs_data),
+        },
+    )
     return db_paper
 
 
@@ -326,7 +367,9 @@ async def list_papers(
     return PaperListResponse(papers=papers, total=len(papers))
 
 
-@router.post("/{paper_id}/sections/{section_id}/rewrite", response_model=SectionRewriteResponse)
+@router.post(
+    "/{paper_id}/sections/{section_id}/rewrite", response_model=SectionRewriteResponse
+)
 async def rewrite_section(
     paper_id: str,
     section_id: str,
@@ -348,13 +391,17 @@ async def rewrite_section(
         "expand": agent.expand_section,
         "condense": agent.condense_section,
         "improve_tone": agent.improve_tone,
-        "add_citations": lambda t, c: agent.add_citations(t, c, _get_citations_text(paper)),
+        "add_citations": lambda t, c: agent.add_citations(
+            t, c, _get_citations_text(paper)
+        ),
         "improve_depth": agent.improve_depth,
     }
 
     op_func = operation_map.get(request.operation)
     if op_func is None:
-        raise HTTPException(status_code=400, detail=f"Unknown operation: {request.operation}")
+        raise HTTPException(
+            status_code=400, detail=f"Unknown operation: {request.operation}"
+        )
 
     new_content = await op_func(section.section_title, old_content)
     if new_content is None:
@@ -384,10 +431,14 @@ async def rewrite_section(
 
 
 def _get_citations_text(paper: Paper) -> str:
-    return "\n".join(
-        f"{c.citation_key}: {c.authors} ({c.year}). {c.title}. {c.doi or c.url or ''}"
-        for c in paper.citations
-    ) if paper.citations else "No citations available."
+    return (
+        "\n".join(
+            f"{c.citation_key}: {c.authors} ({c.year}). {c.title}. {c.doi or c.url or ''}"
+            for c in paper.citations
+        )
+        if paper.citations
+        else "No citations available."
+    )
 
 
 @router.post("/{paper_id}/quality-review", response_model=QualityReviewResponse)
@@ -408,11 +459,21 @@ async def quality_review(
         "title": paper.title,
         "abstract": paper.abstract,
         "sections": [
-            {"section_number": s.section_number, "section_title": s.section_title, "content": s.content}
+            {
+                "section_number": s.section_number,
+                "section_title": s.section_title,
+                "content": s.content,
+            }
             for s in sections
         ],
         "references": [
-            {"citation_key": c.citation_key, "authors": c.authors, "title": c.title, "year": c.year, "doi": c.doi}
+            {
+                "citation_key": c.citation_key,
+                "authors": c.authors,
+                "title": c.title,
+                "year": c.year,
+                "doi": c.doi,
+            }
             for c in citations
         ],
     }
@@ -455,7 +516,9 @@ async def quality_review(
     )
 
 
-@router.post("/{paper_id}/validate-citations", response_model=CitationValidationResponse)
+@router.post(
+    "/{paper_id}/validate-citations", response_model=CitationValidationResponse
+)
 async def validate_citations(
     paper_id: str,
     current_user: User = Depends(get_current_user),
@@ -468,8 +531,15 @@ async def validate_citations(
     state = make_initial_state(query=paper.title, project_id=str(paper.project_id))
 
     refs = [
-        {"citation_key": c.citation_key, "authors": c.authors, "title": c.title,
-         "year": c.year, "journal": c.journal, "doi": c.doi, "url": c.url}
+        {
+            "citation_key": c.citation_key,
+            "authors": c.authors,
+            "title": c.title,
+            "year": c.year,
+            "journal": c.journal,
+            "doi": c.doi,
+            "url": c.url,
+        }
         for c in paper.citations
     ]
     state["paper_draft"] = {"references": refs}
@@ -480,7 +550,9 @@ async def validate_citations(
         key = c_data.get("citation_key", "")
         for db_c in paper.citations:
             if db_c.citation_key == key:
-                db_c.verified = not c_data.get("is_fabricated", False) and not c_data.get("is_duplicate", False)
+                db_c.verified = not c_data.get(
+                    "is_fabricated", False
+                ) and not c_data.get("is_duplicate", False)
                 db_c.ieee_format = c_data.get("ieee_format", "")
                 db_c.verification_errors = c_data.get("verification_notes", [])
     await session.commit()
@@ -509,7 +581,11 @@ async def validate_evidence(
     sections = paper.sections
     state["paper_draft"] = {
         "sections": [
-            {"section_number": s.section_number, "section_title": s.section_title, "content": s.content}
+            {
+                "section_number": s.section_number,
+                "section_title": s.section_title,
+                "content": s.content,
+            }
             for s in sections
         ],
     }
@@ -541,23 +617,30 @@ async def download_paper(
     paper = await _get_paper(current_user, paper_id, session)
 
     if fmt not in ("pdf", "docx"):
-        raise HTTPException(status_code=400, detail="Unsupported format. Use 'pdf' or 'docx'.")
+        raise HTTPException(
+            status_code=400, detail="Unsupported format. Use 'pdf' or 'docx'."
+        )
 
     existing = await session.execute(
-        select(PaperExport).where(
+        select(PaperExport)
+        .where(
             PaperExport.paper_id == paper.id,
             PaperExport.format == fmt,
-        ).order_by(PaperExport.generated_at.desc())
+        )
+        .order_by(PaperExport.generated_at.desc())
     )
     export = existing.scalar_one_or_none()
 
     if export and export.file_path:
         from fastapi.responses import FileResponse
         import os
+
         if os.path.exists(export.file_path):
             return FileResponse(
                 export.file_path,
-                media_type="application/pdf" if fmt == "pdf" else "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                media_type="application/pdf"
+                if fmt == "pdf"
+                else "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 filename=f"{paper.title[:50]}.{fmt}",
             )
 
@@ -573,9 +656,12 @@ async def download_paper(
     await session.commit()
 
     from fastapi.responses import FileResponse
+
     return FileResponse(
         export_path,
-        media_type="application/pdf" if fmt == "pdf" else "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        media_type="application/pdf"
+        if fmt == "pdf"
+        else "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         filename=f"{paper.title[:50]}.{fmt}",
     )
 
@@ -605,7 +691,7 @@ def _render_ieee_markdown(paper: Paper) -> str:
         lines.append("## References")
         lines.append("")
         for c in paper.citations:
-            ieee = c.ieee_format or f"{c.authors} \"{c.title},\" {c.year}."
+            ieee = c.ieee_format or f'{c.authors} "{c.title}," {c.year}.'
             lines.append(f"[{c.citation_key}] {ieee}")
         lines.append("")
 
@@ -617,8 +703,11 @@ def _render_ieee_markdown(paper: Paper) -> str:
     return "\n".join(lines)
 
 
-async def _generate_export(paper: Paper, fmt: str, ieee_md: str, session: AsyncSession) -> str:
+async def _generate_export(
+    paper: Paper, fmt: str, ieee_md: str, session: AsyncSession
+) -> str:
     import os
+
     export_dir = os.path.join("exports", str(paper.id))
     os.makedirs(export_dir, exist_ok=True)
 
@@ -631,6 +720,7 @@ async def _generate_export(paper: Paper, fmt: str, ieee_md: str, session: AsyncS
         try:
             import markdown
             from weasyprint import HTML
+
             html = markdown.markdown(ieee_md, extensions=["tables", "fenced_code"])
             styled = f"""<html><head><style>
 body {{ font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.6; margin: 1in; }}
@@ -651,6 +741,7 @@ code {{ background: #f4f4f4; padding: 2px 4px; }}
         try:
             from docx import Document
             from docx.shared import Pt
+
             doc = Document()
             style = doc.styles["Normal"]
             style.font.name = "Times New Roman"
@@ -669,7 +760,7 @@ code {{ background: #f4f4f4; padding: 2px 4px; }}
             if paper.citations:
                 doc.add_heading("References", 1)
                 for c in paper.citations:
-                    ieee = c.ieee_format or f"{c.authors}, \"{c.title},\" {c.year}."
+                    ieee = c.ieee_format or f'{c.authors}, "{c.title}," {c.year}.'
                     doc.add_paragraph(f"[{c.citation_key}] {ieee}")
             doc.save(docx_path)
             return docx_path

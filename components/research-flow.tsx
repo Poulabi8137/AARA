@@ -1,10 +1,8 @@
 'use client'
 
-import { useMemo, useCallback } from 'react'
 import {
   ReactFlow,
   Background,
-  Controls,
   useNodesState,
   useEdgesState,
   type Node,
@@ -17,7 +15,7 @@ import {
 import '@xyflow/react/dist/style.css'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import { BookOpen, Search, Lightbulb, Quote, FileText, ArrowRight } from 'lucide-react'
+import { BookOpen, Search, Lightbulb, Quote, FileText } from 'lucide-react'
 
 const moduleIcons: Record<string, React.ElementType> = {
   papers: BookOpen,
@@ -81,8 +79,8 @@ const researchEdges: Edge[] = [
 ]
 
 export function ResearchFlow({ className }: { className?: string }) {
-  const [nodes, setNodes, onNodesChange] = useNodesState(researchNodes)
-  const [edges, setEdges, onEdgesChange] = useEdgesState(researchEdges)
+  const [nodes, , onNodesChange] = useNodesState(researchNodes)
+  const [edges, , onEdgesChange] = useEdgesState(researchEdges)
 
   return (
     <div className={cn('h-[200px] rounded-xl overflow-hidden border border-border/50', className)}>

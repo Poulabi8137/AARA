@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import time
-from collections import deque
 
 from app.core.logging import get_logger
 from app.knowledge_graph.config import get_knowledge_graph_settings
-from app.knowledge_graph.models import GraphValidationReport, KnowledgeGraph, NodeType, RelationshipType
+from app.knowledge_graph.models import (
+    GraphValidationReport,
+    KnowledgeGraph,
+    NodeType,
+    RelationshipType,
+)
 
 logger = get_logger("knowledge_graph.validator")
 settings = get_knowledge_graph_settings()
@@ -98,10 +102,14 @@ class GraphValidator:
         for eid, edge in graph.edges.items():
             if edge.source_id not in graph.nodes:
                 report.broken_edges.append(eid)
-                report.errors.append(f"Broken edge {eid}: source {edge.source_id} not found")
+                report.errors.append(
+                    f"Broken edge {eid}: source {edge.source_id} not found"
+                )
             if edge.target_id not in graph.nodes:
                 report.broken_edges.append(eid)
-                report.errors.append(f"Broken edge {eid}: target {edge.target_id} not found")
+                report.errors.append(
+                    f"Broken edge {eid}: target {edge.target_id} not found"
+                )
 
     def _check_missing_provenance(
         self,
@@ -165,7 +173,10 @@ class GraphValidator:
                     report.confidence_inconsistencies.append(
                         f"Edge {eid} has out-of-range confidence: {edge.metadata.confidence}"
                     )
-                if source_node.metadata.confidence > 0.9 and target_node.metadata.confidence < 0.1:
+                if (
+                    source_node.metadata.confidence > 0.9
+                    and target_node.metadata.confidence < 0.1
+                ):
                     if edge.metadata.confidence > 0.5:
                         report.confidence_inconsistencies.append(
                             f"Confidence mismatch: source {source_node.node_id} ({source_node.metadata.confidence:.2f}) "
@@ -193,7 +204,9 @@ class GraphValidator:
         for eid, edge in graph.edges.items():
             if edge.relationship_type not in valid_rels:
                 report.invalid_relationships.append(eid)
-                report.errors.append(f"Invalid relationship type for {eid}: {edge.relationship_type}")
+                report.errors.append(
+                    f"Invalid relationship type for {eid}: {edge.relationship_type}"
+                )
 
     def _check_connectivity(
         self,
@@ -211,7 +224,9 @@ class GraphValidator:
                 continue
             visited.add(current)
             for edge in graph.adjacency.get(current, []):
-                neighbor = edge.target_id if edge.source_id == current else edge.source_id
+                neighbor = (
+                    edge.target_id if edge.source_id == current else edge.source_id
+                )
                 if neighbor not in visited and neighbor in graph.nodes:
                     stack.append(neighbor)
 
@@ -221,4 +236,6 @@ class GraphValidator:
                 f"{disconnected} nodes not reachable from {start}"
             )
             if disconnected > len(graph.nodes) * 0.3:
-                report.errors.append(f"Graph has poor connectivity: {disconnected} isolated nodes")
+                report.errors.append(
+                    f"Graph has poor connectivity: {disconnected} isolated nodes"
+                )
