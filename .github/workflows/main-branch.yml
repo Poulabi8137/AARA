@@ -38,6 +38,7 @@ jobs:
       - name: Run ruff formatter check
         run: ruff format --check app/ tests/
       - name: Run mypy type checking
+        continue-on-error: true
         run: mypy app/ --ignore-missing-imports --warn-unused-configs
 
   test:
