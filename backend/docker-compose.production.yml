@@ -1,0 +1,89 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-agentwatch}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-agentwatch}
+      POSTGRES_DB: ${POSTGRES_DB:-agentwatch}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-agentwatch}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  chromadb:
+    image: chromadb/chroma:latest
+    restart: unless-stopped
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      IS_PERSISTENT: "TRUE"
+      PERSIST_DIRECTORY: /chroma/chroma
+      ANONYMIZED_TELEMETRY: "FALSE"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      chromadb:
+        condition: service_started
+    env_file:
+      - .env.production
+    environment:
+      # Production environment overrides (use deployment platform secrets)
+      CHROMA_HOST: chromadb
+      CHROMA_PORT: "8000"
+      VECTORSTORE_PERSIST_DIR: /app/chroma_data
+      # LLM configuration (use deployment platform secrets)
+      LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      LLM_MODEL: ${LLM_MODEL:-gpt-4o}
+      # Observability
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      DEBUG: ${DEBUG:-false}
+      # Monitoring
+      PROMETHEUS_METRICS_ENABLED: ${PROMETHEUS_METRICS_ENABLED:-true}
+      METRICS_PORT: ${METRICS_PORT:-9090}
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/app/chroma_data
+    command: >
+      sh -c "
+        echo "Starting AARA API in production mode..."
+        alembic upgrade head
+        echo "Running uvicorn with $LLM_PROVIDER provider..."
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+      "
+
+volumes:
+  pgdata:
+  chroma_data:

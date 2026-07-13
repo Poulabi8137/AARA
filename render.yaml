@@ -1,0 +1,94 @@
+# AARA — Render Blueprint Deployment
+# https://render.com/docs/blueprint-spec
+
+services:
+  # ── Backend API ──────────────────────────────────────────────
+  - type: web
+    name: aara-api
+    env: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: APP_NAME
+        value: AARA API
+      - key: ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: LOG_FORMAT
+        value: json
+      - key: DATABASE_URL
+        fromDatabase:
+          name: aara-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "30"
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: "7"
+      - key: ALGORITHM
+        value: HS256
+      - key: TOKEN_VERSION
+        value: "1"
+      - key: CORS_ALLOW_CREDENTIALS
+        value: "true"
+      - key: ALLOWED_ORIGINS
+        value: '[https://aara.vercel.app]'
+      - key: LLM_PROVIDER
+        value: gemini
+      - key: LLM_MODEL
+        value: gemini-2.0-flash
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          name: aara-redis
+          type: redis
+          property: connectionString
+      - key: DEFAULT_CACHE_TTL
+        value: "300"
+      - key: VECTORSTORE_PERSIST_DIR
+        value: /data/chroma
+      - key: CHUNK_SIZE
+        value: "1000"
+      - key: CHUNK_OVERLAP
+        value: "200"
+      - key: WORKFLOW_MAX_RETRIES
+        value: "3"
+      - key: WORKFLOW_NODE_TIMEOUT
+        value: "120"
+      - key: REQUIRE_HUMAN_APPROVAL
+        value: "false"
+
+  # ── ChromaDB ─────────────────────────────────────────────────
+  - type: web
+    name: aara-chromadb
+    env: docker
+    dockerfilePath: Dockerfile.chromadb
+    plan: free
+    healthCheckPath: /api/v1/heartbeat
+    envVars:
+      - key: IS_PERSISTENT
+        value: "TRUE"
+      - key: PERSIST_DIRECTORY
+        value: /chroma/chroma
+      - key: ANONYMIZED_TELEMETRY
+        value: "FALSE"
+      - key: CHROMA_SERVER_CORS_ALLOW_ORIGINS
+        value: '["https://aara-api.onrender.com"]'
+
+databases:
+  # ── PostgreSQL (Neon via Render) ─────────────────────────────
+  - name: aara-db
+    databaseName: aara
+    plan: free
+
+redis:
+  # ── Redis (Upstash via Render Blueprint placeholder) ─────────
+  - name: aara-redis
+    plan: free

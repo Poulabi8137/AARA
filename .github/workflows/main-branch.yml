@@ -207,7 +207,7 @@ jobs:
           file: backend/Dockerfile
           push: false
           load: true
-          tags: ${{ env.IMAGE_NAME }}:test
+          tags: ${{ github.repository_owner }}/aara:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Test Docker image
@@ -215,7 +215,7 @@ jobs:
           docker run --rm -d -p 8000:8000 --name test-api \
             -e DATABASE_URL=postgresql+asyncpg://test:test@localhost:5432/test \
             -e SECRET_KEY=test-secret-key-32-chars-minimum-length!! \
-            ${{ env.IMAGE_NAME }}:test
+            ${{ github.repository_owner }}/aara:test
           sleep 5
           curl -f http://localhost:8000/health || exit 1
           docker stop test-api

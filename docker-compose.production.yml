@@ -1,0 +1,29 @@
+# AARA — Production Docker Compose (with external services via URL)
+# PostgreSQL:  Neon (postgresql+asyncpg://...)
+# Redis:       Upstash (rediss://...)
+# ChromaDB:    self-hosted or Render service
+# Gemini:      Google AI Studio API key
+
+version: "3.9"
+
+services:
+  chromadb:
+    image: chromadb/chroma:0.5.5
+    restart: unless-stopped
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      IS_PERSISTENT: "TRUE"
+      PERSIST_DIRECTORY: /chroma/chroma
+      ANONYMIZED_TELEMETRY: "FALSE"
+      CHROMA_SERVER_CORS_ALLOW_ORIGINS: '["https://aara.vercel.app"]'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  chroma_data:
