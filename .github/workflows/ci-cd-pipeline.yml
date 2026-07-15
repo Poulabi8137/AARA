@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -104,7 +104,7 @@ jobs:
       ENCRYPTION_KEY: ci-quality-gates-encryption-key
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -241,7 +241,7 @@ jobs:
     needs: quality-gates
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js with cache
         uses: actions/setup-node@v4
@@ -289,7 +289,7 @@ jobs:
     needs: cache-dependencies
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -335,7 +335,7 @@ jobs:
     needs: generate-artifacts
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Download frontend artifact
         uses: actions/download-artifact@v4
@@ -389,7 +389,7 @@ jobs:
     needs: validate-docker
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Generate release build info
         run: |
