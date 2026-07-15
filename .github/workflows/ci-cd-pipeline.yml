@@ -178,7 +178,7 @@ jobs:
           cat npm-audit-report.json
 
       - name: Upload vulnerability reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: vulnerability-reports
           path: |
@@ -316,14 +316,14 @@ jobs:
           echo "Backend build artifact generated"
 
       - name: Upload frontend artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: frontend-build
           path: artifacts/frontend/
           retention-days: 7
 
       - name: Upload backend artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: backend-build
           path: artifacts/backend/
@@ -377,7 +377,7 @@ jobs:
           EOF
 
       - name: Upload validation report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: docker-validation
           path: validation-reports/
@@ -430,7 +430,7 @@ jobs:
           zip -r deployment-artifacts.zip ./* 2>/dev/null || true
 
       - name: Upload deployment artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: deployment-artifacts
           path: deployment-artifacts/
@@ -502,7 +502,7 @@ jobs:
           echo "CI validation report generated"
 
       - name: Upload validation report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ci-validation-report
           path: validation-reports/
