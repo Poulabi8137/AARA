@@ -31,7 +31,7 @@ jobs:
           filename: load-testing/${{ github.event.inputs.test_type }}.js
           flags: -e BASE_URL=${{ github.event.inputs.target_url }}
       - name: Upload results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: k6-results
           path: load-testing/*.json
